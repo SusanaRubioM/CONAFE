@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # app_conafe
 
 A new Flutter project.
@@ -14,3 +15,7 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+=======
+# CONAFE
+proyecto de formulación y evaluación de proyectos, 7bv1
+>>>>>>> 3b92c4982b13e0432498ca2be493904176437f6a
