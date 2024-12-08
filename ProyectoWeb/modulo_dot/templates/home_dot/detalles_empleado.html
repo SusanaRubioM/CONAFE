@@ -1,0 +1,50 @@
+<!-- detalles_empleado.html -->
+{% extends "base.html" %}
+
+{% block title %}Detalles del Empleado{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-start mb-3">
+        <a href="{% url 'dot_home:home_dot' %}" class="btn btn-warning" style="background-color: #620b0b; color:white" >Menu</a>
+    </div>
+<div class="container mt-5">
+    <h2>Detalles del Empleado</h2>
+    
+    <div class="row">
+        <!-- Columna para los detalles del empleado -->
+        <div class="col-md-8">
+            <p><strong>Nombre:</strong> {{ empleado.nombre }}</p>
+            <p><strong>Apellido Paterno:</strong> {{ empleado.apellidopa }}</p>
+            <p><strong>Apellido Materno:</strong> {{ empleado.apellidoma }}</p>
+            <p><strong>Email:</strong> {{ empleado.email }}</p>
+            <p><strong>Edad:</strong> {{ empleado.edad }}</p>
+            <p><strong>Género:</strong> {{ empleado.genero }}</p>
+            <p><strong>Salario:</strong> {{ empleado.salario }}</p>
+            <p><strong>Rol:</strong> {{ empleado.rol }}</p>
+            
+            <!-- Mostrar datos del usuario asociado -->
+            <p><strong>Usuario:</strong> {{ empleado.usuario.username }}</p>
+
+            <!-- Si el campo contrasenia está en el modelo Empleado, usa esta línea: -->
+            {% if empleado.contrasenia %}
+                <p><strong>contraseña:</strong> {{ empleado.contrasenia }}</p>
+            {% else %}
+                <p><strong>contraseña:</strong> {{ "La contraseña está cifrada y no se puede mostrar" }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Columna para la foto -->
+        <div class="col-md-4">
+            {% if empleado.foto %}
+                <img src="{{ empleado.foto.url }}" alt="Foto de {{ empleado.nombre }}" class="img-fluid rounded-circle">
+            {% else %}
+                <p>No hay foto disponible</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+

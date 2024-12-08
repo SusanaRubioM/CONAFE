@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Home Director{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4 text-center">Home Director</h2>
+  <p class="text-center">Bienvenido Director!</p>
+  <div class="row text-center">
+    <!-- Botón Agregar -->
+    <div class="col-md-4 mb-4">
+      <a href="{% url 'dot_home:home_agregar' %}" class="btn btn-primary btn-block">
+        <i class="fas fa-plus"></i> Agregar
+      </a>
+    </div>
+
+     <!-- Botón Visualizar -->
+     <div class="col-md-4 mb-4">
+      <a href="{% url 'dot_home:dashboard_visualizar' %}" class="btn btn-primary btn-block">
+        <i class="fas fa-eye"></i> Visualizar
+      </a>
+    </div>
+
+
+    <!-- Botón Modificar -->
+    <div class="col-md-4 mb-4">
+      <a href="{% url 'dot_home:dashboard_modificar' %}" class="btn btn-warning btn-block">
+        <i class="fas fa-edit"></i> Modificar
+      </a>>
+    </div>
+
+    <!-- Botón Status -->
+    <div class="col-md-4 mb-4">
+      <button class="btn btn-success btn-block">
+        <i class="fas fa-users"></i> Status
+      </button>
+    </div>
+    
+    <!-- Botón Eliminar -->
+    <div class="col-md-4 mb-4">
+      <button class="btn btn-danger btn-block">
+        <i class="fas"></i> Asignacion
+      </button>
+    </div>
+   
+
+    <!-- Botón Documentación -->
+    <div class="col-md-4 mb-4">
+      <button class="btn btn-secondary btn-block">
+        <i class="fas fa-file-alt"></i> Documentación
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock %}

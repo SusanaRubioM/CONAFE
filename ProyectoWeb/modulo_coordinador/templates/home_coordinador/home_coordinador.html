@@ -1,0 +1,53 @@
+{% extends "base.html" %} <!-- Extiende una plantilla base para consistencia en el diseño -->
+
+{% block title %}Dashboard Coordinador{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4 text-center">Home Coordinador</h2>
+  <p class="text-center">Bienvenido Coordinador!</p>
+  <div class="row text-center">
+    <!-- Botón Crear y enviar plan de captación -->
+    <div class="col-md-4 mb-4">
+      <a href="#" class="btn btn-primary btn-block">
+        <i class="fas fa-file-signature"></i> Crear y Enviar Plan de Captación
+      </a>
+    </div>
+
+    <!-- Botón Recibir registros de nuevos EC -->
+    <div class="col-md-4 mb-4">
+      <a href="{% url 'coordinador_home:dashboard_aspirante' %}" class="btn btn-info btn-block">
+        <i class="fas fa-file-import"></i> Recibir Registros de Aspirantes
+      </a>
+    </div>
+
+    <!-- Botón Seleccionar nuevos EC, ECA y ECAR -->
+    <div class="col-md-4 mb-4">
+      <a href="#" class="btn btn-success btn-block">
+        <i class="fas fa-user-check"></i> Seleccionar Nuevos EC, ECA y ECAR
+      </a>
+    </div>
+
+    <!-- Botón Visualizar datos de figuras educativas -->
+    <div class="col-md-4 mb-4">
+      <a href="#" class="btn btn-secondary btn-block">
+        <i class="fas fa-database"></i> Visualizar Altas de Figuras Educativas
+      </a>
+    </div>
+
+    <!-- Botón Visualizar y gestionar microrregiones y regiones -->
+    <div class="col-md-4 mb-4">
+      <a href="#" class="btn btn-warning btn-block">
+        <i class="fas fa-map-marked-alt"></i> Gestionar Microrregiones y Regiones
+      </a>
+    </div>
+
+    <!-- Botón Asignar EC, ECA y ECAR a zonas -->
+    <div class="col-md-4 mb-4">
+      <a href="#" class="btn btn-danger btn-block">
+        <i class="fas fa-map-pin"></i> Asignar EC, ECA y ECAR a Zonas
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

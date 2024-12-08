@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Detalles del Aspirante{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Botón para regresar al menú -->
+    <div class="d-flex justify-content-start mb-3">
+        <a href="{% url 'coordinador_home:dashboard_aspirante' %}" class="btn btn-warning" style="background-color: #620b0b; color: white;">Regresar</a>
+    </div>
+
+    <h2 class="text-center">Detalles del Aspirante</h2>
+
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header text-white" style="background-color: #620b0b">Información Personal</div>
+                <div class="card-body">
+                    <p><strong>Nombre:</strong> {{ aspirante.nombre }} {{ aspirante.apellido_paterno }} {{ aspirante.apellido_materno }}</p>
+                    <p><strong>Correo:</strong> {{ aspirante.correo }}</p>
+                    <p><strong>Teléfono:</strong> {{ aspirante.telefono }}</p>
+                    <p><strong>Rol:</strong> {{ aspirante.rol }}</p>
+                </div>
+            </div>
+
+            {% if aspirante.residencias.all %}
+            <div class="card mb-4">
+              <div class="card-header text-white" style="background-color: #620b0b">Residencia</div>
+                <div class="card-body">
+                    {% for residencia in aspirante.residencias.all %}
+                    <p><strong>Estado:</strong> {{ residencia.estado }}</p>
+                    <p><strong>Municipio:</strong> {{ residencia.municipio }}</p>
+                    <p><strong>Localidad:</strong> {{ residencia.localidad }}</p>
+                    <p><strong>Colonia:</strong> {{ residencia.colonia }}</p>
+                    <p><strong>Código Postal:</strong> {{ residencia.codigo_postal }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if aspirante.formaciones_academicas.all %}
+            <div class="card mb-4">
+              <div class="card-header text-white" style="background-color: #620b0b">Formación Académica</div>
+                <div class="card-body">
+                    {% for formacion in aspirante.formaciones_academicas.all %}
+                    <p><strong>Nivel Académico:</strong> {{ formacion.nivel_academico }}</p>
+                    <p><strong>¿Habla lengua indígena?:</strong> {{ formacion.habla_lengua_indigena|yesno:"Sí,No" }}</p>
+                    <p><strong>Certificado/Constancia:</strong> 
+                        <a href="{{ formacion.certificado_constancia.url }}" target="_blank">Descargar</a>
+                    </p>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Columna secundaria para la foto -->
+        <div class="col-md-4 text-center">
+            {% if aspirante.documentos.all %}
+                {% for documento in aspirante.documentos.all %}
+                    {% if documento.fotografia %}
+                        <img src="{{ documento.fotografia.url }}" alt="Fotografía del aspirante" class="img-thumbnail" style="max-width: 150px;">
+                    {% endif %}
+                {% empty %}
+                    <p>No hay foto disponible</p>
+                {% endfor %}
+            {% else %}
+                <p>No hay documentos asociados</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Información adicional -->
+    {% if aspirante.informaciones_adicionales.all %}
+    <div class="card mb-4">
+      <div class="card-header text-white" style="background-color: #620b0b">Información Adicional</div>
+        <div class="card-body">
+            {% for info in aspirante.informaciones_adicionales.all %}
+            <p><strong>Banco:</strong> {{ info.banco }}</p>
+            <p><strong>Cuenta Bancaria:</strong> {{ info.cuenta_bancaria }}</p>
+            <p><strong>Talla Playera:</strong> {{ info.talla_playera }}</p>
+            <p><strong>Talla Pantalón:</strong> {{ info.talla_pantalon }}</p>
+            <p><strong>Talla Calzado:</strong> {{ info.talla_calzado }}</p>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Documentos -->
+    {% if aspirante.documentos.all %}
+    <div class="card mb-4">
+      <div class="card-header text-white" style="background-color: #620b0b">Documentos</div>
+        <div class="card-body">
+            {% for documento in aspirante.documentos.all %}
+            <p><strong>Identificación Oficial:</strong> 
+                <a href="{{ documento.identificacion_oficial.url }}" target="_blank">Ver Documento</a>
+            </p>
+            <p><strong>Comprobante de Domicilio:</strong> 
+                <a href="{{ documento.comprobante_domicilio.url }}" target="_blank">Ver Documento</a>
+            </p>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

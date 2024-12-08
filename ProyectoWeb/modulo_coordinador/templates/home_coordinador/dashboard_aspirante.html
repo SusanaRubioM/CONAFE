@@ -1,0 +1,50 @@
+{% extends "base.html" %} <!-- Extiende una plantilla base para consistencia en el diseño -->
+
+{% block title %}Dashboard Aspirante{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="d-flex justify-content-start mb-3">
+    <a href="{% url 'coordinador_home:home_coordinador' %}" class="btn btn-warning" style="background-color: #620b0b; color:white" >Menu</a>
+</div>
+  <h2 class="mb-4 text-center">Aspirantes Registrados</h2>
+  
+  <table class="table table-striped table-bordered">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Nombre</th>
+        <th>Residencia</th>
+        <th>Correo</th>
+        <th>Teléfono</th>
+        <th>Rol</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for aspirante in aspirantes %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ aspirante.nombre }} {{ aspirante.apellido_paterno }} {{ aspirante.apellido_materno }}</td>
+        <td>
+          {% for residencia in aspirante.residencias.all %}
+            {{ residencia.estado }}, {{ residencia.municipio }}, {{ residencia.localidad }}, {{ residencia.colonia }}
+          {% endfor %}
+        </td>
+        <td>{{ aspirante.correo }}</td>
+        <td>{{ aspirante.telefono }}</td>
+        <td>{{ aspirante.rol }}</td>
+        <td>
+          <a href="{% url 'coordinador_home:detalles_aspirante' aspirante.id %}" class="btn btn-primary btn-sm">Ver Detalles</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="7" class="text-center">No hay aspirantes registrados.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+

@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Modificar Información del Empleado{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-start mb-3">
+        <a href="{% url 'dot_home:home_dot' %}" class="btn btn-warning" style="background-color: #620b0b; color:white" >Menu</a>
+    </div>
+<div class="container mt-5">
+    <h2>Modificar Información del Empleado</h2>
+    <form method="POST">
+        {% csrf_token %}
+        
+        <!-- Campo Nombre -->
+        <div class="form-group">
+            <label for="nombre">Nombre</label>
+            <input 
+                type="text" 
+                class="form-control" 
+                id="nombre" 
+                name="nombre" 
+                value="{{ empleado.nombre }}" 
+                required>
+        </div>
+        
+        <!-- Campo Apellido Paterno -->
+        <div class="form-group">
+            <label for="apellidopa">Apellido Paterno</label>
+            <input 
+                type="text" 
+                class="form-control" 
+                id="apellidopa" 
+                name="apellidopa" 
+                value="{{ empleado.apellidopa }}" 
+                required>
+        </div>
+        
+        <!-- Campo Apellido Materno -->
+        <div class="form-group">
+            <label for="apellidoma">Apellido Materno</label>
+            <input 
+                type="text" 
+                class="form-control" 
+                id="apellidoma" 
+                name="apellidoma" 
+                value="{{ empleado.apellidoma }}" 
+                required>
+        </div>
+        
+        <!-- Campo Email -->
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input 
+                type="email" 
+                class="form-control" 
+                id="email" 
+                name="email" 
+                value="{{ empleado.email }}" 
+                required>
+        </div>
+
+        <!-- Campo Selección de Rol -->
+        <div class="form-group">
+            <label for="rol">Rol del Empleado</label>
+            <select 
+                id="rol" 
+                name="rol" 
+                class="form-control" 
+                required>
+                <option value="">Selecciona el Rol</option>
+                <option value="DOT" {% if empleado.rol == "DOT" %}selected{% endif %}>
+                    Director de Operaciones y Tecnología
+                </option>
+                <option value="CT" {% if empleado.rol == "CT" %}selected{% endif %}>
+                    Coordinador Territorial
+                </option>
+                <option value="EC" {% if empleado.rol == "EC" %}selected{% endif %}>
+                    Educador Comunitario
+                </option>
+                <option value="ECA" {% if empleado.rol == "ECA" %}selected{% endif %}>
+                    Educador Comunitario de Acompañamiento Microrregional
+                </option>
+                <option value="ECAR" {% if empleado.rol == "ECAR" %}selected{% endif %}>
+                    Educador Comunitario de Acompañamiento Regional
+                </option>
+                <option value="APEC" {% if empleado.rol == "APEC" %}selected{% endif %}>
+                    Asesor de Promoción y Educación Comunitaria
+                </option>
+                <option value="DEP" {% if empleado.rol == "DEP" %}selected{% endif %}>
+                    Desarrollo Educativo Profesional
+                </option>
+            </select>
+        </div>
+
+        <!-- Campo Nombre de Usuario -->
+        <div class="form-group">
+            <label for="username">Nombre de Usuario</label>
+            <input 
+                type="text" 
+                id="username" 
+                name="username" 
+                class="form-control" 
+                value="{{ empleado.usuario.username }}" 
+                placeholder="Nombre de Usuario" 
+                required>
+        </div>
+
+        <!-- Campo Contraseña -->
+        <div class="form-group">
+            <label for="password">Contraseña</label>
+            <div class="input-group">
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    class="form-control" 
+                    value="{{ empleado.contrasenia }}" 
+                    placeholder="Contraseña (solo si deseas cambiarla)">
+                <div class="input-group-append">
+                    <button 
+                        class="btn btn-outline-secondary" 
+                        type="button" 
+                        id="togglePassword">
+                        Mostrar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botón de Envío -->
+        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+    </form>
+</div>
+
+<!-- Script para mostrar/ocultar contraseña -->
+<script>
+    document.getElementById("togglePassword").addEventListener("click", function () {
+        const passwordInput = document.getElementById("password");
+        const passwordType = passwordInput.getAttribute("type");
+        
+        if (passwordType === "password") {
+            passwordInput.setAttribute("type", "text");
+            this.textContent = "Ocultar";
+        } else {
+            passwordInput.setAttribute("type", "password");
+            this.textContent = "Mostrar";
+        }
+    });
+</script>
+{% endblock %}
+
+
+
