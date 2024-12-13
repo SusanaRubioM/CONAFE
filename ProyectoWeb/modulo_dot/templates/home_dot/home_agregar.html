@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 
-{% block title %}Agregar Nuevo Empleado{% endblock %}
+{% block title %}Agregar Nuevo Usuario{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-  <div class="container mt-5">
-    <div class="d-flex justify-content-start mb-3">
-        <a href="{% url 'dot_home:home_dot' %}" class="btn btn-warning" style="background-color: #620b0b; color:white" >Menu</a>
-    </div>
-  <h2 class="text-center mb-4">Agregar Nuevo Empleado</h2>
+  <div class="d-flex justify-content-start mb-3">
+    <a href="{% url 'dot_home:home_dot' %}" class="btn btn-warning" style="background-color: #620b0b; color:white">Menú</a>
+  </div>
+
+  <h2 class="text-center mb-4">Agregar Nuevo Usuario</h2>
 
   <!-- Bloque para mostrar los mensajes -->
   {% if messages %}
@@ -24,44 +24,39 @@
   <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="row">
-      <!-- Nombre del Empleado -->
+      <!-- Nombre del Usuario -->
       <div class="col-md-6 mb-3">
-        <label for="nombre">Nombre del Empleado</label>
-        <input type="text" id="nombre" name="nombre" class="form-control" placeholder="Nombre del Empleado" required>
+        <label for="nombre">Nombre</label>
+        <input type="text" id="nombre" name="nombre" class="form-control" placeholder="Nombre del Usuario" required>
       </div>
 
-      <!-- Apellido del Empleado -->
+      <!-- Apellido Paterno -->
       <div class="col-md-6 mb-3">
-        <label for="apellido">Apellido Paterno del Empleado</label>
-        <input type="text" id="apellidopa" name="apellidopa" class="form-control" placeholder="Apellido Paterno del Empleado" required>
+        <label for="apellidopa">Apellido Paterno</label>
+        <input type="text" id="apellidopa" name="apellidopa" class="form-control" placeholder="Apellido Paterno" required>
       </div>
 
-       <!-- Apellido del Empleado -->
-       <div class="col-md-6 mb-3">
-        <label for="apellido">Apellido Materno del Empleado</label>
-        <input type="text" id="apellidoma" name="apellidoma" class="form-control" placeholder="Apellido Materno del Empleado" required>
+      <!-- Apellido Materno -->
+      <div class="col-md-6 mb-3">
+        <label for="apellidoma">Apellido Materno</label>
+        <input type="text" id="apellidoma" name="apellidoma" class="form-control" placeholder="Apellido Materno" required>
       </div>
 
-      <!-- Email del Empleado -->
+      <!-- Correo Electrónico -->
       <div class="col-md-6 mb-3">
-        <label for="email">Email del Empleado</label>
-        <input type="email" id="email" name="email" class="form-control" placeholder="Email del Empleado" required>
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" class="form-control" placeholder="Email del Usuario" required>
       </div>
 
-      <!-- Edad del Empleado -->
+      <!-- Edad -->
       <div class="col-md-6 mb-3">
-        <label for="edad">Edad del Empleado</label>
-        <select id="edad" name="edad" class="form-control" required>
-          <option value="">Selecciona la edad</option>
-          {% for i in edades %}
-            <option value="{{ i }}">{{ i }}</option>
-          {% endfor %}
-        </select>
+        <label for="edad">Edad</label>
+        {{ datos_personales_form.edad }}
       </div>
 
-      <!-- Género del Empleado -->
+      <!-- Género -->
       <div class="col-md-6 mb-3">
-        <label for="genero">Género del Empleado</label><br>
+        <label for="genero">Género</label><br>
         <div class="form-check form-check-inline">
           <input class="form-check-input" type="radio" name="genero" id="masculino" value="Masculino" checked>
           <label class="form-check-label" for="masculino">Masculino</label>
@@ -76,29 +71,26 @@
         </div>
       </div>
 
-      <!-- Salario del Empleado -->
+      <!-- Formación Académica -->
       <div class="col-md-6 mb-3">
-        <label for="salario">Salario del Empleado</label>
-        <input type="number" id="salario" name="salario" class="form-control" placeholder="Salario del Empleado" required>
+        <label for="formacion_academica">Formación Académica</label>
+        <select name="formacion_academica" class="form-control" id="formacion_academica">
+          <option value="preparatoria">Preparatoria</option>
+          <option value="tecnica">Tecnica</option>
+          <option value="universidad">Universidad</option>
+        </select>
       </div>
 
-      <!-- Foto y Rol del Empleado (En la misma fila) -->
+      <!-- CURP -->
       <div class="col-md-6 mb-3">
-        <label for="foto">Cargar Foto del Empleado</label>
-        <input type="file" id="foto" name="foto" class="form-control-file">
+        <label for="curp">CURP</label>
+        <input type="text" id="curp" name="curp" class="form-control" placeholder="CURP del Usuario" required>
       </div>
+
+      <!-- Foto -->
       <div class="col-md-6 mb-3">
-        <label for="rol">Rol del Empleado</label>
-        <select id="rol" name="rol" class="form-control" required>
-          <option value="">Selecciona el Rol</option>
-          <option value="DOT">Director de Operaciones y Tecnología</option>
-          <option value="CT">Coordinador Territorial</option>
-          <option value="EC">Educador Comunitario</option>
-          <option value="ECA">Educador Comunitario de Acompañamiento Microrregional</option>
-          <option value="ECAR">Educador Comunitario de Acompañamiento Regional</option>
-          <option value="APEC">Asesor de Promoción y Educación Comunitaria</option>
-          <option value="DEP">Desarrollo Educativo Profesional</option>
-        </select>
+        <label for="fotografia">Foto del Usuario</label>
+        <input type="file" id="fotografia" name="fotografia" class="form-control-file">
       </div>
 
       <!-- Campos de Usuario y Contraseña -->
@@ -112,16 +104,49 @@
         <input type="password" id="password" name="password" class="form-control" placeholder="Contraseña" required>
       </div>
 
+      <!-- Rol del Usuario -->
+      <div class="col-md-6 mb-3">
+        <label for="rol">Rol</label>
+        <select id="rol" name="rol" class="form-control" required>
+          <option value="">Selecciona el Rol</option>
+          <option value="CT">Coordinador Territorial</option>
+          <option value="DECB">Dirección de Educación Comunitaria e Inclusión Social</option>
+          <option value="DPE">Dirección de Planeación y Evaluación</option>
+          <option value="EC">Educador Comunitario</option>
+          <option value="ECA">Educador Comunitario de Acompañamiento Microrregional</option>
+          <option value="ECAR">Educador Comunitario de Acompañamiento Regional</option>
+          <option value="APEC">Asesor de Promoción y Educación Comunitaria</option>
+        </select>
+      </div>
+
+      <!-- Documentos Personales -->
+      <div class="col-md-6 mb-3">
+        <label for="identificacion_oficial">Identificación Oficial</label>
+        <input type="file" id="identificacion_oficial" name="identificacion_oficial" class="form-control-file" required>
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label for="comprobante_domicilio">Comprobante de Domicilio</label>
+        <input type="file" id="comprobante_domicilio" name="comprobante_domicilio" class="form-control-file" required>
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label for="certificado_estudio">Certificado de Estudio</label>
+        <input type="file" id="certificado_estudio" name="certificado_estudio" class="form-control-file" required>
+      </div>
+
       <!-- Botón de envío -->
       <div class="col-md-12 text-center">
         <button type="submit" class="btn btn-success btn-block" style="background-color: #620b0b">  
-          Registrar Empleado <i class="fas fa-check-circle"></i>
+          Registrar Usuario <i class="fas fa-check-circle"></i>
         </button>
       </div>
     </div>
   </form>
 </div>
 {% endblock %}
+
+
 
 
 
