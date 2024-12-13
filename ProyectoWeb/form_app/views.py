@@ -86,6 +86,4 @@ def form_view(request):
 def confirmacion(request):
     # Renderiza una página de confirmación con un mensaje adecuado
     return render(request, 'app_form/confirmacion.html')
-        
-
 
