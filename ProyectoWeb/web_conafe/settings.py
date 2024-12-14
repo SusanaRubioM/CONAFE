@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import socket
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -79,17 +79,40 @@ WSGI_APPLICATION = 'web_conafe.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'HOST': '34.118.149.167',  # IP pública de la base de datos
-        'PORT': '3306',             # Puerto configurado
-        'NAME': 'conafe_motor',
-        'USER': 'root',
-        'PASSWORD': '1234567890',
+# Detectar si la conexión es local o remota
+try:
+    # Verifica si puedes acceder a la IP pública de Google Cloud
+    socket.create_connection(("34.118.149.167", 3306), timeout=1)
+    is_online = True
+except OSError:
+    is_online = False
+
+if is_online:
+    # Configuración para Google Cloud
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'HOST': '34.118.149.167',  # IP pública de Google Cloud
+            'PORT': '3306',             # Puerto configurado
+            'NAME': 'conafe_motor',
+            'USER': 'root',
+            'PASSWORD': '1234567890',
+        }
     }
-}
-print("conexion exitosa a google-cloud")
+    print("Connected a Google Cloud Database")
+else:
+    # Configuración para base de datos local (ejemplo: MySQL local)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'HOST': '127.0.0.1',       # IP local
+            'PORT': '3306',            # Puerto local
+            'NAME': 'conafe_motor',
+            'USER': 'root',
+            'PASSWORD': '1234567890',  # Cambia a tu contraseña local
+        }
+    }
+    print("Connected a Local Database")
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
