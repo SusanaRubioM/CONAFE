@@ -83,7 +83,7 @@ def agregar_trabajador(request):
         documentos_form = DocumentosPersonalesForm()
 
     usuario = usuario_form.save(commit=False)
-    if not usuario.usuario:
+    if  usuario.usuario:
         print("El campo 'usuario' está vacío")
         messages.error(request, "El nombre de usuario no puede estar vacío.")
                    
