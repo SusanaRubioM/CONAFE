@@ -26,118 +26,217 @@
     <div class="row">
       <!-- Nombre del Usuario -->
       <div class="col-md-6 mb-3">
-        <label for="nombre">Nombre</label>
-        <input type="text" id="nombre" name="nombre" class="form-control" placeholder="Nombre del Usuario" required>
+        <label for="id_nombre">Nombre</label>
+        {{ datos_personales_form.nombre }}
+        {% if datos_personales_form.nombre.errors %}
+          <div class="alert alert-danger">
+            {% for error in datos_personales_form.nombre.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
       </div>
 
       <!-- Apellido Paterno -->
       <div class="col-md-6 mb-3">
-        <label for="apellidopa">Apellido Paterno</label>
-        <input type="text" id="apellidopa" name="apellidopa" class="form-control" placeholder="Apellido Paterno" required>
+        <label for="id_apellidopa">Apellido Paterno</label>
+        {{ datos_personales_form.apellidopa }}
+        {% if datos_personales_form.apellidopa.errors %}
+          <div class="alert alert-danger">
+            {% for error in datos_personales_form.apellidopa.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
       </div>
 
       <!-- Apellido Materno -->
       <div class="col-md-6 mb-3">
-        <label for="apellidoma">Apellido Materno</label>
-        <input type="text" id="apellidoma" name="apellidoma" class="form-control" placeholder="Apellido Materno" required>
+        <label for="id_apellidoma">Apellido Materno</label>
+        {{ datos_personales_form.apellidoma }}
+        {% if datos_personales_form.apellidoma.errors %}
+          <div class="alert alert-danger">
+            {% for error in datos_personales_form.apellidoma.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
       </div>
 
       <!-- Correo Electrónico -->
       <div class="col-md-6 mb-3">
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" class="form-control" placeholder="Email del Usuario" required>
+        <label for="id_correo">Email</label>
+        {{ datos_personales_form.correo }}
+        {% if datos_personales_form.correo.errors %}
+          <div class="alert alert-danger">
+            {% for error in datos_personales_form.correo.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Teléfono -->
+      <div class="col-md-6 mb-3">
+        <label for="id_telefono">Teléfono</label>
+        {{ datos_personales_form.telefono }}
+        {% if datos_personales_form.telefono.errors %}
+          <div class="alert alert-danger">
+            {% for error in datos_personales_form.telefono.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
       </div>
 
       <!-- Edad -->
       <div class="col-md-6 mb-3">
-        <label for="edad">Edad</label>
+        <label for="id_edad">Edad</label>
         {{ datos_personales_form.edad }}
+        {% if datos_personales_form.edad.errors %}
+          <div class="alert alert-danger">
+            {% for error in datos_personales_form.edad.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
       </div>
 
-      <!-- Género -->
+  <!-- Género -->
       <div class="col-md-6 mb-3">
-        <label for="genero">Género</label><br>
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" name="genero" id="masculino" value="Masculino" checked>
-          <label class="form-check-label" for="masculino">Masculino</label>
-        </div>
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" name="genero" id="femenino" value="Femenino">
-          <label class="form-check-label" for="femenino">Femenino</label>
-        </div>
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" name="genero" id="otro" value="Otro">
-          <label class="form-check-label" for="otro">Otro</label>
-        </div>
+          <label for="id_sexo">Género</label>
+          <div class="form-check form-check-inline">
+              {{ datos_personales_form.sexo }}
+              {% if datos_personales_form.sexo.errors %}
+                  <div class="alert alert-danger">
+                      {% for error in datos_personales_form.sexo.errors %}
+                          <p>{{ error }}</p>
+                      {% endfor %}
+                  </div>
+              {% endif %}
+          </div>
       </div>
 
       <!-- Formación Académica -->
       <div class="col-md-6 mb-3">
-        <label for="formacion_academica">Formación Académica</label>
-        <select name="formacion_academica" class="form-control" id="formacion_academica">
-          <option value="preparatoria">Preparatoria</option>
-          <option value="tecnica">Tecnica</option>
-          <option value="universidad">Universidad</option>
-        </select>
+        <label for="id_formacion_academica">Formación Académica</label>
+        {{ datos_personales_form.formacion_academica }}
+        {% if datos_personales_form.formacion_academica.errors %}
+          <div class="alert alert-danger">
+            {% for error in datos_personales_form.formacion_academica.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
       </div>
 
       <!-- CURP -->
       <div class="col-md-6 mb-3">
-        <label for="curp">CURP</label>
-        <input type="text" id="curp" name="curp" class="form-control" placeholder="CURP del Usuario" required>
+        <label for="id_curp">CURP</label>
+        {{ datos_personales_form.curp }}
+        {% if datos_personales_form.curp.errors %}
+          <div class="alert alert-danger">
+            {% for error in datos_personales_form.curp.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
       </div>
 
       <!-- Foto -->
       <div class="col-md-6 mb-3">
-        <label for="fotografia">Foto del Usuario</label>
-        <input type="file" id="fotografia" name="fotografia" class="form-control-file">
+        <label for="id_fotografia">Foto del Usuario</label>
+        {{ datos_personales_form.fotografia }}
+        {% if datos_personales_form.fotografia.errors %}
+          <div class="alert alert-danger">
+            {% for error in datos_personales_form.fotografia.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
       </div>
 
-      <!-- Campos de Usuario y Contraseña -->
+      <!-- Nombre de Usuario -->
       <div class="col-md-6 mb-3">
-        <label for="username">Nombre de Usuario</label>
-        <input type="text" id="username" name="username" class="form-control" placeholder="Nombre de Usuario" required>
+        <label for="id_usuario">Nombre de Usuario</label>
+        {{ usuario_form.usuario }}
+        {% if usuario_form.usuario.errors %}
+          <div class="alert alert-danger">
+            {% for error in usuario_form.usuario.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
       </div>
 
+      <!-- Contraseña -->
       <div class="col-md-6 mb-3">
-        <label for="password">Contraseña</label>
-        <input type="password" id="password" name="password" class="form-control" placeholder="Contraseña" required>
+        <label for="id_contrasenia">Contraseña</label>
+        {{ usuario_form.contrasenia }}
+        {% if usuario_form.contrasenia.errors %}
+          <div class="alert alert-danger">
+            {% for error in usuario_form.contrasenia.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
       </div>
 
-      <!-- Rol del Usuario -->
+      
       <div class="col-md-6 mb-3">
-        <label for="rol">Rol</label>
+        <label for="rol">Rol del Empleado</label>
         <select id="rol" name="rol" class="form-control" required>
           <option value="">Selecciona el Rol</option>
+          <option value="DOT">Director de Operaciones y Tecnología</option>
           <option value="CT">Coordinador Territorial</option>
-          <option value="DECB">Dirección de Educación Comunitaria e Inclusión Social</option>
-          <option value="DPE">Dirección de Planeación y Evaluación</option>
           <option value="EC">Educador Comunitario</option>
           <option value="ECA">Educador Comunitario de Acompañamiento Microrregional</option>
           <option value="ECAR">Educador Comunitario de Acompañamiento Regional</option>
           <option value="APEC">Asesor de Promoción y Educación Comunitaria</option>
+          <option value="DEP">Desarrollo Educativo Profesional</option>
         </select>
       </div>
 
-      <!-- Documentos Personales -->
+            <!-- Documentos Personales -->
       <div class="col-md-6 mb-3">
-        <label for="identificacion_oficial">Identificación Oficial</label>
-        <input type="file" id="identificacion_oficial" name="identificacion_oficial" class="form-control-file" required>
+        <label for="id_identificacion_oficial">Identificación Oficial</label>
+        {{ documentos_personales_form.identificacion_oficial }}
+        {% if documentos_personales_form.identificacion_oficial.errors %}
+          <div class="alert alert-danger">
+            {% for error in documentos_personales_form.identificacion_oficial.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
       </div>
 
       <div class="col-md-6 mb-3">
-        <label for="comprobante_domicilio">Comprobante de Domicilio</label>
-        <input type="file" id="comprobante_domicilio" name="comprobante_domicilio" class="form-control-file" required>
+        <label for="id_comprobante_domicilio">Comprobante de Domicilio</label>
+        {{ documentos_personales_form.comprobante_domicilio }}
+        {% if documentos_personales_form.comprobante_domicilio.errors %}
+          <div class="alert alert-danger">
+            {% for error in documentos_personales_form.comprobante_domicilio.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
       </div>
 
       <div class="col-md-6 mb-3">
-        <label for="certificado_estudio">Certificado de Estudio</label>
-        <input type="file" id="certificado_estudio" name="certificado_estudio" class="form-control-file" required>
+        <label for="id_certificado_estudio">Certificado de Estudio</label>
+        {{ documentos_personales_form.certificado_estudio }}
+        {% if documentos_personales_form.certificado_estudio.errors %}
+          <div class="alert alert-danger">
+            {% for error in documentos_personales_form.certificado_estudio.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
       </div>
 
       <!-- Botón de envío -->
       <div class="col-md-12 text-center">
-        <button type="submit" class="btn btn-success btn-block" style="background-color: #620b0b">  
+        <button type="submit" class="btn btn-success btn-block" style="background-color: #620b0b">
           Registrar Usuario <i class="fas fa-check-circle"></i>
         </button>
       </div>

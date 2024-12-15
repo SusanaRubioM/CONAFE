@@ -1,3 +1,4 @@
+"""
 from django.db import models
 from django.core.exceptions import ValidationError
 import re
@@ -137,3 +138,4 @@ class Documentos(models.Model):
 
     def __str__(self):
         return f"{self.aspirante} - Documentos"
+"""

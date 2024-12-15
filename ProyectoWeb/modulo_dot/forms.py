@@ -1,106 +1,145 @@
 from django import forms
 from .models import Usuario, DatosPersonales, DocumentosPersonales
 
+# Formulario para el modelo Usuario
 class UsuarioForm(forms.ModelForm):
     class Meta:
         model = Usuario
-        fields = ['usuario', 'contrasenia']
+        fields = ['usuario', 'contrasenia', 'rol']  # Incluir el campo 'rol'
+
+    # Validación personalizada para el campo 'usuario'
+    def clean_usuario(self):
+        usuario = self.cleaned_data.get('usuario')
+        if not usuario:
+            raise forms.ValidationError("El nombre de usuario no puede estar vacío.")
+        return usuario
+
+    # Validación para la contraseña
+    def clean_contrasenia(self):
+        contrasenia = self.cleaned_data.get('contrasenia')
+        if len(contrasenia) < 8:
+            raise forms.ValidationError("La contraseña debe tener al menos 8 caracteres.")
+        return contrasenia
 
     usuario = forms.CharField(
         max_length=255,
         required=True,
         label="Nombre de Usuario",
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre de Usuario'})
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "Nombre de Usuario"}
+        ),
     )
     contrasenia = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Contraseña'}),
+        widget=forms.PasswordInput(
+            attrs={"class": "form-control", "placeholder": "Contraseña"}
+        ),
         min_length=8,
         required=True,
-        label="Contraseña"
+        label="Contraseña",
+    )
+    rol = forms.ChoiceField(
+        choices=[('DOT', 'Director de Operaciones y Tecnología'),
+                 ('CT', 'Coordinador Territorial'),
+                 ('EC', 'Educador Comunitario'),
+                 ('ECA', 'Educador Comunitario de Acompañamiento Microrregional'),
+                 ('ECAR', 'Educador Comunitario de Acompañamiento Regional'),
+                 ('APEC', 'Asesor de Promoción y Educación Comunitaria'),
+                 ('DEP', 'Desarrollo Educativo Profesional')],
+        required=True,
+        label="Rol del Empleado",
+        widget=forms.Select(attrs={"class": "form-control"}),
     )
 
+# Formulario para el modelo DatosPersonales
 class DatosPersonalesForm(forms.ModelForm):
     class Meta:
         model = DatosPersonales
-        fields = ['nombre', 'apellidopa', 'apellidoma', 'edad', 'sexo', 'correo', 'telefono', 
-                  'formacion_academica', 'curp', 'fotografia']
+        fields = [
+            "nombre", "apellidopa", "apellidoma", "edad", "sexo", "correo", 
+            "telefono", "formacion_academica", "curp", "fotografia"
+        ]
 
     nombre = forms.CharField(
         max_length=255,
         required=True,
         label="Nombre",
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del Usuario'})
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "Nombre del Usuario"}
+        ),
     )
     apellidopa = forms.CharField(
         max_length=255,
         required=True,
         label="Apellido Paterno",
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Apellido Paterno'})
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "Apellido Paterno"}
+        ),
     )
     apellidoma = forms.CharField(
         max_length=255,
         required=True,
         label="Apellido Materno",
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Apellido Materno'})
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "Apellido Materno"}
+        ),
     )
 
     EDADES_CHOICES = [(i, str(i)) for i in range(18, 50)]  # Opciones de edad de 18 a 99
-
     edad = forms.ChoiceField(
         choices=EDADES_CHOICES,
         required=True,
         label="Edad",
-        widget=forms.Select(attrs={'class': 'form-control'})
+        widget=forms.Select(attrs={"class": "form-control"}),
     )
 
     sexo = forms.ChoiceField(
-        choices=[('Masculino', 'Masculino'), ('Femenino', 'Femenino'), ('Otro', 'Otro')],
+        choices=[("Masculino", "Masculino"), ("Femenino", "Femenino"), ("Otro", "Otro")],
         required=True,
         label="Género",
-        widget=forms.RadioSelect(attrs={'class': 'form-check-input'})
+        widget=forms.RadioSelect(attrs={"class": "form-check-input"}),
     )
+
     correo = forms.EmailField(
         required=True,
         label="Correo Electrónico",
-        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Correo Electrónico'})
+        widget=forms.EmailInput(attrs={"class": "form-control", "placeholder": "Correo Electrónico"}),
     )
     telefono = forms.CharField(
         max_length=50,
         required=True,
         label="Teléfono",
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Teléfono del Usuario'})
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Teléfono del Usuario"}),
     )
 
-    formacion_academica_CHOICE = [
-    ('preparatoria', 'Preparatoria'),
-    ('tecnica', 'Tecnica'),
-    ('universidad', 'Universidad'),
-    ]
-    
+    formacion_academica_CHOICE = [("preparatoria", "Preparatoria"), ("tecnica", "Técnica"), ("universidad", "Universidad")]
     formacion_academica = forms.ChoiceField(
-
-    choices=formacion_academica_CHOICE,  # Opciones definidas en formacion_academica_CHOICE
-    required=True,
-    label="Formación Académica",
-    widget=forms.Select(attrs={'class': 'form-control', 'placeholder': 'Formación Académica'})  # Usar Select en lugar de TextInput
+        choices=formacion_academica_CHOICE,  
+        required=True,
+        label="Formación Académica",
+        widget=forms.Select(attrs={"class": "form-control", "placeholder": "Formación Académica"}),
     )
-    
+
     curp = forms.CharField(
         max_length=18,
         required=True,
         label="CURP",
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'CURP del Usuario'})
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "CURP del Usuario"}),
     )
     fotografia = forms.ImageField(
         required=False,
         label="Foto del Usuario",
-        widget=forms.ClearableFileInput(attrs={'class': 'form-control-file'})
+        widget=forms.ClearableFileInput(attrs={"class": "form-control-file"}),
     )
 
+# Formulario para el modelo DocumentosPersonales
 class DocumentosPersonalesForm(forms.ModelForm):
     class Meta:
         model = DocumentosPersonales
-        fields = ['identificacion_oficial', 'comprobante_domicilio', 'certificado_estudio']
+        fields = [
+            "identificacion_oficial",
+            "comprobante_domicilio",
+            "certificado_estudio",
+        ]
 
     identificacion_oficial = forms.FileField(required=True, label="Identificación Oficial")
     comprobante_domicilio = forms.FileField(required=True, label="Comprobante de Domicilio")

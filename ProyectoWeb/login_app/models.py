@@ -1,13 +1,16 @@
-# models.py en login_app
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
 from django.contrib.auth.hashers import make_password
 
 class UsuarioRolManager(BaseUserManager):
     def create_user(self, username, password=None, **extra_fields):
+        """
+        Crea y retorna un usuario normal con username y password.
+        """
         if not username:
-            raise ValueError('El usuario debe tener un nombre de usuario')
+            raise ValueError("El usuario debe tener un nombre de usuario")
 
+        # Asegurarse de que is_active esté configurado por defecto
         extra_fields.setdefault('is_active', True)
 
         # Crear el usuario sin encriptar la contraseña
@@ -17,8 +20,11 @@ class UsuarioRolManager(BaseUserManager):
         return user
 
     def create_superuser(self, username, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
+        """
+        Crea y retorna un superusuario.
+        """
+        extra_fields.setdefault('is_staff', True)  # El superusuario debe ser un miembro del staff
+        extra_fields.setdefault('is_superuser', True)  # El superusuario debe ser un superusuario
 
         return self.create_user(username, password, **extra_fields)
 
@@ -28,37 +34,32 @@ class UsuarioRol(AbstractBaseUser):
     first_name = models.CharField(max_length=150, null=True, blank=True)
     last_name = models.CharField(max_length=150, null=True, blank=True)
     email = models.EmailField(max_length=254, null=True, blank=True)
-    is_staff = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)  # Para saber si el usuario es parte del staff
     is_active = models.BooleanField(default=True)
-    is_superuser = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)  # Agregar este campo para el superusuario
     date_joined = models.DateTimeField(auto_now_add=True)
     role = models.CharField(
         max_length=10, 
         choices=[
+            ('ADMIN', 'ADMIN'),
+            ('DOT', 'Director de Operaciones y Tecnología'),
             ('CT', 'Coordinador Territorial'),
-            ('DECB', 'Dirección de Educación Comunitaria e Inclusión Social'),
-            ('DPE', 'Dirección de Planeación y Evaluación'),
             ('EC', 'Educador Comunitario'),
             ('ECA', 'Educador Comunitario de Acompañamiento Microrregional'),
             ('ECAR', 'Educador Comunitario de Acompañamiento Regional'),
             ('APEC', 'Asesor de Promoción y Educación Comunitaria'),
-            ('DOT', 'Dirección de Operación Territorial'),
-            ('ASPIRANTE', 'aspirante'),
-        ]
+            ('DEP', 'Desarrollo Educativo Profesional')
+        ], 
+        default='EC'
     )
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
 
-    objects = UsuarioRolManager()  # Usando el manager personalizado
+    objects = UsuarioRolManager()  # Asignar el manager personalizado
 
     class Meta:
         db_table = 'Usuario_rol'
 
     def __str__(self):
         return self.username
-
-    def save(self, *args, **kwargs):
-        if self.password and not self.password.startswith('$'):
-            self.password = make_password(self.password)  # Encriptar la contraseña
-        super().save(*args, **kwargs)

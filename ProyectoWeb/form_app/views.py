@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .forms import RegistroAspiranteForm
-from .models import Aspirante , FormacionAcademica , InformacionAdicional, Residencia, Participacion, Documentos
+#from .forms import RegistroAspiranteForm
+#from .models import Aspirante , FormacionAcademica , InformacionAdicional, Residencia, Participacion, Documentos
 
 def form_view(request):
+    """
     if request.method == 'POST':
         form = RegistroAspiranteForm(request.POST, request.FILES)
         if form.is_valid():
@@ -79,8 +80,8 @@ def form_view(request):
 
     else:
         form = RegistroAspiranteForm()
-
-    return render(request, 'app_form/template_form.html', {'form': form})
+"""
+    return render(request, 'app_form/template_form.html') #, {'form': form})
 
 
 def confirmacion(request):

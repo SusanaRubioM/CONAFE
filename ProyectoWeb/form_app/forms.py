@@ -1,8 +1,9 @@
 from django import forms
-from .models import Aspirante, FormacionAcademica
-from .models import validate_phone_number  # Suponiendo que hayas definido este validador
-from django.core.validators import RegexValidator
+#from .models import Aspirante, FormacionAcademica
+#from .models import validate_phone_number  # Suponiendo que hayas definido este validador
+#from django.core.validators import RegexValidator
 # Lista de estados mexicanos como constante fuera de la clase
+"""
 ESTADOS_MEXICO = [
     ('aguascalientes', 'Aguascalientes'),
     ('baja_california', 'Baja California'),
@@ -166,7 +167,7 @@ class RegistroAspiranteForm(forms.ModelForm):
             else:
                 field.widget.attrs.update({'class': 'form-control'})
 
-
+"""
 
 
 
