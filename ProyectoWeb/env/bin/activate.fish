@@ -33,7 +33,7 @@ end
 # Unset irrelevant variables.
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV "/home/emma/Escritorio/Projects/Conafe_code/conafe_web/conafe_web/CONAFE/ProyectoWeb/env"
+set -gx VIRTUAL_ENV "/home/emma/Escritorio/Projects/Conafe_code/conafe_web/CONAFE/ProyectoWeb/env"
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/bin" $PATH

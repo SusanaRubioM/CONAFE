@@ -1,4 +1,4 @@
-#!/home/emma/Escritorio/Projects/Conafe_code/conafe_web/conafe_web/CONAFE/ProyectoWeb/env/bin/python
+#!/home/emma/Escritorio/Projects/Conafe_code/conafe_web/CONAFE/ProyectoWeb/env/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys

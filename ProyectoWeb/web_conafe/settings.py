@@ -86,33 +86,33 @@ WSGI_APPLICATION = "web_conafe.wsgi.application"
 try:
     # Verifica si puedes acceder a la IP pública de Google Cloud
     socket.create_connection(("34.118.149.167", 3306), timeout=1)
-    is_online = True
-except OSError:
     is_online = False
+except OSError:
+    is_online = True
 
 if is_online:
     # Configuración para Google Cloud
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'HOST': '34.118.149.167',  # IP pública de Google Cloud
-            'PORT': '3306',             # Puerto configurado
-            'NAME': 'conafe_motor',
-            'USER': 'root',
-            'PASSWORD': '1234567890',
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "HOST": "34.118.149.167",  # IP pública de Google Cloud
+            "PORT": "3306",  # Puerto configurado
+            "NAME": "conafe_motor",
+            "USER": "root",
+            "PASSWORD": "1234567890",
         }
     }
     print("Connected a Google Cloud Database")
 else:
     # Configuración para base de datos local (ejemplo: MySQL local)
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'HOST': '127.0.0.1',       # IP local
-            'PORT': '3306',            # Puerto local
-            'NAME': 'conafe_motor',
-            'USER': 'root',
-            'PASSWORD': '1234567890',  # Cambia a tu contraseña local
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "HOST": "127.0.0.1",  # IP local
+            "PORT": "3306",  # Puerto local
+            "NAME": "conafe_local",
+            "USER": "root",
+            "PASSWORD": "1234567890",  # Cambia a tu contraseña local
         }
     }
     print("Connected a Local Database")
