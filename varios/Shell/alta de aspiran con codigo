@@ -1,0 +1,32 @@
+from modulo_dot.models import Usuario, DatosPersonales, DocumentosPersonales
+
+# Crear un usuario con rol DOT
+usuario = Usuario.objects.create(
+    usuario="DOT",
+    contrasenia="dot",
+    rol="DOT"
+)
+
+# Crear datos personales asociados al usuario
+datos_personales = DatosPersonales.objects.create(
+    nombre="John",
+    apellidopa="Doe",
+    apellidoma="Smith",
+    edad=30,
+    sexo="Masculino",
+    correo="johndoe@example.com",
+    telefono="1234567890",
+    formacion_academica="Tecnica",
+    curp="DOEJ901215HDFRML01",
+    usuario=usuario
+)
+
+# Crear documentos personales con algunos campos en None
+documentos_personales = DocumentosPersonales.objects.create(
+    datos_personales=datos_personales,
+    identificacion_oficial=None,
+    comprobante_domicilio=None,
+    certificado_estudio=None
+)
+
+print("Usuario, datos personales y documentos creados exitosamente.")
