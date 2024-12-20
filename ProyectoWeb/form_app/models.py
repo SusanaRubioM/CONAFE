@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 import re
 from django import forms
 from django.core.validators import FileExtensionValidator
-
+from datetime import datetime
 
 # Función para validar el tamaño del archivo
 def validate_file_size(file):
@@ -24,7 +24,7 @@ def validate_phone_number(value):
 class Aspirante(models.Model):
     # Información Personal
     folio = models.CharField(max_length=150)
-    estado = estado = models.CharField(
+    estado  = models.CharField(
         max_length=50,
         choices=[
             ("Pendiente", "Pendiente"),
