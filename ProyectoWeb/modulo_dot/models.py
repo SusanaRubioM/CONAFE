@@ -4,7 +4,7 @@ from login_app.models import UsuarioRol  # Importa el modelo UsuarioRol de login
 from django.contrib.auth.hashers import make_password
 
 class Usuario(models.Model):
-    usuario_rol = models.OneToOneField(UsuarioRol, null=True, blank=True, on_delete=models.CASCADE)
+    usuario_rol = models.OneToOneField('login_app.UsuarioRol', on_delete=models.CASCADE)
     usuario = models.CharField(max_length=255, unique=True)
     contrasenia = models.CharField(max_length=255)  # Contraseña en texto plano
     rol = models.CharField(

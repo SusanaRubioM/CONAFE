@@ -1,10 +1,10 @@
 from django.db import models
-from models import Usuario, DatosPersonales, DocumentosPersonales
 from django.core.exceptions import ValidationError
 import re
 from django import forms
 from django.core.validators import FileExtensionValidator
 from datetime import datetime
+
 
 # Función para validar el tamaño del archivo
 def validate_file_size(file):
@@ -14,184 +14,116 @@ def validate_file_size(file):
     return file
 
 
+# Función para validar el número de teléfono
 def validate_phone_number(value):
-    if not re.match(r"^\+?\d+$", value):  # Permitirá números con o sin el signo +
+    # Usamos una expresión regular para permitir solo números y, opcionalmente, un signo '+' al principio
+    if not re.match(r"^\+?\d+$", value):
         raise ValidationError(
             "El número de teléfono solo debe contener números y, opcionalmente, un signo + al inicio."
         )
 
 
 class Aspirante(models.Model):
-    # Información Personal
-    folio = models.CharField(max_length=150)
-    estado  = models.CharField(
-        max_length=50,
-        choices=[
-            ("Pendiente", "Pendiente"),
-            ("Aceptado", "Aceptado"),
-            ("Rechazado", "Rechazado"),
-        ],
-    )
+    # Información personal
+    folio = models.CharField(max_length=150, unique=True, blank=True)  # Folio único del aspirante
+    datos_personales = models.OneToOneField(
+        'modulo_dot.DatosPersonales', null=True, blank=True, on_delete=models.CASCADE
+    )  # Relación uno a uno con DatosPersonales (opcional)
     rol = models.CharField(
         max_length=10,
         default="Aspirante",
-    )
+    )  # El rol predeterminado del aspirante
+    telefono = models.CharField(max_length=15, blank=True)  # Campo de teléfono (opcional)
+
+    class Meta:
+        db_table = "Aspirante"  # Definir el nombre de la tabla en minúsculas
 
     def asignacion_folio(self):
         if not self.folio:
-            # Generar el folio en formato ASP-YYYY-XXXXX
             year = datetime.now().year
             last_folio = (
                 Aspirante.objects.filter(folio__startswith=f"ASP-{year}")
-                .order_by("folio")
-                .last()
+                .order_by("-folio")
+                .first()
             )
             if last_folio:
                 last_number = int(last_folio.folio.split("-")[-1])
                 new_number = last_number + 1
             else:
-                # Inicia la secuencia en 1 si no hay registros previos
-                new_number = 1
+                new_number = 1  # Iniciar la secuencia si no existen registros previos
             self.folio = f"ASP-{year}-{new_number:05d}"
 
     def save(self, *args, **kwargs):
-        # Asegura que solo se guarden números en el campo telefono
-        self.telefono = "".join(
-            filter(str.isdigit, str(self.telefono))
-        )  # Elimina caracteres no numéricos
+        if self.telefono:
+            # Eliminar caracteres no numéricos del teléfono
+            self.telefono = "".join(filter(str.isdigit, str(self.telefono)))
+        self.asignacion_folio()  # Asignar folio si no está asignado
         super(Aspirante, self).save(*args, **kwargs)
 
-    class Meta:
-        db_table = "aspirante"  # Cambié la tabla a minúsculas
+    def __str__(self):
+        # Mostrar el nombre completo si existe datos personales
+        if self.datos_personales:
+            return f"{self.datos_personales.nombre} {self.datos_personales.apellido_paterno} {self.datos_personales.apellido_materno}"
+        return "Aspirante sin datos personales"
+
+
+class Gestion(models.Model):
+    aspirante = models.OneToOneField(Aspirante, on_delete=models.CASCADE)
+    habla_lengua_indigena = models.BooleanField(default=False)  #  (obligatorio)
+    lengua_indigena = models.CharField(max_length=100, blank=True, null=True)  # opcional
+    talla_playera = models.CharField(max_length=10)  # obligatorio
+    talla_pantalon = models.CharField(max_length=10)  # obligatorio
+    talla_calzado = models.CharField(max_length=10)  # obligatorio
+    peso = models.FloatField()  # obligatorio
+    estatura = models.FloatField()  # Estatura obligatorio
+    medio_publicitario = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"{self.nombre} {self.apellido_paterno} {self.apellido_materno}"
-
-
-"""
-class FormacionAcademica(models.Model):
-    aspirante = models.ForeignKey(
-        "Aspirante",  # Asegúrate de tener este modelo definido
-        related_name="formaciones_academicas",
-        on_delete=models.CASCADE,
-    )
-    nivel_academico = models.CharField(
-        max_length=150,
-        choices=[
-            ("Primaria", "Primaria"),
-            ("Secundaria", "Secundaria"),
-            ("Preparatoria", "Preparatoria"),
-            ("Licenciatura", "Licenciatura"),
-            ("Maestría", "Maestría"),
-            ("Doctorado", "Doctorado"),
-        ],  # Opciones desplegables
-        default="Primaria",
-    )
-    habla_lengua_indigena = models.BooleanField(default=False)  # Sí/No
-    certificado_constancia = models.FileField(
-        upload_to="documentos_academicos/",
-        validators=[
-            validate_file_size,
-            FileExtensionValidator(allowed_extensions=["pdf", "docx", "jpg", "png"]),
-        ],
-    )
+        return f"Información de Gestión para {self.aspirante.folio}"
 
     class Meta:
-        db_table = "formacion_academica"
+        db_table =  "Informacion_Gestion"  # Definir el nombre de la tabla en minúsculas
+
+
+class Banco(models.Model):
+    aspirante = models.OneToOneField(Aspirante, on_delete=models.CASCADE)
+    banco = models.CharField(max_length=100, blank=True, null=True)  # Banco (opcional)
+    cuenta_bancaria = models.CharField(max_length=50, blank=True, null=True)  # Cuenta bancaria (opcional)
 
     def __str__(self):
-        return f"{self.aspirante} - {self.nivel_academico}"
-
-
-class InformacionAdicional(models.Model):
-    aspirante = models.ForeignKey(
-        Aspirante, related_name="informaciones_adicionales", on_delete=models.CASCADE
-    )
-    habla_lengua_indigena = models.BooleanField(default=False)
-    talla_playera = models.CharField(
-        max_length=5
-    )  # Mantiene el CharField como en el formulario
-    talla_pantalon = models.CharField(
-        max_length=5
-    )  # Puede ser un CharField si usas un ChoiceField
-    talla_calzado = models.DecimalField(
-        max_digits=5, decimal_places=1, null=True, blank=True
-    )  # Cambiado a DecimalField
-    banco = models.CharField(
-        max_length=150,
-        choices=[  # Puede usar CharField si usas ChoiceField en el formulario
-            ("BBVA", "BBVA"),
-            ("Santander", "Santander"),
-            ("Banorte", "Banorte"),
-            ("HSBC", "HSBC"),
-            ("Citibanamex", "Citibanamex"),
-            ("Scotiabank", "Scotiabank"),
-            ("Inbursa", "Inbursa"),
-            ("Bajío", "Bajío"),
-            ("Monex", "Monex"),
-            ("BancoAzteca", "Banco Azteca"),
-            ("Banregio", "Banregio"),
-            ("Compartamos", "Compartamos"),
-            ("Otros", "Otros"),  # Opción adicional
-        ],
-    )
-    cuenta_bancaria = models.CharField(
-        max_length=20
-    )  # Mantén CharField para la cuenta bancaria, con validación de solo números
+        return f"Información Bancaria para {self.aspirante.folio}"
 
     class Meta:
-        db_table = "informacion_adicional"
-
-    def __str__(self):
-        return f"{self.aspirante} - {self.talla_playera} - {self.banco}"
+        db_table = "Informacion_Bancaria"  # Definir el nombre de la tabla en minúsculas
 
 
 class Residencia(models.Model):
-    aspirante = models.ForeignKey(
-        Aspirante, related_name="residencias", on_delete=models.CASCADE
-    )
-    codigo_postal = models.CharField(max_length=10)
-    estado = models.CharField(max_length=100)
-    municipio = models.CharField(max_length=100)
-    localidad = models.CharField(max_length=100)
-    colonia = models.CharField(max_length=100)
-
-    class Meta:
-        db_table = "residencia"
+    aspirante = models.OneToOneField(Aspirante, on_delete=models.CASCADE)
+    codigo_postal = models.CharField(max_length=10)  # Código postal (obligatorio)
+    estado = models.CharField(max_length=100)  # Estado (obligatorio)
+    municipio_alcaldia = models.CharField(max_length=100)  # Municipio o Alcaldía (obligatorio)
+    localidad = models.CharField(max_length=100, blank=True, null=True)  # Localidad (opcional)
+    colonia = models.CharField(max_length=100)  # Colonia (obligatorio)
+    calle = models.CharField(max_length=100)  # Calle (obligatorio)
 
     def __str__(self):
-        return f"{self.aspirante} - {self.estado} - {self.colonia}"
+        return f"Información de Residencia para {self.aspirante.folio}"
+
+    class Meta:
+        db_table = "Residencia"  # Definir el nombre de la tabla en minúsculas
 
 
 class Participacion(models.Model):
-    aspirante = models.ForeignKey(
-        Aspirante, related_name="participaciones", on_delete=models.CASCADE
-    )
-    estado_participacion = models.CharField(max_length=100)
-    ciclo_escolar = models.CharField(max_length=50)
-
-    class Meta:
-        db_table = "participacion"
+    aspirante = models.OneToOneField(Aspirante, on_delete=models.CASCADE)
+    estado_participacion = models.CharField(max_length=100)  # Estado en el que desea participar (obligatorio)
+    ciclo_escolar = models.CharField(max_length=100)  # Ciclo escolar para participar (obligatorio)
+    programa_participacion = models.CharField(max_length=100, default="EC")  # Programa en el que desea participar (obligatorio)
+    tipo_servicio = models.CharField(max_length=100)  # Tipo de servicio (obligatorio)
+    contexto = models.CharField(max_length=100)  # Contexto del aspirante (obligatorio)
 
     def __str__(self):
-        return f"{self.aspirante} - {self.estado_participacion} - {self.ciclo_escolar}"
-
-
-class Documentos(models.Model):
-    aspirante = models.ForeignKey(
-        Aspirante, related_name="documentos", on_delete=models.CASCADE
-    )
-    identificacion_oficial = models.FileField(
-        upload_to="documentos_identificacion/", validators=[validate_file_size]
-    )
-    fotografia = models.ImageField(upload_to="fotografias_aspirantes/")
-    comprobante_domicilio = models.FileField(
-        upload_to="documentos_domicilio/", validators=[validate_file_size]
-    )
+        return f"Información de Participación para {self.aspirante.folio}"
 
     class Meta:
-        db_table = "documentos"
+        db_table = "Participacion"  # Definir el nombre de la tabla en minúsculas
 
-    def __str__(self):
-        return f"{self.aspirante} - Documentos"
-"""
