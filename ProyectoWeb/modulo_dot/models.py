@@ -4,7 +4,7 @@ from login_app.models import UsuarioRol  # Importa el modelo UsuarioRol de login
 from django.contrib.auth.hashers import make_password
 from login_app.models import UsuarioRol  # Lo importamos localmente dentro de save
 class Usuario(models.Model):
-    usuario_rol = models.OneToOneField('login_app.UsuarioRol', on_delete=models.CASCADE)
+    usuario_rol = models.OneToOneField(UsuarioRol, null=True, blank=True, on_delete=models.SET_NULL)
     usuario = models.CharField(max_length=255, unique=True,null=True, blank=True)
     contrasenia = models.CharField(max_length=255,null=True, blank=True)  # Contraseña en texto plano
     rol = models.CharField(
@@ -24,22 +24,23 @@ class Usuario(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        if not self.usuario or not self.rol:
-            raise ValueError("El campo 'usuario' y 'rol' no pueden estar vacíos.")
+        # Si los campos 'usuario' y 'rol' no son obligatorios, omite la validación
+        if self.usuario is not None and self.rol is not None:
+            if not self.usuario or not self.rol:
+                raise ValueError("El campo 'usuario' y 'rol' no pueden estar vacíos.")
         
         # Si no hay un 'usuario_rol' asignado, crearlo antes de continuar
-        if not self.usuario_rol_id:  # Usamos '_id' para verificar si la relación está asignada
-            # Aquí ya no necesitamos importar 'UsuarioRol' porque Django lo resolverá automáticamente
-            usuario_rol = UsuarioRol.objects.create(
-                username=self.usuario,
-                role=self.rol,
-                password=make_password(self.contrasenia)  # Encriptamos la contraseña
-            )
-            self.usuario_rol = usuario_rol  # Asignamos la relación
+        if not self.usuario_rol:  # Verificamos si la relación ya está asignada
+            if self.usuario and self.rol:  # Solo crear el rol si usuario y rol no están vacíos
+                usuario_rol = UsuarioRol.objects.create(
+                    username=self.usuario,
+                    role=self.rol,
+                    password=make_password(self.contrasenia)  # Encriptamos la contraseña
+                )
+                self.usuario_rol = usuario_rol  # Asignamos la relación
 
         # Guardamos el Usuario en la base de datos
         super().save(*args, **kwargs)
-
     class Meta:
         db_table = "usuario"
 

@@ -24,32 +24,38 @@ def validate_phone_number(value):
 
 class Aspirante(models.Model):
     # Información personal
-    folio = models.CharField(max_length=150, unique=True, blank=True)  # Folio único del aspirante
+    folio = models.CharField(max_length=150, unique=True, blank=True, null=True)  # Folio único del aspirante
     datos_personales = models.OneToOneField(
         'modulo_dot.DatosPersonales', null=True, blank=True, on_delete=models.CASCADE
     )  # Relación uno a uno con DatosPersonales (opcional)
+    usuario = models.OneToOneField('modulo_dot.Usuario', on_delete=models.CASCADE, null=True, blank=True)  # Relación uno a uno con Usuario (opcional)
+    
     class Meta:
         db_table = "Aspirante"  # Definir el nombre de la tabla en minúsculas
 
     def asignacion_folio(self):
-            year = datetime.now().year
-            last_folio = (
-                Aspirante.objects.filter(folio__startswith=f"ASP-{year}")
-                .order_by("-folio")
-                .first()
-            )
-            if last_folio:
-                last_number = int(last_folio.folio.split("-")[-1])
-                new_number = last_number + 1
-            else:
-                new_number = 1  # Iniciar la secuencia si no existen registros previos
-            self.folio = f"ASP-{year}-{new_number:05d}"
+        year = datetime.now().year
+        last_folio = (
+            Aspirante.objects.filter(folio__startswith=f"ASP-{year}")
+            .order_by("-folio")
+            .first()
+        )
+        if last_folio:
+            last_number = int(last_folio.folio.split("-")[-1])
+            new_number = last_number + 1
+        else:
+            new_number = 1  # Iniciar la secuencia si no existen registros previos
+        self.folio = f"ASP-{year}-{new_number:05d}"
 
     def save(self, *args, **kwargs):
-        if self.datos_personales and self.datos_personales.telefono:
-            # Eliminar caracteres no numéricos del teléfono
-            self.datos_personales.telefono = "".join(filter(str.isdigit, str(self.datos_personales.telefono)))
-        self.asignacion_folio()  # Asignar folio si no está asignado
+        # Asignar folio solo si el rol del usuario es 'ASPIRANTE'
+        if self.usuario and self.usuario.rol == 'ASPIRANTE':
+            if not self.folio:  # Asignar folio solo si no existe ya uno
+                self.asignacion_folio()
+        else:
+            # Si no es aspirante, asegura que no se asigne un folio
+            self.folio = None
+
         super(Aspirante, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -60,8 +66,8 @@ class Aspirante(models.Model):
 
 
 class Gestion(models.Model):
-    aspirante = models.OneToOneField('Aspirante', on_delete=models.CASCADE)
-    habla_lengua_indigena = models.BooleanField(default=False)  #  (obligatorio)
+    aspirante = models.OneToOneField(Aspirante, on_delete=models.CASCADE)  # Relación con Aspirante
+    habla_lengua_indigena = models.BooleanField(default=False)  # (obligatorio)
     lengua_indigena = models.CharField(max_length=100, blank=True, null=True)  # opcional
     talla_playera = models.CharField(max_length=10)  # obligatorio
     talla_pantalon = models.CharField(max_length=10)  # obligatorio
@@ -78,7 +84,7 @@ class Gestion(models.Model):
 
 
 class Banco(models.Model):
-    aspirante = models.OneToOneField('Aspirante', on_delete=models.CASCADE)
+    aspirante = models.OneToOneField(Aspirante, on_delete=models.CASCADE)  # Relación con Aspirante
     banco = models.CharField(max_length=100, blank=True, null=True)  # Banco (opcional)
     cuenta_bancaria = models.CharField(max_length=50, blank=True, null=True)  # Cuenta bancaria (opcional)
 
@@ -90,7 +96,7 @@ class Banco(models.Model):
 
 
 class Residencia(models.Model):
-    aspirante = models.OneToOneField('Aspirante', on_delete=models.CASCADE)
+    aspirante = models.OneToOneField(Aspirante, on_delete=models.CASCADE)  # Relación con Aspirante
     codigo_postal = models.CharField(max_length=10)  # Código postal (obligatorio)
     estado = models.CharField(max_length=100)  # Estado (obligatorio)
     municipio_alcaldia = models.CharField(max_length=100)  # Municipio o Alcaldía (obligatorio)
@@ -106,7 +112,7 @@ class Residencia(models.Model):
 
 
 class Participacion(models.Model):
-    aspirante = models.OneToOneField('Aspirante', on_delete=models.CASCADE)
+    aspirante = models.OneToOneField(Aspirante, on_delete=models.CASCADE)  # Relación con Aspirante
     estado_participacion = models.CharField(max_length=100)  # Estado en el que desea participar (obligatorio)
     ciclo_escolar = models.CharField(max_length=100)  # Ciclo escolar para participar (obligatorio)
     programa_participacion = models.CharField(max_length=100, default="EC")  # Programa en el que desea participar (obligatorio)

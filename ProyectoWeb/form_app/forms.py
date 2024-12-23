@@ -1,11 +1,11 @@
 from django import forms
-from modulo_dot.models import DatosPersonales
+from django.db import transaction
 from .models import Aspirante, validate_phone_number, Gestion, Residencia, Banco, Participacion
 from django.core.validators import RegexValidator, FileExtensionValidator
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from web_conafe.const import ESTADOS_MEXICO, BANCO_CHOICES, LINGUA_CHOICES, formacion_academica_CHOICES
-
+from modulo_dot.models import DocumentosPersonales
 
 class RegistroAspiranteForm(forms.ModelForm):
     class Meta:
@@ -35,15 +35,15 @@ class RegistroAspiranteForm(forms.ModelForm):
     curp = forms.CharField(max_length=18, label="CURP", validators=[RegexValidator(r'^[A-Z0-9]{18}$', 'CURP no válido')])
 
     # Pregunta sobre lengua indígena
-    habla_lengua_indigena = forms.ChoiceField(
-        choices=[('si', 'Si'), ('no', 'No')],
-        label="¿Hablas alguna lengua indígena?",
-        widget=forms.RadioSelect()
+    habla_lengua_indigena = forms.BooleanField(
+        required=False,  # El campo no es obligatorio para que se pueda desmarcar
+        widget=forms.RadioSelect(choices=[(True, 'Sí'), (False, 'No')]),  # Se usa True/False para los valores booleanos
+        label="¿Hablas alguna lengua indígena?"
     )
-    lengua_indigena = forms.ChoiceField(
-        choices=LINGUA_CHOICES,
-        label="¿Qué lengua indígena hablas?",
-        required=False
+    lengua_indigena = forms.CharField(
+        required=False, 
+        widget=forms.TextInput(attrs={'placeholder': 'Especifica la lengua'}),
+        label='¿Qué lengua indígena hablas?'
     )
 
     # Campos de gestión
@@ -143,23 +143,14 @@ class RegistroAspiranteForm(forms.ModelForm):
         return cleaned_data
 
     def save(self, commit=True):
+        # Guardar el objeto aspirante primero
         aspirante = super().save(commit=False)
 
-        # Crear o actualizar datos personales
-        datos_personales, _ = DatosPersonales.objects.get_or_create(
-            aspirante=aspirante,
-            defaults={
-                'nombre': self.cleaned_data['nombre'],
-                'apellidopa': self.cleaned_data['apellidopa'],
-                'apellidoma': self.cleaned_data['apellidoma'],
-                'correo': self.cleaned_data['correo'],
-                'telefono': self.cleaned_data['telefono'],
-                'formacion_academica': self.cleaned_data['formacion_academica'],
-                'curp': self.cleaned_data['curp'],
-            }
-        )
+        # Guardar el aspirante en la base de datos si commit es True
+        if commit:
+            aspirante.save()  # Guarda el aspirante para obtener su ID
 
-        # Guardar información en modelos relacionados
+        # Ahora puedes crear los objetos relacionados, ya que aspirante tiene un ID
         gestion = Gestion.objects.create(
             aspirante=aspirante,
             talla_playera=self.cleaned_data['talla_playera'],
@@ -194,9 +185,19 @@ class RegistroAspiranteForm(forms.ModelForm):
             ciclo_escolar=self.cleaned_data['ciclo_escolar']
         )
 
-        if commit:
-            aspirante.save()
+        # Aquí creas el objeto DocumentosPersonales y lo asocias con el aspirante
+        if self.cleaned_data.get('identificacion_oficial'):
+            DocumentosPersonales.objects.create(
+                datos_personales=aspirante.datos_personales,
+                identificacion_oficial=self.cleaned_data['identificacion_oficial'],
+                comprobante_domicilio=self.cleaned_data.get('comprobante_domicilio'),
+                certificado_estudio=self.cleaned_data.get('certificado_estudio')
+            )
 
-        return aspirante
+        # Si hay archivos adicionales (como fotografía), también se actualizan aquí
+        if self.cleaned_data.get('fotografia'):
+            aspirante.fotografia = self.cleaned_data['fotografia']
+            aspirante.save()  # Guarda o actualiza la fotografía del aspirante
 
+        return aspirante  # Devolver el aspirante guardado
 

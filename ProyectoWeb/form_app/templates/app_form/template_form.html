@@ -56,7 +56,7 @@
             </div>
         </fieldset>
 
-        <!-- Lengua indigena -->
+        <!-- Lengua indígena -->
         <fieldset class="border p-3 mb-4">
             <legend class="w-auto px-2">Lengua Indígena</legend>
             <div class="row">
@@ -64,23 +64,24 @@
                 <div class="col-md-6 mb-3">
                     <label class="form-label">¿Hablas alguna lengua indígena?</label>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="habla_lengua_indigena" id="id_habla_lengua_indigena_si" value="si">
+                        <!-- Cambiar el valor a True -->
+                        <input class="form-check-input" type="radio" name="habla_lengua_indigena" id="id_habla_lengua_indigena_si" value="True">
                         <label class="form-check-label" for="id_habla_lengua_indigena_si">Sí</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="habla_lengua_indigena" id="id_habla_lengua_indigena_no" value="no">
+                        <!-- Cambiar el valor a False -->
+                        <input class="form-check-input" type="radio" name="habla_lengua_indigena" id="id_habla_lengua_indigena_no" value="False">
                         <label class="form-check-label" for="id_habla_lengua_indigena_no">No</label>
                     </div>
                 </div>
-        
+
                 <!-- Campo "¿Qué lengua indígena hablas?" -->
                 <div class="col-md-6 mb-3" id="lengua-indigena-group" style="display: none;">
                     <label for="id_lengua_indigena" class="form-label">¿Qué lengua indígena hablas?</label>
-                    {{ form.lengua_indigena }}
+                    {{ form.lengua_indigena }}  <!-- Aquí se renderiza el campo de texto si se selecciona "Sí" -->
                 </div>
             </div>
         </fieldset>
-
 
 
         <!-- Documentos -->
@@ -207,11 +208,10 @@
 </div>
 
 <!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const hablaLenguaFieldSi = document.querySelector('input[name="habla_lengua_indigena"][value="si"]');
-        const hablaLenguaFieldNo = document.querySelector('input[name="habla_lengua_indigena"][value="no"]');
+        const hablaLenguaFieldSi = document.querySelector('input[name="habla_lengua_indigena"][value="True"]');
+        const hablaLenguaFieldNo = document.querySelector('input[name="habla_lengua_indigena"][value="False"]');
         const lenguaIndigenaGroup = document.querySelector('#lengua-indigena-group');
         const lenguaIndigenaField = document.querySelector('#id_lengua_indigena');
 
@@ -239,7 +239,6 @@
             hablaLenguaFieldNo.addEventListener('change', updateLenguaIndigenaVisibility);
         }
     });
-</script>
 </script>
 </body>
 </html>
