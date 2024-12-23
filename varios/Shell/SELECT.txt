@@ -1,0 +1,15 @@
+SELECT 
+    usuario.id AS usuario_id,
+    datos_personales.nombre,
+    datos_personales.apellidopa,
+    datos_personales.apellidoma,
+    datos_personales.correo,
+    usuario.usuario AS nombre_usuario,
+    usuario.rol,
+    aspirante.folio
+FROM
+    usuario
+LEFT JOIN
+    datos_personales ON usuario.id = datos_personales.usuario_id
+LEFT JOIN
+    aspirante ON datos_personales.id = aspirante.datos_personales_id;
