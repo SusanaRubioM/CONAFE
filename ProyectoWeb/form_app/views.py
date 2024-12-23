@@ -56,7 +56,6 @@ def form_view(request):
                     codigo_postal=form.cleaned_data['codigo_postal'],
                     estado=form.cleaned_data['estado'],
                     municipio_alcaldia=form.cleaned_data['municipio'],
-                    localidad=form.cleaned_data['localidad'],
                     colonia=form.cleaned_data['colonia'],
                     calle=form.cleaned_data['calle']
                 )

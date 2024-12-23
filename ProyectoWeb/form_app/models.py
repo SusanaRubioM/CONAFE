@@ -100,7 +100,6 @@ class Residencia(models.Model):
     codigo_postal = models.CharField(max_length=10)  # Código postal (obligatorio)
     estado = models.CharField(max_length=100)  # Estado (obligatorio)
     municipio_alcaldia = models.CharField(max_length=100)  # Municipio o Alcaldía (obligatorio)
-    localidad = models.CharField(max_length=100, blank=True, null=True)  # Localidad (opcional)
     colonia = models.CharField(max_length=100)  # Colonia (obligatorio)
     calle = models.CharField(max_length=100)  # Calle (obligatorio)
 

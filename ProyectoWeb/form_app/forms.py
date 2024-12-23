@@ -27,7 +27,12 @@ class RegistroAspiranteForm(forms.ModelForm):
         choices=[("Masculino", "Masculino"), ("Femenino", "Femenino"), ("Otro", "Otro")],
         label="Sexo"
     )
-    edad = forms.IntegerField(label="Edad")
+    edad = forms.TypedChoiceField(
+        choices=[(i, str(i)) for i in range(18, 45)],  # Convertir a enteros
+        label="Edad",
+        coerce=int
+    )
+
     formacion_academica = forms.ChoiceField(
         choices=formacion_academica_CHOICES,
         label="Nivel Académico"
@@ -40,9 +45,9 @@ class RegistroAspiranteForm(forms.ModelForm):
         widget=forms.RadioSelect(choices=[(True, 'Sí'), (False, 'No')]),  # Se usa True/False para los valores booleanos
         label="¿Hablas alguna lengua indígena?"
     )
-    lengua_indigena = forms.CharField(
+    lengua_indigena = forms.ChoiceField(
+        choices = LINGUA_CHOICES,
         required=False, 
-        widget=forms.TextInput(attrs={'placeholder': 'Especifica la lengua'}),
         label='¿Qué lengua indígena hablas?'
     )
 
@@ -63,10 +68,13 @@ class RegistroAspiranteForm(forms.ModelForm):
         label="Peso (kg)",
         validators=[MinValueValidator(1, message="El peso debe ser un valor positivo")]
     )
-    estatura = forms.FloatField(
+
+    estatura = forms.TypedChoiceField(
+        choices=[(i / 100, f"{i / 100:.2f}") for i in range(150, 201)],  # Opciones en metros
         label="Estatura (m)",
-        validators=[MinValueValidator(0.5, message="La estatura debe ser un valor positivo")]
+        coerce=float,  # Convertir el valor ingresado a float
     )
+    
     medio_publicitario = forms.ChoiceField(
         choices=[('Redes Sociales', 'Red Social'), ('Radio', 'Radio'),
                  ('Recomendacion', 'Recomendacion'), ('Television', 'Television')],
@@ -89,7 +97,6 @@ class RegistroAspiranteForm(forms.ModelForm):
     )
     estado = forms.ChoiceField(choices=ESTADOS_MEXICO, label="Estado")
     municipio = forms.CharField(max_length=100, label="Municipio o Alcaldía")
-    localidad = forms.CharField(max_length=100, label="Localidad")
     colonia = forms.CharField(max_length=100, label="Colonia")
     calle = forms.CharField(max_length=100, label="Calle")
 
@@ -141,6 +148,12 @@ class RegistroAspiranteForm(forms.ModelForm):
             self.add_error('lengua_indigena', 'Debe seleccionar una lengua indígena.')
 
         return cleaned_data
+    
+    def clean_estatura(self):
+        # Convertir metros a centímetros antes de guardar
+        estatura_metros = self.cleaned_data.get('estatura')  # Obtiene el valor en metros
+        estatura_cm = int(estatura_metros * 100)  # Convierte a centímetros
+        return estatura_cm
 
     def save(self, commit=True):
         # Guardar el objeto aspirante primero
@@ -168,7 +181,6 @@ class RegistroAspiranteForm(forms.ModelForm):
             codigo_postal=self.cleaned_data['codigo_postal'],
             estado=self.cleaned_data['estado'],
             municipio_alcaldia=self.cleaned_data['municipio'],
-            localidad=self.cleaned_data['localidad'],
             colonia=self.cleaned_data['colonia'],
             calle=self.cleaned_data['calle']
         )
