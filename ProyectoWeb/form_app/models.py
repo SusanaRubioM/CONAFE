@@ -5,7 +5,6 @@ from django import forms
 from django.core.validators import FileExtensionValidator
 from datetime import datetime
 
-
 # Función para validar el tamaño del archivo
 def validate_file_size(file):
     max_size = 5 * 1024 * 1024  # 5 MB
@@ -29,17 +28,10 @@ class Aspirante(models.Model):
     datos_personales = models.OneToOneField(
         'modulo_dot.DatosPersonales', null=True, blank=True, on_delete=models.CASCADE
     )  # Relación uno a uno con DatosPersonales (opcional)
-    rol = models.CharField(
-        max_length=10,
-        default="Aspirante",
-    )  # El rol predeterminado del aspirante
-    telefono = models.CharField(max_length=15, blank=True)  # Campo de teléfono (opcional)
-
     class Meta:
         db_table = "Aspirante"  # Definir el nombre de la tabla en minúsculas
 
     def asignacion_folio(self):
-        if not self.folio:
             year = datetime.now().year
             last_folio = (
                 Aspirante.objects.filter(folio__startswith=f"ASP-{year}")
@@ -54,21 +46,21 @@ class Aspirante(models.Model):
             self.folio = f"ASP-{year}-{new_number:05d}"
 
     def save(self, *args, **kwargs):
-        if self.telefono:
+        if self.datos_personales and self.datos_personales.telefono:
             # Eliminar caracteres no numéricos del teléfono
-            self.telefono = "".join(filter(str.isdigit, str(self.telefono)))
+            self.datos_personales.telefono = "".join(filter(str.isdigit, str(self.datos_personales.telefono)))
         self.asignacion_folio()  # Asignar folio si no está asignado
         super(Aspirante, self).save(*args, **kwargs)
 
     def __str__(self):
         # Mostrar el nombre completo si existe datos personales
         if self.datos_personales:
-            return f"{self.datos_personales.nombre} {self.datos_personales.apellido_paterno} {self.datos_personales.apellido_materno}"
+            return f"{self.datos_personales.nombre} {self.datos_personales.apellidopa} {self.datos_personales.apellidoma}"
         return "Aspirante sin datos personales"
 
 
 class Gestion(models.Model):
-    aspirante = models.OneToOneField(Aspirante, on_delete=models.CASCADE)
+    aspirante = models.OneToOneField('Aspirante', on_delete=models.CASCADE)
     habla_lengua_indigena = models.BooleanField(default=False)  #  (obligatorio)
     lengua_indigena = models.CharField(max_length=100, blank=True, null=True)  # opcional
     talla_playera = models.CharField(max_length=10)  # obligatorio
@@ -86,7 +78,7 @@ class Gestion(models.Model):
 
 
 class Banco(models.Model):
-    aspirante = models.OneToOneField(Aspirante, on_delete=models.CASCADE)
+    aspirante = models.OneToOneField('Aspirante', on_delete=models.CASCADE)
     banco = models.CharField(max_length=100, blank=True, null=True)  # Banco (opcional)
     cuenta_bancaria = models.CharField(max_length=50, blank=True, null=True)  # Cuenta bancaria (opcional)
 
@@ -98,7 +90,7 @@ class Banco(models.Model):
 
 
 class Residencia(models.Model):
-    aspirante = models.OneToOneField(Aspirante, on_delete=models.CASCADE)
+    aspirante = models.OneToOneField('Aspirante', on_delete=models.CASCADE)
     codigo_postal = models.CharField(max_length=10)  # Código postal (obligatorio)
     estado = models.CharField(max_length=100)  # Estado (obligatorio)
     municipio_alcaldia = models.CharField(max_length=100)  # Municipio o Alcaldía (obligatorio)
@@ -114,7 +106,7 @@ class Residencia(models.Model):
 
 
 class Participacion(models.Model):
-    aspirante = models.OneToOneField(Aspirante, on_delete=models.CASCADE)
+    aspirante = models.OneToOneField('Aspirante', on_delete=models.CASCADE)
     estado_participacion = models.CharField(max_length=100)  # Estado en el que desea participar (obligatorio)
     ciclo_escolar = models.CharField(max_length=100)  # Ciclo escolar para participar (obligatorio)
     programa_participacion = models.CharField(max_length=100, default="EC")  # Programa en el que desea participar (obligatorio)
@@ -126,4 +118,3 @@ class Participacion(models.Model):
 
     class Meta:
         db_table = "Participacion"  # Definir el nombre de la tabla en minúsculas
-

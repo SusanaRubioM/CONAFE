@@ -29,6 +29,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -86,9 +87,9 @@ WSGI_APPLICATION = "web_conafe.wsgi.application"
 try:
     # Verifica si puedes acceder a la IP pública de Google Cloud
     socket.create_connection(("34.118.149.167", 3306), timeout=1)
-    is_online = True
-except OSError:
     is_online = False
+except OSError:
+    is_online = True
 
 if is_online:
     # Configuración para Google Cloud

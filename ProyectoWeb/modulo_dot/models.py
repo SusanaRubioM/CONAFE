@@ -2,11 +2,11 @@ from django.db import models
 from django.core.validators import FileExtensionValidator
 from login_app.models import UsuarioRol  # Importa el modelo UsuarioRol de login_app
 from django.contrib.auth.hashers import make_password
-
+from login_app.models import UsuarioRol  # Lo importamos localmente dentro de save
 class Usuario(models.Model):
     usuario_rol = models.OneToOneField('login_app.UsuarioRol', on_delete=models.CASCADE)
-    usuario = models.CharField(max_length=255, unique=True)
-    contrasenia = models.CharField(max_length=255)  # Contraseña en texto plano
+    usuario = models.CharField(max_length=255, unique=True,null=True, blank=True)
+    contrasenia = models.CharField(max_length=255,null=True, blank=True)  # Contraseña en texto plano
     rol = models.CharField(
         max_length=10,
         choices=[  # Lista de roles
@@ -27,21 +27,24 @@ class Usuario(models.Model):
         if not self.usuario or not self.rol:
             raise ValueError("El campo 'usuario' y 'rol' no pueden estar vacíos.")
         
-        # Asegurarse de que 'usuario_rol' esté asignado
-        if not self.usuario_rol:
-            # Verificar si ya existe el UsuarioRol con el mismo username y rol
-            usuario_rol, created = UsuarioRol.objects.get_or_create(
-                username=self.usuario, role=self.rol
+        # Si no hay un 'usuario_rol' asignado, crearlo antes de continuar
+        if not self.usuario_rol_id:  # Usamos '_id' para verificar si la relación está asignada
+            # Aquí ya no necesitamos importar 'UsuarioRol' porque Django lo resolverá automáticamente
+            usuario_rol = UsuarioRol.objects.create(
+                username=self.usuario,
+                role=self.rol,
+                password=make_password(self.contrasenia)  # Encriptamos la contraseña
             )
-            if created:
-                usuario_rol.password = make_password(self.contrasenia)  # Encriptamos la contraseña
-                usuario_rol.save()
+            self.usuario_rol = usuario_rol  # Asignamos la relación
 
-            # Asignamos el UsuarioRol al objeto Usuario
-            self.usuario_rol = usuario_rol
-
-        # Guardamos el Usuario en la base de datos (sin encriptar la contraseña, solo en texto plano en 'contrasenia')
+        # Guardamos el Usuario en la base de datos
         super().save(*args, **kwargs)
+
+    class Meta:
+        db_table = "usuario"
+
+    def __str__(self):
+        return f"{self.usuario} - {self.rol}"
 
     class Meta:
         db_table = "usuario"
@@ -71,12 +74,13 @@ class DatosPersonales(models.Model):
     fotografia = models.ImageField(
         upload_to="fotografias_personales/", null=True, blank=True
     )
-    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE)  # Relación OneToOne con Usuario
+
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, null=True, blank=True)  # Relación OneToOne con Usuario
 
     def save(self, *args, **kwargs):
         # Asegurarse de que no existan datos personales asociados al usuario
-        if DatosPersonales.objects.filter(usuario=self.usuario).exists():
-            raise ValueError("Este usuario ya tiene datos personales asociados.")
+        #if DatosPersonales.objects.filter(usuario=self.usuario).exists():
+           # raise ValueError("Este usuario ya tiene datos personales asociados.")
         super().save(*args, **kwargs)
 
     class Meta:

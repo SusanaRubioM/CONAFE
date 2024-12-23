@@ -2,7 +2,8 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
 from django.contrib.auth.hashers import make_password
 
-# En login_app/models.py
+
+# Definir el manager del modelo de usuario para crear usuarios
 class UsuarioRolManager(BaseUserManager):
     def create_user(self, username, password=None, **extra_fields):
         if not username:
@@ -11,7 +12,10 @@ class UsuarioRolManager(BaseUserManager):
         extra_fields.setdefault('is_active', True)
 
         user = self.model(username=username, **extra_fields)
-        user.set_password(password)  # Encriptar la contraseña
+        
+        # Si se proporciona una contraseña, la encriptamos
+        if password:
+            user.set_password(password)
         user.save(using=self._db)
         return user
 
@@ -21,24 +25,35 @@ class UsuarioRolManager(BaseUserManager):
 
         return self.create_user(username, password, **extra_fields)
 
+
+# Modelo de usuario con roles
 class UsuarioRol(AbstractBaseUser):
-    username = models.CharField(max_length=150, unique=True)
+    username = models.CharField(max_length=150, unique=True, null=True, blank=True)
     first_name = models.CharField(max_length=150, null=True, blank=True)
     last_name = models.CharField(max_length=150, null=True, blank=True)
     email = models.EmailField(max_length=254, null=True, blank=True)
+    
+    # No usamos null=True aquí, ya que la contraseña debe estar encriptada
+    password = models.CharField(max_length=255, null=True, blank=True)  # Permitir password vacío (no null)
+    
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
     role = models.CharField(
         max_length=10,
-        choices=[('ADMIN', 'ADMIN'), ('DOT', 'Director de Operaciones y Tecnología'), 
-                 ('CT', 'Coordinador Territorial'), ('EC', 'Educador Comunitario'),
-                 ('ECA', 'Educador Comunitario de Acompañamiento Microrregional'),
-                 ('ECAR', 'Educador Comunitario de Acompañamiento Regional'),
-                 ('APEC', 'Asesor de Promoción y Educación Comunitaria'),
-                 ('DEP', 'Desarrollo Educativo Profesional')],
-        default='EC'
+        choices=[  
+            ("CT", "Coordinador Territorial"),
+            ("DECB", "Dirección de Educación Comunitaria e Inclusión Social"),
+            ("DPE", "Dirección de Planeación y Evaluación"),
+            ("EC", "Educador Comunitario"),
+            ("ECA", "Educador Comunitario de Acompañamiento Microrregional"),
+            ("ECAR", "Educador Comunitario de Acompañamiento Regional"),
+            ("APEC", "Asesor de Promoción y Educación Comunitaria"),
+            ("DOT", "Dirección de Operación Territorial"),
+            ("ASPIRANTE", "aspirante"),
+        ],
+        default="ASPIRANTE",
     )
 
     USERNAME_FIELD = 'username'
@@ -52,7 +67,8 @@ class UsuarioRol(AbstractBaseUser):
     def __str__(self):
         return self.username
 
-# Modificación para evitar importación circular
+
+# Modelo de Status, para indicar el estado de un usuario
 class Status(models.Model):
     usuario = models.OneToOneField('modulo_dot.Usuario', null=True, blank=True, on_delete=models.CASCADE)
     estado = models.CharField(
@@ -64,5 +80,6 @@ class Status(models.Model):
         db_table = "Status"
 
     def __str__(self):
-        return self.usuario.usuario
+        return self.usuario.username
+
 

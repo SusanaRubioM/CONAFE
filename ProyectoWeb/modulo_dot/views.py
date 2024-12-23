@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from form_app.models import Aspirante
 from login_app.models import UsuarioRol  # Este modelo es para crear usuarios con roles
 from .forms import UsuarioForm, DatosPersonalesForm, DocumentosPersonalesForm
 from login_app.decorators import role_required
@@ -35,8 +36,6 @@ def agregar_trabajador(request):
         ):
             # Crear y guardar el nuevo usuario
             usuario = usuario_form.save(commit=False)
-
-            # Guardamos el usuario en la base de datos
             usuario.save()
 
             # Obtener el rol desde el formulario
@@ -52,18 +51,27 @@ def agregar_trabajador(request):
             usuario.usuario_rol = usuario_rol
             usuario.save()
 
-            # Crear y guardar los datos personales asociados al usuario
+           
+                # Crear y guardar los datos personales asociados al usuario
             datos_personales = datos_personales_form.save(commit=False)
             datos_personales.usuario = usuario  # Asociar el usuario con los datos personales
             datos_personales.save()
 
-            # Crear y guardar los documentos personales asociados a los datos personales
+             # Crear y guardar los documentos personales asociados a los datos personales
             documentos_personales = documentos_form.save(commit=False)
             documentos_personales.datos_personales = datos_personales  # Asociamos los documentos con DatosPersonales
             documentos_personales.save()
 
-            # Mensaje de éxito
+             # Crear el aspirante y asociar los datos personales
+            aspirante = Aspirante.objects.create(
+                    datos_personales=datos_personales,
+                    # Puedes agregar más campos si es necesario
+                )
+
+                # Crear solo el usuario sin datos adicionales si no es aspirante
             messages.success(request, "¡Trabajador agregado exitosamente!")
+
+
             return redirect("dot_home:home_dot")  # Redirigir a la página principal
         else:
             # Aquí imprimimos los errores en la consola para depuración
@@ -81,12 +89,6 @@ def agregar_trabajador(request):
         usuario_form = UsuarioForm()
         datos_personales_form = DatosPersonalesForm()
         documentos_form = DocumentosPersonalesForm()
-
-    usuario = usuario_form.save(commit=False)
-    if  usuario.usuario:
-        print("El campo 'usuario' está vacío")
-        messages.error(request, "El nombre de usuario no puede estar vacío.")
-                   
 
     return render(
         request,
