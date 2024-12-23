@@ -1,0 +1,41 @@
+from modulo_dot.models import Usuario, DatosPersonales, DocumentosPersonales
+from form_app.models import Aspirante  # Asegúrate de importar el modelo Aspirante si es necesario
+
+# Crear un usuario DOT sin encriptar la contraseña
+usuario_dot = Usuario.objects.create(
+    usuario="dot",  
+    contrasenia="dot",  # Contraseña sin encriptar (texto plano)
+    rol="DOT",  # Rol Dirección de Operación Territorial
+)
+
+# Crear datos personales asociados al usuario DOT
+# Si 'aspirante' es un campo obligatorio, deberías tener una instancia de Aspirante
+# En este caso, si es opcional, lo podemos dejar en NULL si es necesario
+datos_personales_dot = DatosPersonales.objects.create(
+    usuario=usuario_dot,  # Relacionamos con el usuario recién creado
+    nombre="Carlos",
+    apellidopa="Pérez",
+    apellidoma="González",
+    edad=40,
+    sexo="Masculino",
+    correo="carlos.perez@example.com",
+    telefono="5552345678",
+    formacion_academica="Tecnico",
+    curp="PEMC800512HDFRNL09",
+)
+
+# Si el campo 'aspirante' es obligatorio, lo puedes asignar aquí
+# Si no es obligatorio, no necesitas esta línea
+# aspirante_obj = Aspirante.objects.get(id=1)  # Aquí asumes que ya tienes un aspirante existente
+# datos_personales_dot.aspirante = aspirante_obj
+# datos_personales_dot.save()
+
+# Crear documentos personales asociados al usuario DOT
+documentos_personales_dot = DocumentosPersonales.objects.create(
+    datos_personales=datos_personales_dot,
+    identificacion_oficial=None,  # Asume que no tienes un archivo para este campo
+    comprobante_domicilio=None,  # Lo mismo para este campo
+    certificado_estudio=None  # Y para este también
+)
+
+print("Usuario DOT y documentos creados exitosamente.")

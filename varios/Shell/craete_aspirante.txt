@@ -1,0 +1,35 @@
+from form_app.models import Aspirante
+from modulo_dot.models import DatosPersonales
+
+# Usamos `get_or_create` para evitar duplicados por el campo `correo`
+datos_personales5, created = DatosPersonales.objects.get_or_create(
+    correo="ana.martinez@example.com",  # Este es el campo único que queremos manejar
+    defaults={
+        'nombre': "Ana",
+        'apellidopa': "Martínez",
+        'apellidoma': "López",
+        'edad': 30,
+        'sexo': "Femenino",
+        'telefono': "5553456789",
+        'formacion_academica': "Licenciatura en Psicología",
+        'curp': "MALP920601MDFNNA03",
+    }
+)
+
+# Si los datos ya existen (si no fueron creados), informamos que ya están en la base de datos
+if created:
+    print(f"Nuevo DatosPersonales creado: {datos_personales5}")
+else:
+    print(f"DatosPersonales ya existen: {datos_personales5}")
+
+# Crear el Aspirante asociado con DatosPersonales
+aspirante5, aspirante_created = Aspirante.objects.get_or_create(
+    datos_personales=datos_personales5
+)
+
+# Si el Aspirante fue creado, mostramos un mensaje
+if aspirante_created:
+    print(f"Aspirante creado: {aspirante5}")
+else:
+    print(f"Aspirante ya existe con estos DatosPersonales: {aspirante5}")
+
