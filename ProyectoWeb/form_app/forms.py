@@ -45,9 +45,10 @@ class RegistroAspiranteForm(forms.ModelForm):
         widget=forms.RadioSelect(choices=[(True, 'Sí'), (False, 'No')]),  # Se usa True/False para los valores booleanos
         label="¿Hablas alguna lengua indígena?"
     )
+
     lengua_indigena = forms.ChoiceField(
-        choices = LINGUA_CHOICES,
-        required=False, 
+        choices=LINGUA_CHOICES,  # Asegúrate de tener la lista de opciones de lenguas indígenas
+        required=False,  # Este campo solo será obligatorio si 'habla_lengua_indigena' es verdadero
         label='¿Qué lengua indígena hablas?'
     )
 
@@ -136,16 +137,12 @@ class RegistroAspiranteForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        habla_lengua = cleaned_data.get('habla_lengua_indigena')
-        lengua = cleaned_data.get('lengua_indigena')
+        habla_lengua_indigena = cleaned_data.get('habla_lengua_indigena')
+        lengua_indigena = cleaned_data.get('lengua_indigena')
 
-        if habla_lengua == 'si':
-            cleaned_data['habla_lengua_indigena'] = True
-        else:
-            cleaned_data['habla_lengua_indigena'] = False
-
-        if habla_lengua == 'si' and not lengua:
-            self.add_error('lengua_indigena', 'Debe seleccionar una lengua indígena.')
+        # Si 'habla_lengua_indigena' es True, entonces 'lengua_indigena' debe ser obligatorio
+        if habla_lengua_indigena and not lengua_indigena:
+            self.add_error('lengua_indigena', 'Este campo es obligatorio si seleccionas que hablas una lengua indígena.')
 
         return cleaned_data
     

@@ -128,18 +128,9 @@
                 <!-- Campo "¿Hablas alguna lengua indígena?" con opciones horizontales -->
                 <div class="col-md-6 mb-3">
                     <label class="form-label">¿Hablas alguna lengua indígena?</label>
-                    <div class="form-check form-check-inline">
-                        <!-- Cambiar el valor a True -->
-                        <input class="form-check-input" type="radio" name="habla_lengua_indigena" id="id_habla_lengua_indigena_si" value="True">
-                        <label class="form-check-label" for="id_habla_lengua_indigena_si">Sí</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <!-- Cambiar el valor a False -->
-                        <input class="form-check-input" type="radio" name="habla_lengua_indigena" id="id_habla_lengua_indigena_no" value="False">
-                        <label class="form-check-label" for="id_habla_lengua_indigena_no">No</label>
-                    </div>
+                    {{ form.habla_lengua_indigena }}
                 </div>
-
+        
                 <!-- Campo "¿Qué lengua indígena hablas?" -->
                 <div class="col-md-6 mb-3" id="lengua-indigena-group" style="display: none;">
                     <label for="id_lengua_indigena" class="form-label">¿Qué lengua indígena hablas?</label>
@@ -270,35 +261,16 @@
 
 <!-- Bootstrap JS -->
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const hablaLenguaFieldSi = document.querySelector('input[name="habla_lengua_indigena"][value="True"]');
-        const hablaLenguaFieldNo = document.querySelector('input[name="habla_lengua_indigena"][value="False"]');
-        const lenguaIndigenaGroup = document.querySelector('#lengua-indigena-group');
-        const lenguaIndigenaField = document.querySelector('#id_lengua_indigena');
-
-        // Función para actualizar la visibilidad del campo "Lengua Indígena"
-        function updateLenguaIndigenaVisibility() {
-            if (hablaLenguaFieldSi && hablaLenguaFieldNo) {
-                if (hablaLenguaFieldSi.checked) {
-                    lenguaIndigenaGroup.style.display = 'block';  // Mostrar el campo
-                    lenguaIndigenaField.required = true;  // Hacer el campo obligatorio
-                } else {
-                    lenguaIndigenaGroup.style.display = 'none';  // Ocultar el campo
-                    lenguaIndigenaField.required = false; // No obligatorio
-                }
+    document.querySelectorAll('input[name="habla_lengua_indigena"]').forEach((elem) => {
+        elem.addEventListener('change', function() {
+            let lenguaIndigenaGroup = document.getElementById('lengua-indigena-group');
+            // Cambiar la comparación para usar valores booleanos
+            if (this.value === 'True') {
+                lenguaIndigenaGroup.style.display = 'block';
+            } else {
+                lenguaIndigenaGroup.style.display = 'none';
             }
-        }
-
-        // Llamar a la función en caso de que haya un valor pre-seleccionado
-        updateLenguaIndigenaVisibility();  // Comprobar el valor inicial
-
-        // Añadir el evento de cambio
-        if (hablaLenguaFieldSi) {
-            hablaLenguaFieldSi.addEventListener('change', updateLenguaIndigenaVisibility);
-        }
-        if (hablaLenguaFieldNo) {
-            hablaLenguaFieldNo.addEventListener('change', updateLenguaIndigenaVisibility);
-        }
+        });
     });
 </script>
 </body>

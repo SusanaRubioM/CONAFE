@@ -67,7 +67,7 @@ class Aspirante(models.Model):
 
 class Gestion(models.Model):
     aspirante = models.OneToOneField(Aspirante, on_delete=models.CASCADE)  # Relación con Aspirante
-    habla_lengua_indigena = models.BooleanField(default=False)  # (obligatorio)
+    habla_lengua_indigena = models.BooleanField()  # (obligatorio)
     lengua_indigena = models.CharField(max_length=100, blank=True, null=True)  # opcional
     talla_playera = models.CharField(max_length=10)  # obligatorio
     talla_pantalon = models.CharField(max_length=10)  # obligatorio

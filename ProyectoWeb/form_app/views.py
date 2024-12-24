@@ -8,6 +8,7 @@ def form_view(request):
     if request.method == "POST":
         form = RegistroAspiranteForm(request.POST, request.FILES)
         if form.is_valid():
+            print(form.cleaned_data['habla_lengua_indigena']) 
             # Usamos transaction.atomic para asegurarnos de que todas las operaciones sean atómicas
             with transaction.atomic():
                 # Crear y guardar el objeto Usuario sin asignar los campos 'usuario' y 'contrasenia'
@@ -38,7 +39,10 @@ def form_view(request):
                     usuario=usuario,  # Asignamos el Usuario
                 )
 
-                # Crear objetos relacionados como 'Gestion', 'Residencia', etc.
+                # Comprobar si 'habla_lengua_indigena' es verdadero (booleano)
+                habla_lengua_indigena = form.cleaned_data['habla_lengua_indigena']
+
+                # Crear el objeto Gestion
                 gestion = Gestion.objects.create(
                     aspirante=aspirante,
                     talla_playera=form.cleaned_data['talla_playera'],
@@ -47,9 +51,11 @@ def form_view(request):
                     peso=form.cleaned_data['peso'],
                     estatura=form.cleaned_data['estatura'],
                     medio_publicitario=form.cleaned_data['medio_publicitario'],
-                    habla_lengua_indigena=form.cleaned_data['habla_lengua_indigena'],
-                    lengua_indigena=form.cleaned_data.get('lengua_indigena')
+                    habla_lengua_indigena=habla_lengua_indigena,
+                    # Solo guardamos 'lengua_indigena' si 'habla_lengua_indigena' es verdadero
+                    lengua_indigena=form.cleaned_data['lengua_indigena'] if habla_lengua_indigena else None,
                 )
+
 
                 residencia = Residencia.objects.create(
                     aspirante=aspirante,
