@@ -51,35 +51,39 @@ def agregar_trabajador(request):
             usuario.usuario_rol = usuario_rol
             usuario.save()
 
-           
-                # Crear y guardar los datos personales asociados al usuario
+            # Crear y guardar los datos personales asociados al usuario
             datos_personales = datos_personales_form.save(commit=False)
-            datos_personales.usuario = usuario  # Asociar el usuario con los datos personales
+            datos_personales.usuario = usuario  # Asociamos el usuario con los datos personales
             datos_personales.save()
 
-             # Crear y guardar los documentos personales asociados a los datos personales
+            # Crear y guardar los documentos personales asociados a los datos personales
             documentos_personales = documentos_form.save(commit=False)
             documentos_personales.datos_personales = datos_personales  # Asociamos los documentos con DatosPersonales
             documentos_personales.save()
 
-             # Crear el aspirante y asociar los datos personales
+            # Crear el aspirante y asociar los datos personales
             aspirante = Aspirante.objects.create(
-                    datos_personales=datos_personales,
-                    # Puedes agregar más campos si es necesario
-                )
+                datos_personales=datos_personales,
+                usuario=usuario  # Asociamos el usuario al aspirante
+            )
 
-                # Crear solo el usuario sin datos adicionales si no es aspirante
+            # Si el rol del usuario es 'ASPIRANTE', asignamos un folio
+            if usuario.rol == "ASPIRANTE":
+                aspirante.asignacion_folio()  # Asigna el folio al aspirante si es necesario
+                aspirante.save()
+
+            # Mensaje de éxito
             messages.success(request, "¡Trabajador agregado exitosamente!")
 
-
-            return redirect("dot_home:home_dot")  # Redirigir a la página principal
+            # Redirigir a la página principal
+            return redirect("dot_home:home_dot")
         else:
-            # Aquí imprimimos los errores en la consola para depuración
+            # Si hay errores en los formularios, imprimimos los errores para depuración
             print("Errores en UsuarioForm:", usuario_form.errors)
             print("Errores en DatosPersonalesForm:", datos_personales_form.errors)
             print("Errores en DocumentosPersonalesForm:", documentos_form.errors)
 
-            # Opcional: muestra un mensaje al usuario
+            # Mensaje de error al usuario
             messages.error(
                 request,
                 "Hubo errores en el formulario. Verifique los datos ingresados.",
@@ -99,7 +103,6 @@ def agregar_trabajador(request):
             "documentos_personales_form": documentos_form,  # Asegúrate de usar este nombre
         },
     )
-
 
 @login_required
 @role_required("DOT")

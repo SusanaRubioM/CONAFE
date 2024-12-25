@@ -47,12 +47,6 @@ class Usuario(models.Model):
     def __str__(self):
         return f"{self.usuario} - {self.rol}"
 
-    class Meta:
-        db_table = "usuario"
-
-    def __str__(self):
-        return f"{self.usuario} - {self.rol}"
-
 
 # Modelo de Datos Personales
 class DatosPersonales(models.Model):
@@ -76,7 +70,7 @@ class DatosPersonales(models.Model):
         upload_to="fotografias_personales/", null=True, blank=True
     )
 
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, null=True, blank=True)  # Relación OneToOne con Usuario
+    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE)  # Relación OneToOne con Usuario
 
     def save(self, *args, **kwargs):
         # Asegurarse de que no existan datos personales asociados al usuario
