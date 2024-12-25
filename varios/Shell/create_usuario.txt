@@ -1,0 +1,46 @@
+from modulo_dot.models import Usuario, DatosPersonales, DocumentosPersonales
+from form_app.models import Aspirante
+
+# Crear un usuario DOT
+usuario_dot = Usuario.objects.create(
+    usuario="dot",  
+    contrasenia="dot",  # Contraseña sin encriptar
+    rol="DOT",  # Rol Dirección de Operación Territorial
+)
+
+# Crear los datos personales asociados al usuario DOT
+datos_personales_dot = DatosPersonales.objects.create(
+    usuario=usuario_dot,
+    nombre="Carlos",
+    apellidopa="Pérez",
+    apellidoma="González",
+    edad=40,
+    sexo="Masculino",
+    correo="carlos.perez@example.com",
+    telefono="5552345678",
+    formacion_academica="Técnico",
+    curp="PEMC800512HDFRNL09",
+)
+
+# Verificar si el aspirante existe, si no, crearlo sin folio
+aspirante_obj, created = Aspirante.objects.get_or_create(
+    datos_personales=datos_personales_dot,
+    usuario=usuario_dot,  # Relacionar con el usuario recién creado
+    defaults={}  # No asignamos folio aquí
+)
+
+# Crear documentos personales asociados a los datos personales
+documentos_personales_dot = DocumentosPersonales.objects.create(
+    datos_personales=datos_personales_dot,
+    identificacion_oficial=None,  # Archivo no proporcionado
+    comprobante_domicilio=None,
+    certificado_estudio=None
+)
+
+if created:
+    print("Aspirante creado exitosamente.")
+else:
+    print("El aspirante ya existía y fue recuperado.")
+
+print("Usuario DOT, datos personales y documentos creados exitosamente.")
+
