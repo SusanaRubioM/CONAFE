@@ -5,6 +5,8 @@ from django import forms
 from django.core.validators import FileExtensionValidator
 from datetime import datetime
 
+from modulo_dot.models import Usuario
+
 # Función para validar el tamaño del archivo
 def validate_file_size(file):
     max_size = 5 * 1024 * 1024  # 5 MB
@@ -48,13 +50,19 @@ class Aspirante(models.Model):
         self.folio = f"ASP-{year}-{new_number:05d}"
 
     def save(self, *args, **kwargs):
-        # Asignar folio solo si el rol del usuario es 'ASPIRANTE'
-        if self.usuario and self.usuario.rol == 'ASPIRANTE':
-            if not self.folio:  # Asignar folio solo si no existe ya uno
-                self.asignacion_folio()
-        else:
-            # Si no es aspirante, asegura que no se asigne un folio
-            self.folio = None
+        # Asignar folio automáticamente si es un aspirante
+        if not self.folio:
+            self.asignacion_folio()
+
+        # Asignar un Usuario con rol 'ASPIRANTE' solo si no existe
+        if not self.usuario:
+            self.usuario = Usuario.objects.create(rol="ASPIRANTE")  # Crear un nuevo Usuario con rol "ASPIRANTE"
+
+        # Solo cambiar el rol a 'ASPIRANTE' si el usuario no tiene rol y es un aspirante
+        # No modificamos el rol de un usuario ya existente si no es necesario
+        if self.usuario and self.usuario.rol != "ASPIRANTE":
+            # Si ya existe un Usuario, no hacemos nada para cambiar su rol
+            pass
 
         super(Aspirante, self).save(*args, **kwargs)
 

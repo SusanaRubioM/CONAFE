@@ -29,16 +29,28 @@ class Usuario(models.Model):
             if not self.usuario or not self.rol:
                 raise ValueError("El campo 'usuario' y 'rol' no pueden estar vacíos.")
         
-        # Si no hay un 'usuario_rol' asignado, crearlo antes de continuar
-        if not self.usuario_rol:  # Verificamos si la relación ya está asignada
-            if self.usuario and self.rol:  # Solo crear el rol si usuario y rol no están vacíos
+        # Si el rol es "ASPIRANTE", no asignar username ni password
+        if self.rol == "ASPIRANTE":
+            self.usuario = None
+            self.contrasenia = None
+            # Si no hay un 'usuario_rol' asignado, crearlo con username y password como None
+            if not self.usuario_rol:
                 usuario_rol = UsuarioRol.objects.create(
-                    username=self.usuario,
+                    username=None,  # Deja el username como None para ASPIRANTE
                     role=self.rol,
-                    password=make_password(self.contrasenia)  # Encriptamos la contraseña
+                    password=None,  # Deja el password como None para ASPIRANTE
                 )
-                self.usuario_rol = usuario_rol  # Asignamos la relación
-
+                self.usuario_rol = usuario_rol
+        else:
+            # Si el rol no es "ASPIRANTE", asignar el username y password normalmente
+            if not self.usuario_rol:  # Verificamos si la relación ya está asignada
+                usuario_rol = UsuarioRol.objects.create(
+                    username=self.usuario or f"usuario_{self.id}",  # Usamos un valor predeterminado si está vacío
+                    role=self.rol,
+                    password=make_password(self.contrasenia) if self.contrasenia else None,
+                )
+                self.usuario_rol = usuario_rol
+        
         # Guardamos el Usuario en la base de datos
         super().save(*args, **kwargs)
     class Meta:

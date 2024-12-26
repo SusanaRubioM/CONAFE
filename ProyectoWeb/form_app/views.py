@@ -1,22 +1,29 @@
 from django.shortcuts import render, redirect
 from .forms import RegistroAspiranteForm
-from .models import Residencia, Participacion, Gestion, Banco, Aspirante
-from modulo_dot.models import DatosPersonales, DocumentosPersonales, Usuario
+from .models import Residencia, Participacion, Gestion, Banco, Aspirante, Usuario
+from modulo_dot.models import DatosPersonales, DocumentosPersonales
 from django.db import transaction
-
+from login_app.models import UsuarioRol
 def form_view(request):
     if request.method == "POST":
         form = RegistroAspiranteForm(request.POST, request.FILES)
         if form.is_valid():
-            print(form.cleaned_data['habla_lengua_indigena']) 
             # Usamos transaction.atomic para asegurarnos de que todas las operaciones sean atómicas
             with transaction.atomic():
-                # Crear y guardar el objeto Usuario sin asignar los campos 'usuario' y 'contrasenia'
-                usuario = Usuario.objects.create(
-                    usuario=None,  # Deja el valor como None o vacío
-                    contrasenia=None,  # Deja el valor como None o vacío
-                    rol="ASPIRANTE",  # Asignamos el rol "ASPIRANTE"
+
+                # Crear el Usuario relacionado al aspirante
+                usuario = Usuario.objects.create(  # O algún campo que identifique al usuario
+                    rol="ASPIRANTE"
                 )
+
+                # Relacionar usuario_rol si es necesario
+                if not usuario.usuario_rol:
+                    usuario.usuario_rol = UsuarioRol.objects.create(
+                        username=None,
+                        role="ASPIRANTE",
+                        password=None
+                    )
+                    usuario.save()
                 
                 # Crear el objeto DatosPersonales
                 datos_personales = DatosPersonales.objects.create(
@@ -29,20 +36,18 @@ def form_view(request):
                     edad=form.cleaned_data["edad"],
                     formacion_academica=form.cleaned_data["formacion_academica"],
                     curp=form.cleaned_data["curp"],
-                    fotografia=form.cleaned_data.get("fotografia"),  # Asignamos la fotografía si fue subida
-                    usuario=usuario,  # Asignamos el Usuario creado
+                    fotografia=form.cleaned_data.get("fotografia"),
+                    usuario=usuario  # Asociamos el usuario a los datos personales
                 )
+                
 
                 # Crear el objeto Aspirante
                 aspirante = Aspirante.objects.create(
-                    datos_personales=datos_personales,  # Asignamos los DatosPersonales
-                    usuario=usuario,  # Asignamos el Usuario
+                    datos_personales=datos_personales,
+                    usuario=usuario  # Asociamos el usuario al aspirante
                 )
 
-                # Comprobar si 'habla_lengua_indigena' es verdadero (booleano)
-                habla_lengua_indigena = form.cleaned_data['habla_lengua_indigena']
-
-                # Crear el objeto Gestion
+                # Los objetos relacionados con la gestión, residencia, banco y participación
                 gestion = Gestion.objects.create(
                     aspirante=aspirante,
                     talla_playera=form.cleaned_data['talla_playera'],
@@ -51,11 +56,9 @@ def form_view(request):
                     peso=form.cleaned_data['peso'],
                     estatura=form.cleaned_data['estatura'],
                     medio_publicitario=form.cleaned_data['medio_publicitario'],
-                    habla_lengua_indigena=habla_lengua_indigena,
-                    # Solo guardamos 'lengua_indigena' si 'habla_lengua_indigena' es verdadero
-                    lengua_indigena=form.cleaned_data['lengua_indigena'] if habla_lengua_indigena else None,
+                    habla_lengua_indigena=form.cleaned_data['habla_lengua_indigena'],
+                    lengua_indigena=form.cleaned_data['lengua_indigena'] if form.cleaned_data['habla_lengua_indigena'] else None,
                 )
-
 
                 residencia = Residencia.objects.create(
                     aspirante=aspirante,
@@ -78,10 +81,10 @@ def form_view(request):
                     ciclo_escolar=form.cleaned_data['ciclo_escolar']
                 )
 
-                # Aquí manejas los archivos subidos y los asignas al aspirante
+                # Guardamos la fotografía si fue subida
                 if form.cleaned_data.get('fotografia'):
                     aspirante.fotografia = form.cleaned_data['fotografia']
-                    aspirante.save()  # Guarda la fotografía si fue subida
+                    aspirante.save()
 
                 # Guardamos los documentos personales si están presentes
                 if form.cleaned_data.get('identificacion_oficial'):
@@ -94,11 +97,10 @@ def form_view(request):
 
                 # Redirigir a una página de éxito o confirmación
                 return render(request, "app_form/confirmacion.html")
-
     else:
         form = RegistroAspiranteForm()
 
     return render(request, 'app_form/template_form.html', {'form': form})
 
 def confirmacion(request):
-    return render(request, "app_form/confirmacion.html")
+    return render(request, 'app_form/confirmacion.html')
