@@ -78,7 +78,9 @@ def form_view(request):
                 participacion = Participacion.objects.create(
                     aspirante=aspirante,
                     estado_participacion=form.cleaned_data['estado_participacion'],
-                    ciclo_escolar=form.cleaned_data['ciclo_escolar']
+                    ciclo_escolar=form.cleaned_data['ciclo_escolar'],
+                    tipo_servicio=form.cleaned_data['tipo_servicio'],
+                    contexto=form.cleaned_data['contexto']
                 )
 
                 # Guardamos la fotografía si fue subida

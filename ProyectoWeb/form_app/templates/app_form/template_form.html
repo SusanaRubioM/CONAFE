@@ -360,6 +360,7 @@
         <fieldset class="border p-3 mb-4">
             <legend class="w-auto px-2">Participación</legend>
             <div class="row">
+                <!-- Primera fila -->
                 <div class="col-md-6 mb-3">
                     <label for="id_estado_participacion" class="form-label">Estado en el que deseas participar</label>
                     {{ form.estado_participacion }}
@@ -382,6 +383,10 @@
                     </div>
                     {% endif %}
                 </div>
+            </div>
+        
+            <div class="row">
+                <!-- Segunda fila -->
                 <div class="col-md-6 mb-3">
                     <label for="id_medio_publicitario" class="form-label">Medio Publicitario</label>
                     {{ form.medio_publicitario }}
@@ -393,8 +398,35 @@
                     </div>
                     {% endif %}
                 </div>
+                <div class="col-md-6 mb-3">
+                    <label for="id_tipo_servicio" class="form-label">Tipo de Servicio</label>
+                    {{ form.tipo_servicio }}
+                    {% if form.tipo_servicio.errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.tipo_servicio.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        
+            <div class="row">
+                <!-- Tercera fila -->
+                <div class="col-md-6 mb-3">
+                    <label for="id_contexto" class="form-label">Contexto</label>
+                    {{ form.contexto }}
+                    {% if form.contexto.errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.contexto.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
             </div>
         </fieldset>
+        
 
         <!-- Botón de Envío -->
         <div class="text-center">

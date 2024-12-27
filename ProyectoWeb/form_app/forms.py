@@ -106,6 +106,23 @@ class RegistroAspiranteForm(forms.ModelForm):
         choices=[('2025-2026', '2025-2026'), ('2026-2027', '2026-2027')],
         label="Ciclo Escolar"
     )
+    tipo_servicio = forms.ChoiceField(choices=[('Inicial', 'Inicial'), ('Preescolar', 'Preescolar')
+                                              ,('Primaria', 'Primaria'), ('Secundaria', 'Secundaria'),
+                                               ('postsecundaria', 'postsecundaria') ], label="Tipo de Servicio")
+    
+    contexto = forms.ChoiceField(
+        choices=[
+            ('Rural', 'Rural'),
+            ('Urbano', 'Urbano'),
+            ('Indígena', 'Indígena'),
+            ('Mestizo', 'Mestizo'),
+            ('Migrante', 'Migrante'),
+            ('Circense', 'Circense'),
+            ('Grupos Vulnerables', 'Grupos Vulnerables'),
+            ('Excluidos del Sistema Regular', 'Excluidos del Sistema Regular'),
+        ],
+        label="Contexto"
+    )
 
     # Documentos
     identificacion_oficial = forms.FileField(
@@ -179,7 +196,7 @@ class RegistroAspiranteForm(forms.ModelForm):
             estado=self.cleaned_data['estado'],
             municipio_alcaldia=self.cleaned_data['municipio'],
             colonia=self.cleaned_data['colonia'],
-            calle=self.cleaned_data['calle']
+            calle=self.cleaned_data['calle'],
         )
 
         Banco.objects.create(
@@ -191,7 +208,9 @@ class RegistroAspiranteForm(forms.ModelForm):
         Participacion.objects.create(
             aspirante=aspirante,
             estado_participacion=self.cleaned_data['estado_participacion'],
-            ciclo_escolar=self.cleaned_data['ciclo_escolar']
+            ciclo_escolar=self.cleaned_data['ciclo_escolar'],
+            tipo_servicio=self.cleaned_data['Tipo_de_servicio'],
+            Contexto=self.cleaned_data['Contexto']
         )
 
         # Aquí creas el objeto DocumentosPersonales y lo asocias con el aspirante

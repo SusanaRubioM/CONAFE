@@ -50,19 +50,17 @@ class Aspirante(models.Model):
         self.folio = f"ASP-{year}-{new_number:05d}"
 
     def save(self, *args, **kwargs):
-        # Asignar folio automáticamente si es un aspirante
-        if not self.folio:
-            self.asignacion_folio()
+        # Asignar folio automáticamente si el rol del usuario es "ASPIRANTE"
+        if self.usuario and self.usuario.rol == "ASPIRANTE":
+            if not self.folio:
+                self.asignacion_folio()  # Este método ya asigna el folio directamente
+        else:
+            # Si no es "ASPIRANTE", asegurarse de que el folio sea nulo
+            self.folio = None
 
-        # Asignar un Usuario con rol 'ASPIRANTE' solo si no existe
+        # Crear un usuario con rol "ASPIRANTE" solo si el usuario no existe
         if not self.usuario:
-            self.usuario = Usuario.objects.create(rol="ASPIRANTE")  # Crear un nuevo Usuario con rol "ASPIRANTE"
-
-        # Solo cambiar el rol a 'ASPIRANTE' si el usuario no tiene rol y es un aspirante
-        # No modificamos el rol de un usuario ya existente si no es necesario
-        if self.usuario and self.usuario.rol != "ASPIRANTE":
-            # Si ya existe un Usuario, no hacemos nada para cambiar su rol
-            pass
+            self.usuario = Usuario.objects.create(rol="ASPIRANTE")
 
         super(Aspirante, self).save(*args, **kwargs)
 

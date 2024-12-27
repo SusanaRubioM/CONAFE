@@ -24,35 +24,32 @@ class Usuario(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        # Si los campos 'usuario' y 'rol' no son obligatorios, omite la validación
-        if self.usuario is not None and self.rol is not None:
-            if not self.usuario or not self.rol:
-                raise ValueError("El campo 'usuario' y 'rol' no pueden estar vacíos.")
-        
+        # Validar solo si el rol no es "ASPIRANTE"
+        if self.rol != "ASPIRANTE":
+            if not self.usuario or not self.contrasenia:
+                raise ValueError("Los campos 'usuario' y 'contrasenia' son obligatorios para roles distintos de 'ASPIRANTE'.")
+
         # Si el rol es "ASPIRANTE", no asignar username ni password
         if self.rol == "ASPIRANTE":
             self.usuario = None
             self.contrasenia = None
-            # Si no hay un 'usuario_rol' asignado, crearlo con username y password como None
             if not self.usuario_rol:
-                usuario_rol = UsuarioRol.objects.create(
-                    username=None,  # Deja el username como None para ASPIRANTE
+                self.usuario_rol = UsuarioRol.objects.create(
+                    username=None,
                     role=self.rol,
-                    password=None,  # Deja el password como None para ASPIRANTE
+                    password=None,
                 )
-                self.usuario_rol = usuario_rol
         else:
-            # Si el rol no es "ASPIRANTE", asignar el username y password normalmente
-            if not self.usuario_rol:  # Verificamos si la relación ya está asignada
-                usuario_rol = UsuarioRol.objects.create(
-                    username=self.usuario or f"usuario_{self.id}",  # Usamos un valor predeterminado si está vacío
+            # Crear `usuario_rol` solo si no existe
+            if not self.usuario_rol:
+                self.usuario_rol = UsuarioRol.objects.create(
+                    username=self.usuario,
                     role=self.rol,
-                    password=make_password(self.contrasenia) if self.contrasenia else None,
+                    password=make_password(self.contrasenia),
                 )
-                self.usuario_rol = usuario_rol
-        
-        # Guardamos el Usuario en la base de datos
+
         super().save(*args, **kwargs)
+
     class Meta:
         db_table = "usuario"
 

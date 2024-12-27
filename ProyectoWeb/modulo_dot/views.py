@@ -64,13 +64,13 @@ def agregar_trabajador(request):
             # Crear el aspirante y asociar los datos personales
             aspirante = Aspirante.objects.create(
                 datos_personales=datos_personales,
-                usuario=usuario  # Asociamos el usuario al aspirante
+                usuario=usuario
             )
 
-            # Si el rol del usuario es 'ASPIRANTE', asignamos un folio
+            # Asignar folio si el rol es 'ASPIRANTE'
             if usuario.rol == "ASPIRANTE":
                 aspirante.asignacion_folio()  # Asigna el folio al aspirante si es necesario
-                aspirante.save()
+            aspirante.save()  # Solo guardamos una vez
 
             # Mensaje de éxito
             messages.success(request, "¡Trabajador agregado exitosamente!")
