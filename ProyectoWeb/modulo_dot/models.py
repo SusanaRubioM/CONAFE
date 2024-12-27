@@ -38,6 +38,7 @@ class Usuario(models.Model):
                     username=None,
                     role=self.rol,
                     password=None,
+                    is_active=False,
                 )
         else:
             # Crear `usuario_rol` solo si no existe
