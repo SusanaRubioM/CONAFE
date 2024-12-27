@@ -17,6 +17,8 @@ class UsuarioForm(forms.ModelForm):
     # Validación para la contraseña
     def clean_contrasenia(self):
         contrasenia = self.cleaned_data.get('contrasenia')
+        if not contrasenia:
+            return None  # No se modifica si no se proporciona una contraseña.
         if len(contrasenia) < 8:
             raise forms.ValidationError("La contraseña debe tener al menos 8 caracteres.")
         return contrasenia

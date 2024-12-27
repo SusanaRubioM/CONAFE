@@ -1,11 +1,13 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.contrib.auth.hashers import make_password
 from form_app.models import Aspirante
 from login_app.models import UsuarioRol  # Este modelo es para crear usuarios con roles
 from .forms import UsuarioForm, DatosPersonalesForm, DocumentosPersonalesForm
 from login_app.decorators import role_required
 from .models import Usuario, UsuarioRol
+from modulo_dot.models import DatosPersonales
 
 @login_required
 @role_required("DOT")  # Solo los usuarios con rol 'DOT' pueden acceder
@@ -110,8 +112,8 @@ def dashboard_view(request):
     """
     Vista para mostrar el dashboard con todos los empleados.
     """
-    # Obtener todos los empleados registrados
-    empleados = UsuarioRol.objects.all()
+    # Obtener datos de empleados desde el modelo DatosPersonales
+    empleados = DatosPersonales.objects.select_related('usuario')  # Trae relación con Usuario
     return render(
         request, "home_dot/dashboard_visualizar.html", {"empleados": empleados}
     )
@@ -123,7 +125,10 @@ def detalles_empleado(request, empleado_id):
     """
     Vista para ver los detalles de un empleado en específico.
     """
-    empleado = get_object_or_404(UsuarioRol, id=empleado_id)
+    # Obtener el objeto DatosPersonales asociado al usuario con el id proporcionado
+    empleado = get_object_or_404(DatosPersonales, usuario__id=empleado_id)  # Acceder a los datos de un empleado relacionado con Usuario
+    
+    # Pasar el objeto empleado a la plantilla
     return render(request, "home_dot/detalles_empleado.html", {"empleado": empleado})
 
 
@@ -133,7 +138,7 @@ def modificar_dashboard(request):
     """
     Vista para modificar la información de los empleados, mostrando el dashboard.
     """
-    empleados = UsuarioRol.objects.all()  # Obtener todos los empleados
+    empleados = DatosPersonales.objects.select_related('usuario')  # Trae relación con Usuario
     return render(
         request, "home_dot/dashboard_modificar.html", {"empleados": empleados}
     )
@@ -142,41 +147,50 @@ def modificar_dashboard(request):
 @login_required
 @role_required("DOT")
 def modificar_empleado(request, empleado_id):
-    """
-    Vista para modificar la información de un empleado específico.
-    """
-    empleado = get_object_or_404(UsuarioRol, id=empleado_id)
-    usuario = empleado.usuario  # Obtenemos el usuario relacionado con el empleado
+    empleado = get_object_or_404(DatosPersonales, id=empleado_id)
+    usuario = empleado.usuario
 
     if request.method == "POST":
-        # Instanciar los formularios con los datos de POST y las instancias correspondientes
+        # Crear formularios con los datos del POST
         usuario_form = UsuarioForm(request.POST, instance=usuario)
-        datos_personales_form = DatosPersonalesForm(
-            request.POST, request.FILES, instance=empleado.datos_personales
-        )
-        documentos_form = DocumentosPersonalesForm(
-            request.POST, request.FILES, instance=empleado.datos_personales.documentos.first()
-        )
+        datos_personales_form = DatosPersonalesForm(request.POST, request.FILES, instance=empleado)
+        documentos_form = DocumentosPersonalesForm(request.POST, request.FILES, instance=empleado.documentos)
 
         if usuario_form.is_valid() and datos_personales_form.is_valid() and documentos_form.is_valid():
-            # Guardar los cambios
-            usuario_form.save()
-            datos_personales_form.save()
-            documentos_form.save()
+            try:
+                # Revisar si se cambió la contraseña
+                nueva_contrasenia = usuario_form.cleaned_data.get('contrasenia')
 
-            # Mensaje de éxito
-            messages.success(
-                request, "El registro del empleado ha sido modificado correctamente."
-            )
-            return redirect("dot_home:dashboard_modificar")
+                if nueva_contrasenia:
+                    # Encriptar la nueva contraseña y actualizarla en el modelo UsuarioRol
+                    usuario.usuario_rol.password = make_password(nueva_contrasenia)  # Encriptada en UsuarioRol
+                    empleado.contrasenia = nueva_contrasenia  # Guardar la contraseña en texto plano en Empleado
 
+                # Mantener valor original para 'sexo' en datos personales si no se cambia
+                datos_personales_form.instance.sexo = empleado.sexo
+
+                # Guardar los formularios
+                usuario.usuario_rol.save()
+                usuario_form.save()  # Guardar cambios en el usuario
+                datos_personales_form.save()  # Guardar cambios en datos personales
+                documentos_form.save()  # Guardar cambios en documentos personales
+
+                messages.success(request, "El registro del empleado ha sido modificado correctamente.")
+                return redirect("dot_home:home_dot")
+
+            except Exception as e:
+                messages.error(request, f"Hubo un error al guardar los cambios: {e}")
+        else:
+            messages.error(request, "Hubo un error en el formulario. Revisa los campos.")
+            for form in [usuario_form, datos_personales_form, documentos_form]:
+                for field, error_list in form.errors.items():
+                    for error in error_list:
+                        messages.error(request, f"{field}: {error}")
     else:
-        # Crear las instancias de los formularios con los datos actuales del empleado
+        # Si la petición es GET, mostrar los formularios con los datos actuales
         usuario_form = UsuarioForm(instance=usuario)
-        datos_personales_form = DatosPersonalesForm(instance=empleado.datos_personales)
-        documentos_form = DocumentosPersonalesForm(
-            instance=empleado.datos_personales.documentos.first() if empleado.datos_personales.documentos.exists() else None
-        )
+        datos_personales_form = DatosPersonalesForm(instance=empleado)
+        documentos_form = DocumentosPersonalesForm(instance=empleado.documentos)
 
     return render(
         request,
@@ -184,7 +198,9 @@ def modificar_empleado(request, empleado_id):
         {
             "usuario_form": usuario_form,
             "datos_personales_form": datos_personales_form,
-            "documentos_form": documentos_form,  # Asegúrate de mostrar este formulario también
+            "documentos_form": documentos_form,
             "empleado": empleado,
         },
     )
+
+

@@ -4,12 +4,11 @@
 {% block title %}Modificar Empleado{% endblock %}
 
 {% block content %}
-
 <div class="container mt-5">
-    <div class="container mt-5">
-        <div class="d-flex justify-content-start mb-3">
-            <a href="{% url 'dot_home:home_dot' %}" class="btn btn-warning" style="background-color: #620b0b; color:white" >Menu</a>
-        </div>
+    <div class="d-flex justify-content-start mb-3">
+        <a href="{% url 'dot_home:home_dot' %}" class="btn btn-warning" style="background-color: #620b0b; color:white">Menú</a>
+    </div>
+
     <h2 class="text-center mb-4">Modificar Empleados</h2>
 
     {% if empleados %}
@@ -27,17 +26,19 @@
             </thead>
             <tbody>
                 {% for empleado in empleados %}
+                {% if empleado.usuario.rol != "ASPIRANTE" %}
                 <tr id="empleado_{{ empleado.id }}">
                     <td>{{ empleado.nombre }}</td>
                     <td>{{ empleado.apellidopa }}</td>
                     <td>{{ empleado.apellidoma }}</td>
-                    <td>{{ empleado.email }}</td>
-                    <td>{{ empleado.rol }}</td>
+                    <td>{{ empleado.correo }}</td>
+                    <td>{{ empleado.usuario.rol }}</td>
                     <td>
                         <!-- Enlace para modificar al empleado -->
                         <a href="{% url 'dot_home:modificar_empleado' empleado.id %}" class="btn btn-warning">Modificar</a>
                     </td>
                 </tr>
+                {% endif %}
                 {% endfor %}
             </tbody>
         </table>
@@ -48,9 +49,3 @@
 </div>
 {% endblock %}
 
-{% block customJS %}
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script>
-    // Aquí podrías agregar un script para manejar operaciones JS si es necesario
-</script>
-{% endblock %}

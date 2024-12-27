@@ -1,4 +1,3 @@
-<!-- dashboard_visualizar.html -->
 {% extends "base.html" %}
 {% load static %}
 
@@ -7,7 +6,7 @@
 {% block content %}
 <div class="container mt-5">
     <div class="d-flex justify-content-start mb-3">
-        <a href="{% url 'dot_home:home_dot' %}" class="btn btn-warning" style="background-color: #620b0b; color:white" >Menu</a>
+        <a href="{% url 'dot_home:home_dot' %}" class="btn btn-warning" style="background-color: #620b0b; color:white;">Menu</a>
     </div>
 
     <h2 class="text-center mb-4">Lista de Empleados</h2>
@@ -27,17 +26,18 @@
             </thead>
             <tbody>
                 {% for empleado in empleados %}
+                {% if empleado.usuario.rol != "ASPIRANTE" %}
                 <tr id="empleado_{{ empleado.id }}">
                     <td>{{ empleado.nombre }}</td>
                     <td>{{ empleado.apellidopa }}</td>
                     <td>{{ empleado.apellidoma }}</td>
-                    <td>{{ empleado.email }}</td>
-                    <td>{{ empleado.rol }}</td>
+                    <td>{{ empleado.correo }}</td>
+                    <td>{{ empleado.usuario.rol }}</td>
                     <td>
-                        <!-- Enlace a los detalles del empleado -->
                         <a href="{% url 'dot_home:detalles_empleado' empleado.id %}" class="btn btn-info">Detalles</a>
                     </td>
                 </tr>
+                {% endif %}
                 {% endfor %}
             </tbody>
         </table>
@@ -47,30 +47,4 @@
     {% endif %}
 </div>
 {% endblock %}
-
-{% block customJS %}
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script>
-    async function borrarEmpleado(idEmpleado) {
-        if (confirm("¿Estás seguro de que deseas eliminar este empleado?")) {
-            try {
-                const csrfToken = "{{ csrf_token|escapejs }}";
-                const response = await axios.post("/eliminar-empleado/", { idEmpleado }, {
-                    headers: { "X-CSRFToken": csrfToken }
-                });
-
-                if (response.data.resultado === 1) {
-                    document.getElementById(`empleado_${idEmpleado}`).remove();
-                    alert("Empleado eliminado correctamente.");
-                } else {
-                    alert("Error al eliminar el empleado.");
-                }
-            } catch (error) {
-                console.error("Error al eliminar el empleado:", error);
-            }
-        }
-    }
-</script>
-{% endblock %}
-
 
