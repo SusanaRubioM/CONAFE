@@ -203,4 +203,10 @@ def modificar_empleado(request, empleado_id):
         },
     )
 
+@login_required
+@role_required("DOT")
+def status_empleado(request):
+
+    return render(request, "home_dot/dashboard_status.html")
+
 

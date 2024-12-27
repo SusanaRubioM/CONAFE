@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Status de los empleados{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-start mb-3">
+        <a href="{% url 'dot_home:home_dot' %}" class="btn btn-warning" style="background-color: #620b0b; color:white;">Menu</a>
+    </div>
+    <h2 class="text-center mb-4">Status de los empleados</h2>
+</div>
+{% endblock %}
+
