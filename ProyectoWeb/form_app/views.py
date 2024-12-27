@@ -80,7 +80,8 @@ def form_view(request):
                     estado_participacion=form.cleaned_data['estado_participacion'],
                     ciclo_escolar=form.cleaned_data['ciclo_escolar'],
                     tipo_servicio=form.cleaned_data['tipo_servicio'],
-                    contexto=form.cleaned_data['contexto']
+                    contexto=form.cleaned_data['contexto'],
+                    programa_participacion=form.cleaned_data['programa_participacion']
                 )
 
                 # Guardamos la fotografía si fue subida

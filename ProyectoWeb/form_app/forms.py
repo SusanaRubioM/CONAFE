@@ -110,6 +110,13 @@ class RegistroAspiranteForm(forms.ModelForm):
                                               ,('Primaria', 'Primaria'), ('Secundaria', 'Secundaria'),
                                                ('postsecundaria', 'postsecundaria') ], label="Tipo de Servicio")
     
+    programa_participacion = forms.ChoiceField(
+    choices=[("EC", "Educador Comunitario"),
+             ("ECA", "Educador Comunitario de Acompañamiento Microrregional"),
+             ("ECAR", "Educador Comunitario de Acompañamiento Regional")]
+)
+                                                    
+    
     contexto = forms.ChoiceField(
         choices=[
             ('Rural', 'Rural'),
@@ -210,7 +217,8 @@ class RegistroAspiranteForm(forms.ModelForm):
             estado_participacion=self.cleaned_data['estado_participacion'],
             ciclo_escolar=self.cleaned_data['ciclo_escolar'],
             tipo_servicio=self.cleaned_data['Tipo_de_servicio'],
-            Contexto=self.cleaned_data['Contexto']
+            Contexto=self.cleaned_data['Contexto'],
+            programa_participacion=self.cleaned_data['programa_participacion']
         )
 
         # Aquí creas el objeto DocumentosPersonales y lo asocias con el aspirante

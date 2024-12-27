@@ -424,6 +424,19 @@
                     </div>
                     {% endif %}
                 </div>
+
+                <!-- Tercera fila -->
+                <div class="col-md-6 mb-3">
+                    <label for="id_programa_participacion" class="form-label">Programa en el que deseas participar</label>
+                    {{ form.programa_participacion }}
+                    {% if form.programa_participacion.errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.programa_participacion.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
             </div>
         </fieldset>
         

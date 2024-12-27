@@ -120,7 +120,7 @@ class Participacion(models.Model):
     aspirante = models.OneToOneField(Aspirante, on_delete=models.CASCADE)  # Relación con Aspirante
     estado_participacion = models.CharField(max_length=100)  # Estado en el que desea participar (obligatorio)
     ciclo_escolar = models.CharField(max_length=100)  # Ciclo escolar para participar (obligatorio)
-    programa_participacion = models.CharField(max_length=100, default="EC")  # Programa en el que desea participar (obligatorio)
+    programa_participacion = models.CharField(max_length=100)  # Programa en el que desea participar (obligatorio)
     tipo_servicio = models.CharField(max_length=100)  # Tipo de servicio (obligatorio)
     contexto = models.CharField(max_length=100)  # Contexto del aspirante (obligatorio)
 
