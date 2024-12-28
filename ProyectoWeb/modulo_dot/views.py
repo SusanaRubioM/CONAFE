@@ -4,18 +4,21 @@ from django.contrib import messages
 from django.contrib.auth.hashers import make_password
 from form_app.models import Aspirante
 from login_app.models import UsuarioRol  # Este modelo es para crear usuarios con roles
-from .forms import UsuarioForm, DatosPersonalesForm, DocumentosPersonalesForm
+from .forms import UsuarioForm, DatosPersonalesForm, DocumentosPersonalesForm, StatusesForm
 from login_app.decorators import role_required
 from .models import Usuario, UsuarioRol
 from modulo_dot.models import DatosPersonales
+from login_app.models import Statuses
+from django.http import JsonResponse
+import json
+from django.views.decorators.csrf import csrf_exempt
 
 @login_required
 @role_required("DOT")  # Solo los usuarios con rol 'DOT' pueden acceder
 def home_view(request):
-    """
-    Vista principal del portal para el rol 'DOT'.
-    """
-    return render(request, "home_dot/dot_home.html")
+    empleados = DatosPersonales.objects.all()  # O el filtro que estés utilizando
+    return render(request, 'home_dot/dot_home.html', {'empleados': empleados})
+
 
 
 @login_required
@@ -203,10 +206,51 @@ def modificar_empleado(request, empleado_id):
         },
     )
 
+
+
 @login_required
 @role_required("DOT")
 def status_empleado(request):
+    empleados = DatosPersonales.objects.all()
+    empleados_forms = []
 
-    return render(request, "home_dot/dashboard_status.html")
+    for empleado in empleados:
+        try:
+            status = Statuses.objects.get(usuario=empleado.usuario)
+        except Statuses.DoesNotExist:
+            status = Statuses(usuario=empleado.usuario, status='')
+
+        form = StatusesForm(instance=status)
+        empleados_forms.append((empleado, form))
+
+    return render(request, 'home_dot/dashboard_status.html', {'empleados_forms': empleados_forms})
+
+
+
+
+@login_required
+@role_required("DOT")
+@csrf_exempt
+def actualizar_status_ajax(request, empleado_id):
+    if request.method == "POST":
+        try:
+            empleado = DatosPersonales.objects.get(id=empleado_id)
+            status = Statuses.objects.get_or_create(usuario=empleado.usuario)[0]  # Crear estado si no existe
+            data = json.loads(request.body)
+            nuevo_status = data.get("status", "")
+
+            # Validar si el estado es válido
+            if nuevo_status in dict(Statuses._meta.get_field('status').choices).keys():
+                status.status = nuevo_status
+                status.save()
+                return JsonResponse({"success": True, "message": "Estado actualizado correctamente."})
+            else:
+                return JsonResponse({"success": False, "message": "Estado no válido."})
+        except DatosPersonales.DoesNotExist:
+            return JsonResponse({"success": False, "message": "Empleado no encontrado."})
+    return JsonResponse({"success": False, "message": "Método no permitido."})
+
+
+
 
 

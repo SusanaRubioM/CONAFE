@@ -10,7 +10,10 @@ urlpatterns = [
     path('detalles_empleado/<int:empleado_id>/', views.detalles_empleado, name='detalles_empleado'),
     path('modificar_dashboard/', views.modificar_dashboard, name='dashboard_modificar'),  # Configuración correcta
     path('empleado_modificar/<int:empleado_id>/', views.modificar_empleado, name='modificar_empleado'),
-    path('status_empleado/', views.status_empleado, name='empleado_status'),
+    path('dasboard/status/', views.status_empleado, name='dasboard_status'),
+    path('ajax/empleado/status/<int:empleado_id>/', views.actualizar_status_ajax, name='actualizar_status_ajax'),
+
+  # Modificado
 ]
 
 

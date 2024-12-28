@@ -1,5 +1,5 @@
 from django import forms
-from .models import Usuario, DatosPersonales, DocumentosPersonales
+from .models import Usuario, DatosPersonales, DocumentosPersonales, Statuses
 
 # Formulario para el modelo Usuario
 class UsuarioForm(forms.ModelForm):
@@ -56,7 +56,28 @@ class UsuarioForm(forms.ModelForm):
         widget=forms.Select(attrs={"class": "form-control"}),
     )
 
+
+from django import forms
+from .models import Statuses
+
+class StatusesForm(forms.ModelForm):
+    class Meta:
+        model = Statuses
+        fields = ['status']
+
+    def __init__(self, *args, **kwargs):
+        readonly = kwargs.pop('readonly', False)
+        super().__init__(*args, **kwargs)
+
+        if readonly:
+            for field in self.fields.values():
+                field.widget.attrs['readonly'] = True
+                field.required = False
+
+
 # Formulario para el modelo DatosPersonales
+
+
 class DatosPersonalesForm(forms.ModelForm):
     class Meta:
         model = DatosPersonales
