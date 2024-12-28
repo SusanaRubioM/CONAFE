@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import FileExtensionValidator
 from login_app.models import UsuarioRol  # Importa el modelo UsuarioRol de login_app
+from login_app.models import Statuses  # Importa el modelo Statuses
 from django.contrib.auth.hashers import make_password
 from login_app.models import UsuarioRol  # Lo importamos localmente dentro de save
 class Usuario(models.Model):
@@ -50,6 +51,26 @@ class Usuario(models.Model):
                 )
 
         super().save(*args, **kwargs)
+
+
+        self._handle_statuses()  # Llamar a la función para manejar los estados
+
+    def _handle_statuses(self):
+            """Gestiona la creación o actualización de Statuses según el rol del usuario.
+            """
+            if self.rol != "ASPIRANTE":
+                # Crear o actualizar el estado a 'activa' para roles distintos de 'ASPIRANTE'
+                status, created = Statuses.objects.update_or_create(
+                    usuario=self, 
+                    defaults={'status': 'activa'}
+                )
+            else:
+                # Crear o actualizar el estado a 'suspendida' para el rol 'ASPIRANTE'
+                status, created = Statuses.objects.update_or_create(
+                    usuario=self, 
+                    defaults={'status': 'suspendida'}
+                )
+        
 
     class Meta:
         db_table = "usuario"

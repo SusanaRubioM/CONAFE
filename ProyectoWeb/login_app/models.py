@@ -84,6 +84,6 @@ class Statuses(models.Model):
         db_table = "Statuses"
 
     def __str__(self):
-        return self.usuario.username
+        return self.usuario.username if self.usuario else 'No Usuario'
 
 
