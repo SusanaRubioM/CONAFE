@@ -69,15 +69,19 @@ class UsuarioRol(AbstractBaseUser):
 
 
 # Modelo de Status, para indicar el estado de un usuario
-class Status(models.Model):
+class Statuses(models.Model):
     usuario = models.OneToOneField('modulo_dot.Usuario', null=True, blank=True, on_delete=models.CASCADE)
-    estado = models.CharField(
-        max_length=10,
-        choices=[('activo', 'activo'), ('pendiente', 'pendiente'), ('rechazado', 'rechazado')]
+    status = models.CharField(
+        max_length=15,  
+        choices=[('activa', 'Activa'),
+                 ('baja', 'Baja'),
+                 ('reincorporacion', 'Reincorporación'),
+                 ('reingreso', 'Reingreso'),
+                 ('suspendida', 'Suspendida')],
+        default='suspendida'  
     )
-
     class Meta:
-        db_table = "Status"
+        db_table = "Statuses"
 
     def __str__(self):
         return self.usuario.username

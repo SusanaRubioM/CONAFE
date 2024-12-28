@@ -30,6 +30,18 @@ class Aspirante(models.Model):
     datos_personales = models.OneToOneField(
         'modulo_dot.DatosPersonales', null=True, blank=True, on_delete=models.CASCADE
     )  # Relación uno a uno con DatosPersonales (opcional)
+    status_seleccion = models.CharField(
+        max_length=10, 
+        choices=[      
+            ('activo', 'activo'),
+            ('pendiente', 'pendiente'),
+            ('rechazado', 'rechazado')
+        ],
+        default='pendiente',  # Establecer 'pendiente' como valor por defecto
+        null=True,  # Permitir valores nulos
+        blank=True  # Permitir valores en blanco
+    )
+
     usuario = models.OneToOneField('modulo_dot.Usuario', on_delete=models.CASCADE, null=True, blank=True)  # Relación uno a uno con Usuario (opcional)
     
     class Meta:
@@ -57,6 +69,7 @@ class Aspirante(models.Model):
         else:
             # Si no es "ASPIRANTE", asegurarse de que el folio sea nulo
             self.folio = None
+            self.status_seleccion = None  # Cambiar el estado de selección a "activo"
 
         # Crear un usuario con rol "ASPIRANTE" solo si el usuario no existe
         if not self.usuario:
