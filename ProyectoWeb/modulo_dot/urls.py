@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static  # Asegúrate de esta importación
 
 app_name = 'dot_home'
 
@@ -12,9 +14,11 @@ urlpatterns = [
     path('empleado_modificar/<int:empleado_id>/', views.modificar_empleado, name='modificar_empleado'),
     path('dasboard/status/', views.status_empleado, name='dasboard_status'),
     path('ajax/empleado/status/<int:empleado_id>/', views.actualizar_status_ajax, name='actualizar_status_ajax'),
-
-  # Modificado
+    path('dashboard/eliminar/', views.dashboard_eleminar, name='dashboard_eleminar'),
+    path('eliminar/<int:empleado_id>/', views.eliminar_empleado, name='empleado_eliminar'),
+    path('visualizacion/docs/', views.visualizar_docs, name='visualizacion_docs'),
 ]
+
 
 
 

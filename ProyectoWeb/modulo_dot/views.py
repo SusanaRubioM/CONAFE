@@ -12,6 +12,8 @@ from login_app.models import Statuses
 from django.http import JsonResponse
 import json
 from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+import os
 
 @login_required
 @role_required("DOT")  # Solo los usuarios con rol 'DOT' pueden acceder
@@ -249,6 +251,65 @@ def actualizar_status_ajax(request, empleado_id):
         except DatosPersonales.DoesNotExist:
             return JsonResponse({"success": False, "message": "Empleado no encontrado."})
     return JsonResponse({"success": False, "message": "Método no permitido."})
+
+
+@login_required
+@role_required("DOT")
+def dashboard_eleminar(request):
+    empleados = DatosPersonales.objects.select_related('usuario')  # Trae relación con Usuario
+    return render(
+        request, "home_dot/dasboard_eleminar.html", {"empleados": empleados}
+    )
+
+
+@login_required
+@role_required("DOT")
+def eliminar_empleado(request, empleado_id):
+    empleado = get_object_or_404(DatosPersonales, id=empleado_id)
+    usuario = empleado.usuario  # Relación con el modelo Usuario
+
+    if usuario.rol != "ASPIRANTE":  # Validar roles si es necesario
+        try:
+            # Eliminar el estado asociado
+            Statuses.objects.filter(usuario=usuario).delete()
+
+            # Eliminar la relación con UsuarioRol si existe
+            if usuario.usuario_rol:
+                usuario.usuario_rol.delete()
+
+            # Eliminar el usuario asociado
+            usuario.delete()
+
+            # Finalmente, eliminar los datos personales
+            empleado.delete()
+
+            messages.success(request, f"El empleado {empleado.nombre} ha sido eliminado junto con sus relaciones.")
+        except Exception as e:
+            messages.error(request, f"Hubo un error al eliminar el empleado: {e}")
+    else:
+        messages.error(request, "No se puede eliminar a un usuario con rol ASPIRANTE.")
+    
+    return redirect('dot_home:dashboard_eleminar')
+
+@login_required
+@role_required("DOT")
+def visualizar_docs(request):
+    # Ruta absoluta de la carpeta donde se almacenan los documentos
+    carpeta_documentos = os.path.join(settings.MEDIA_ROOT, 'documentos')
+    
+    # Obtener una lista de los archivos en esa carpeta
+    documentos = []
+    if os.path.exists(carpeta_documentos):
+        documentos = os.listdir(carpeta_documentos)  # Lista los archivos en la carpeta
+    
+    # Pasar la lista de documentos y MEDIA_URL a la plantilla
+    return render(request, "home_dot/visualizacion_docs.html", {
+        'documentos': documentos,
+        'MEDIA_URL': settings.MEDIA_URL,  # Pasa MEDIA_URL a la plantilla
+    })
+
+
+
 
 
 

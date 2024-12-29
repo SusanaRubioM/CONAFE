@@ -40,18 +40,18 @@
     
     <!-- Botón asignacion -->
     <div class="col-md-4 mb-4">
-      <button class="btn btn-danger btn-block">
-        <i class="fas"></i> Asignacion
-      </button>
+      <a href="{% url 'dot_home:dashboard_eleminar' %}" class="btn btn-danger btn-block">
+      <i class="fas fa-trash"></i> Eliminar
+      </a>
     </div>
    
 
     <!-- Botón Documentación -->
     <div class="col-md-4 mb-4">
-      <button class="btn btn-secondary btn-block">
-        <i class="fas fa-file-alt"></i> Documentación
-      </button>
+      <a href="{% url 'dot_home:visualizacion_docs' %}" class="btn btn-secondary btn-block">
+      <i class="fas fa-file-alt"></i> Documentación
+      </a>
     </div>
-  </div>
+    </div>
 </div>
 {% endblock %}
