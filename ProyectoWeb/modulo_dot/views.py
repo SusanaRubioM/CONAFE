@@ -14,6 +14,7 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 import os
+from django.db import transaction
 
 @login_required
 @role_required("DOT")  # Solo los usuarios con rol 'DOT' pueden acceder
@@ -266,30 +267,26 @@ def dashboard_eleminar(request):
 @role_required("DOT")
 def eliminar_empleado(request, empleado_id):
     empleado = get_object_or_404(DatosPersonales, id=empleado_id)
-    usuario = empleado.usuario  # Relación con el modelo Usuario
+    usuario = empleado.usuario
 
-    if usuario.rol != "ASPIRANTE":  # Validar roles si es necesario
-        try:
-            # Eliminar el estado asociado
+    try:
+        with transaction.atomic():
+            # Operaciones de eliminación
             Statuses.objects.filter(usuario=usuario).delete()
-
-            # Eliminar la relación con UsuarioRol si existe
             if usuario.usuario_rol:
                 usuario.usuario_rol.delete()
-
-            # Eliminar el usuario asociado
+            Aspirante.objects.filter(usuario=usuario).delete()
+            if hasattr(empleado, 'documentos'):
+                empleado.documentos.delete()
             usuario.delete()
-
-            # Finalmente, eliminar los datos personales
             empleado.delete()
 
-            messages.success(request, f"El empleado {empleado.nombre} ha sido eliminado junto con sus relaciones.")
-        except Exception as e:
-            messages.error(request, f"Hubo un error al eliminar el empleado: {e}")
-    else:
-        messages.error(request, "No se puede eliminar a un usuario con rol ASPIRANTE.")
+        messages.success(request, f"El empleado {empleado.nombre} ha sido eliminado junto con todas sus relaciones.")
+    except Exception as e:
+        messages.error(request, f"Hubo un error al eliminar el empleado: {e}")
     
     return redirect('dot_home:dashboard_eleminar')
+
 
 @login_required
 @role_required("DOT")

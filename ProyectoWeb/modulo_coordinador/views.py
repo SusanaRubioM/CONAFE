@@ -11,11 +11,24 @@ def empleado_view(request):
     return render(request, 'home_coordinador/home_coordinador.html')
 
 
-def listar_aspirantes(request):
-    # Optimiza la consulta cargando las relaciones one-to-one
-    aspirantes = Aspirante.objects.select_related('datos_personales', 'residencia').all()
-
-    return render(request, 'home_coordinador/dashboard_aspirante.html', {'aspirantes': aspirantes})
+def dashboard_aspirantes(request):
+    aspirantes = (
+        Aspirante.objects
+        .select_related(
+            "datos_personales",
+            "datos_personales__documentos",  # Relación de DocumentosPersonales
+            "residencia",
+            "participacion",
+            "gestion",
+            "usuario",
+        )
+        .all()
+    )
+    return render(
+        request,
+        "home_coordinador/dashboard_aspirante.html",
+        {"aspirantes": aspirantes},
+    )
 
 @role_required('CT')
 def detalles_aspirante(request, aspirante_id):

@@ -33,7 +33,7 @@ class Aspirante(models.Model):
     status_seleccion = models.CharField(
         max_length=10, 
         choices=[      
-            ('activo', 'activo'),
+            ('aceptado', 'aceptado'),
             ('pendiente', 'pendiente'),
             ('rechazado', 'rechazado')
         ],
