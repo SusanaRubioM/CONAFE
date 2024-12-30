@@ -32,7 +32,7 @@
 
 <div class="container mt-5">
     <div class="d-flex justify-content-start mb-3">
-        <a href="{% url 'dot_home:home_dot' %}" class="btn btn-warning" style="background-color: #620b0b; color:white">
+        <a href="{% url 'coordinador_home:home_coordinador' %}" class="btn btn-warning" style="background-color: #620b0b; color:white">
             Menú
         </a>
     </div>
@@ -86,8 +86,8 @@
                     <td>{{ aspirante.participacion.tipo_servicio }}</td>
                     <td>{{ aspirante.participacion.programa_participacion }}</td>
                     <td>
-                        <button class="btn aceptar-btn" data-aspirante-id="{{ aspirante.id }}">Aceptar</button>
-                        <button class="btn rechazar-btn" data-aspirante-id="{{ aspirante.id }}">Rechazar</button>
+                        <button class="btn aceptar-btn" data-aspirante-id="{{ aspirante.id }}" data-status="aceptado">Aceptar</button>
+                        <button class="btn rechazar-btn" data-aspirante-id="{{ aspirante.id }}" data-status="rechazado">Rechazar</button>
                     </td>
                 </tr>
                 {% endif %}
@@ -99,7 +99,65 @@
     <p class="text-center">No hay aspirantes disponibles.</p>
     {% endif %}
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const botonesAceptar = document.querySelectorAll(".aceptar-btn");
+        const botonesRechazar = document.querySelectorAll(".rechazar-btn");
+
+        // Handle "aceptar" button click
+        botonesAceptar.forEach((boton) => {
+            boton.addEventListener("click", function () {
+                const aspiranteId = boton.getAttribute("data-aspirante-id");
+                const nuevoEstado = boton.getAttribute("data-status");  // Leer el valor de data-status
+
+                // Verificar qué valor se está enviando
+                console.log("Estado a enviar (aceptar):", nuevoEstado);
+
+                // Send AJAX request to update status to 'aceptado'
+                actualizarEstado(aspiranteId, nuevoEstado);
+            });
+        });
+
+        // Handle "rechazar" button click
+        botonesRechazar.forEach((boton) => {
+            boton.addEventListener("click", function () {
+                const aspiranteId = boton.getAttribute("data-aspirante-id");
+                const nuevoEstado = boton.getAttribute("data-status");  // Leer el valor de data-status
+
+                // Verificar qué valor se está enviando
+                console.log("Estado a enviar (rechazar):", nuevoEstado);
+
+                // Send AJAX request to update status to 'rechazado'
+                actualizarEstado(aspiranteId, nuevoEstado);
+            });
+        });
+
+        // Function to update aspirante status via AJAX
+        function actualizarEstado(aspiranteId, nuevoEstado) {
+            console.log("Enviando solicitud con estado:", nuevoEstado);
+
+            fetch("{% url 'coordinador_home:actualizar_status_ajax' 0 %}".replace("0", aspiranteId), {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}",  // CSRF token for security
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ status_seleccion: nuevoEstado }),
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    alert(data.message);  // Show success message
+                    location.reload();  // Reload the page to reflect changes
+                } else {
+                    alert("Error: " + data.message);  // Show error message
+                }
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+            });
+        }
+    });
+</script>
 {% endblock %}
-
-
-

@@ -3,6 +3,8 @@ from login_app.decorators import role_required
 from django.contrib.auth.decorators import login_required
 from form_app.models import Aspirante
 from django.db.models import Prefetch
+from django.http import JsonResponse
+import json
 
 @login_required
 @role_required('CT')
@@ -30,6 +32,46 @@ def dashboard_aspirantes(request):
         {"aspirantes": aspirantes},
     )
 
+
+
+def ajax_aspirante_status(request, aspirante_id):
+    if request.method == "POST":
+        try:
+            # Obtener los datos del cuerpo de la solicitud en formato JSON
+            data = json.loads(request.body)
+            status_seleccion = data.get("status_seleccion")
+            
+            print("Estado recibido:", status_seleccion)  # Verificar qué valor se recibe en el servidor
+
+            # Verificamos si el estado recibido es uno de los válidos
+            if status_seleccion not in ['aceptado', 'pendiente', 'rechazado']:
+                return JsonResponse({"success": False, "message": "Estado no válido."})
+
+            # Buscar al aspirante por ID
+            aspirante = Aspirante.objects.get(id=aspirante_id)
+
+            if status_seleccion == 'rechazado':
+                # Eliminar el aspirante y todas las relaciones asociadas
+                aspirante.delete()
+                return JsonResponse({"success": True, "message": "Aspirante y sus datos eliminados correctamente."})
+            
+            # Si el estado es 'aceptado' o 'pendiente', actualizar el estado del aspirante
+            aspirante.status_seleccion = status_seleccion
+            aspirante.save()
+
+            return JsonResponse({"success": True, "message": "Estado actualizado correctamente."})
+        
+        except Aspirante.DoesNotExist:
+            return JsonResponse({"success": False, "message": "Aspirante no encontrado."})
+        except json.JSONDecodeError:
+            return JsonResponse({"success": False, "message": "Error al procesar los datos."})
+    return JsonResponse({"success": False, "message": "Método no permitido."})
+
+
+
+
+
+@login_required
 @role_required('CT')
 def detalles_aspirante(request, aspirante_id):
     aspirante = get_object_or_404(Aspirante.objects.prefetch_related(
@@ -42,4 +84,3 @@ def detalles_aspirante(request, aspirante_id):
     ), id=aspirante_id)
 
     return render(request, 'home_coordinador/detalles_aspirante.html', {'aspirante': aspirante})
-
