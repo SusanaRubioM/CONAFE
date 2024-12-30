@@ -13,5 +13,7 @@ urlpatterns = [
     path('aspirante_dashboard_eca_ecar/', views.dashboard_aspirantes_eca_ecar, name='dashboard_aspirante_eca_ecar'),
     path('aspirante_aceptado_eca_ecar/', views.dashboard_aspirantes_aceptados_eca_ecar, name='dashboard_aspirante_aceptado_eca_ecar'),
     path('aspirante_rechazado_eca_ecar/', views.dashboard_aspirantes_rechazados_eca_ecar, name='dashboard_aspirante_rechazado_eca_ecar'),
+    path('dashboard/figura/educativas/', views.dashboard_figura_educativa, name='dashboard_figura_educativa'),
+    path('detalles_educador/<int:empleado_id>/', views.detalles_educador, name='detalles_educador'),
       
 ]

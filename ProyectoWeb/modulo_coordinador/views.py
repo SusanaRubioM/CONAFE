@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from form_app.models import Aspirante, Usuario
 from django.contrib.auth.hashers import make_password
 from login_app.models import UsuarioRol
+from modulo_dot.models import DatosPersonales 
 from django.db.models import Prefetch
 from django.http import JsonResponse
 import json
@@ -133,6 +134,48 @@ def dashboard_aspirantes_eca_ecar(request):
         {"aspirantes": aspirantes},
     )
 
+@login_required
+@role_required('CT')
+def dashboard_figura_educativa(request):
+    """
+    Vista para mostrar el dashboard con todos los empleados.
+    """
+    # Obtener datos de empleados desde el modelo DatosPersonales
+    empleados = DatosPersonales.objects.select_related('usuario')  # Trae relación con Usuario
+    return render(
+        request, "home_coordinador/dashboard_figuras.html", {"empleados": empleados}
+    )
+
+
+@login_required
+@role_required("CT")
+def detalles_educador(request, empleado_id):
+    """
+    Vista para ver los detalles de un empleado en específico.
+    """
+    # Obtener el objeto DatosPersonales asociado al usuario con el id proporcionado
+    empleado = get_object_or_404(DatosPersonales, usuario__id=empleado_id)  # Acceder a los datos de un empleado relacionado con Usuario
+    
+    # Pasar el objeto empleado a la plantilla
+    return render(request, "home_coordinador/detalles_educador.html", {"empleado": empleado})
+
+@login_required
+@role_required('CT')
+def detalles_aspirante(request, aspirante_id):
+    aspirante = get_object_or_404(Aspirante.objects.prefetch_related(
+        'datos_personales',
+        'datos_personales__documentos',
+        'datos_personales__residencia',  # Accediendo a residencia directamente
+        'gestion', 
+        'banco', 
+        'participacion',
+    ), id=aspirante_id)
+
+    return render(request, 'home_coordinador/detalles_aspirante.html', {'aspirante': aspirante})
+
+
+
+
 
 def ajax_aspirante_status(request, aspirante_id):
     if request.method == "POST":
@@ -167,24 +210,6 @@ def ajax_aspirante_status(request, aspirante_id):
 
     return JsonResponse({"success": False, "message": "Método no permitido."})
 
-@login_required
-@role_required('CT')
-def detalles_aspirante(request, aspirante_id):
-    aspirante = get_object_or_404(Aspirante.objects.prefetch_related(
-        'datos_personales',
-        'datos_personales__documentos',
-        'datos_personales__residencia',  # Accediendo a residencia directamente
-        'gestion', 
-        'banco', 
-        'participacion',
-    ), id=aspirante_id)
-
-    return render(request, 'home_coordinador/detalles_aspirante.html', {'aspirante': aspirante})
-
-from django.contrib.auth.hashers import make_password
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-import json
 
 def crear_usuario_ajax(request):
     if request.method == "POST":
