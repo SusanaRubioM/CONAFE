@@ -5,7 +5,7 @@ from login_app.models import Statuses  # Importa el modelo Statuses
 from django.contrib.auth.hashers import make_password
 from login_app.models import UsuarioRol  # Lo importamos localmente dentro de save
 class Usuario(models.Model):
-    usuario_rol = models.OneToOneField(UsuarioRol, null=True, blank=True, on_delete=models.SET_NULL)
+    usuario_rol = models.OneToOneField(UsuarioRol, null=True, blank=True, on_delete=models.CASCADE)
     usuario = models.CharField(max_length=255, unique=True,null=True, blank=True)
     contrasenia = models.CharField(max_length=255,null=True, blank=True)  # Contraseña en texto plano
     rol = models.CharField(

@@ -1,38 +1,37 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h1>Detalles del Aspirante: {{ aspirante.datos_personales.nombre }}</h1>
+<h1>Detalles del Aspirante: {{ aspirante.datos_personales.nombre }}</h1>
 
-  <h2>Información Personal</h2>
-  <p><strong>Nombre:</strong> {{ aspirante.datos_personales.nombre }} {{ aspirante.datos_personales.apellidopa }} {{ aspirante.datos_personales.apellidoma }}</p>
-  <p><strong>Edad:</strong> {{ aspirante.datos_personales.edad }}</p>
-  <p><strong>Sexo:</strong> {{ aspirante.datos_personales.sexo }}</p>
-  <p><strong>Correo:</strong> {{ aspirante.datos_personales.correo }}</p>
-  <p><strong>Teléfono:</strong> {{ aspirante.datos_personales.telefono }}</p>
+<h2>Información Personal</h2>
+<p><strong>Nombre:</strong> {{ aspirante.datos_personales.nombre }} {{ aspirante.datos_personales.apellidopa }}</p>
+<p><strong>Edad:</strong> {{ aspirante.datos_personales.edad }}</p>
+<p><strong>Correo:</strong> {{ aspirante.datos_personales.correo }}</p>
 
-  <h2>Residencia</h2>
-  <p>
-    {% if aspirante.datos_personales.residencia %}
-      {{ aspirante.datos_personales.residencia.estado }}, {{ aspirante.datos_personales.residencia.municipio_alcaldia }},
-      {{ aspirante.datos_personales.residencia.colonia }}, {{ aspirante.datos_personales.residencia.calle }}
-    {% else %}
-      No tiene residencia registrada.
+{% if aspirante.status_seleccion == 'aceptado' and not aspirante.usuario %}
+    <h2>Crear Usuario</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <ul>
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <button type="submit" class="btn btn-primary">Guardar Usuario</button>
+    </form>
+{% else %}
+    {% if aspirante.usuario %}
+        <p>Este aspirante ya tiene un usuario asignado.</p>
     {% endif %}
-  </p>
-
-  <h2>Documentos</h2>
-  <p><strong>Identificación Oficial:</strong> <a href="{{ aspirante.datos_personales.documentos.identificacion_oficial.url }}">Ver documento</a></p>
-  <p><strong>Comprobante de Domicilio:</strong> <a href="{{ aspirante.datos_personales.documentos.comprobante_domicilio.url }}">Ver documento</a></p>
-  <p><strong>Certificado de Estudios:</strong> <a href="{{ aspirante.datos_personales.documentos.certificado_estudio.url }}">Ver documento</a></p>
-
-  <h2>Participación</h2>
-  <p><strong>Estado de Participación:</strong> {{ aspirante.participacion.estado_participacion }}</p>
-  <p><strong>Ciclo Escolar:</strong> {{ aspirante.participacion.ciclo_escolar }}</p>
-  <p><strong>Programa de Participación:</strong> {{ aspirante.participacion.programa_participacion }}</p>
-  <p><strong>Tipo de Servicio:</strong> {{ aspirante.participacion.tipo_servicio }}</p>
-
-  <h2>Gestión</h2>
-  <p><strong>Peso:</strong> {{ aspirante.gestion.peso }} kg</p>
-  <p><strong>Estatura:</strong> {{ aspirante.gestion.estatura }} cm</p>
-  <p><strong>Medio Publicitario:</strong> {{ aspirante.gestion.medio_publicitario }}</p>
+{% endif %}
 {% endblock %}
+

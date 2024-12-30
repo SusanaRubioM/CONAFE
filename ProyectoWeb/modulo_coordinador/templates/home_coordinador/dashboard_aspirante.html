@@ -109,13 +109,9 @@
         botonesAceptar.forEach((boton) => {
             boton.addEventListener("click", function () {
                 const aspiranteId = boton.getAttribute("data-aspirante-id");
-                const nuevoEstado = boton.getAttribute("data-status");  // Leer el valor de data-status
-
-                // Verificar qué valor se está enviando
-                console.log("Estado a enviar (aceptar):", nuevoEstado);
 
                 // Send AJAX request to update status to 'aceptado'
-                actualizarEstado(aspiranteId, nuevoEstado);
+                actualizarEstado(aspiranteId, 'aceptado');
             });
         });
 
@@ -123,20 +119,14 @@
         botonesRechazar.forEach((boton) => {
             boton.addEventListener("click", function () {
                 const aspiranteId = boton.getAttribute("data-aspirante-id");
-                const nuevoEstado = boton.getAttribute("data-status");  // Leer el valor de data-status
-
-                // Verificar qué valor se está enviando
-                console.log("Estado a enviar (rechazar):", nuevoEstado);
 
                 // Send AJAX request to update status to 'rechazado'
-                actualizarEstado(aspiranteId, nuevoEstado);
+                actualizarEstado(aspiranteId, 'rechazado');
             });
         });
 
         // Function to update aspirante status via AJAX
         function actualizarEstado(aspiranteId, nuevoEstado) {
-            console.log("Enviando solicitud con estado:", nuevoEstado);
-
             fetch("{% url 'coordinador_home:actualizar_status_ajax' 0 %}".replace("0", aspiranteId), {
                 method: "POST",
                 headers: {
