@@ -15,6 +15,26 @@ def empleado_view(request):
     # Lógica específica para el coordinador territorial
     return render(request, 'home_coordinador/home_coordinador.html')
 
+@login_required
+@role_required('CT')
+def dashboard_aspirantes_rechazados(request):
+    aspirantes = (
+        Aspirante.objects
+        .select_related(
+            "datos_personales",
+            "datos_personales__documentos",  # Relación de DocumentosPersonales
+            "residencia",
+            "participacion",
+            "gestion",
+            "usuario",
+        )
+        .all()
+    )
+    return render(
+        request,
+        "home_coordinador/dashboard_aspirante_rechazados.html",
+        {"aspirantes": aspirantes},
+    )
 
 def dashboard_aspirantes_ec(request):
     aspirantes = (
@@ -32,6 +52,64 @@ def dashboard_aspirantes_ec(request):
     return render(
         request,
         "home_coordinador/dashboard_aspirante.html",
+        {"aspirantes": aspirantes},
+    )
+
+
+def dashboard_aspirantes_aceptados(request):
+    aspirantes = (
+        Aspirante.objects
+        .select_related(
+            "datos_personales",
+            "datos_personales__documentos",  # Relación de DocumentosPersonales
+            "residencia",
+            "participacion",
+            "gestion",
+            "usuario",
+        )
+        .all()
+    )
+    return render(
+        request,
+        "home_coordinador/dashboard_aspirante_aceptados.html",
+        {"aspirantes": aspirantes},
+    )
+
+def dashboard_aspirantes_aceptados_eca_ecar(request):
+    aspirantes = (
+        Aspirante.objects
+        .select_related(
+            "datos_personales",
+            "datos_personales__documentos",  # Relación de DocumentosPersonales
+            "residencia",
+            "participacion",
+            "gestion",
+            "usuario",
+        )
+        .filter(participacion__programa_participacion__in=["ECA", "ECAR"])
+    )
+    return render(
+        request,
+        "home_coordinador/dashboard_eca_aceptados.html",
+        {"aspirantes": aspirantes},
+    )
+
+def dashboard_aspirantes_rechazados_eca_ecar(request):
+    aspirantes = (
+        Aspirante.objects
+        .select_related(
+            "datos_personales",
+            "datos_personales__documentos",  # Relación de DocumentosPersonales
+            "residencia",
+            "participacion",
+            "gestion",
+            "usuario",
+        )
+        .filter(participacion__programa_participacion__in=["ECA", "ECAR"])
+    )
+    return render(
+        request,
+        "home_coordinador/dashboard_eca_rechazados.html",
         {"aspirantes": aspirantes},
     )
 
