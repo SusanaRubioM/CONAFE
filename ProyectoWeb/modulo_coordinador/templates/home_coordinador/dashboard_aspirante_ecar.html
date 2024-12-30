@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Dashboard de Aspirantes a EC{% endblock %}
+{% block title %}Dashboard de Aspirantes a ECA y ECAR{% endblock %}
 
 {% block content %}
 <style>
@@ -37,7 +37,7 @@
         </a>
     </div>
 
-    <h2 class="text-center mb-4">Dashboard de Aspirantes</h2>
+    <h2 class="text-center mb-4">Dashboard de Aspirantes a ECA y ECAR</h2>
 
     {% if aspirantes %}
     <div class="table-responsive">
@@ -61,36 +61,36 @@
             </thead>
             <tbody>
                 {% for aspirante in aspirantes %}
-                {% if aspirante.folio %}
-                <tr>
-                    <td>{{ aspirante.folio }}</td>
-                    <td>
-                        {{ aspirante.datos_personales.nombre }} 
-                        {{ aspirante.datos_personales.apellidopa }} 
-                        {{ aspirante.datos_personales.apellidoma }}
-                    </td>
-                    <td>{{ aspirante.residencia.estado }}</td>
-                    <td>{{ aspirante.participacion.estado_participacion }}</td>
-                    <td>{{ aspirante.participacion.ciclo_escolar }}</td>
-                    <td>{{ aspirante.gestion.habla_lengua_indigena|yesno:"Sí,No" }}</td>
-                    <td>{{ aspirante.gestion.lengua_indigena }}</td>
-                    <td>{{ aspirante.datos_personales.formacion_academica }}</td>
-                    <td>
-                        {% if aspirante.datos_personales.documentos.certificado_estudio %}
-                        <a href="{{ aspirante.datos_personales.documentos.certificado_estudio.url }}">Ver documento</a>
-                        {% else %}
-                        No disponible
-                        {% endif %}
-                    </td>
-                    <td>{{ aspirante.participacion.contexto }}</td>
-                    <td>{{ aspirante.participacion.tipo_servicio }}</td>
-                    <td>{{ aspirante.participacion.programa_participacion }}</td>
-                    <td>
-                        <button class="btn aceptar-btn" data-aspirante-id="{{ aspirante.id }}" data-status="aceptado">Aceptar</button>
-                        <button class="btn rechazar-btn" data-aspirante-id="{{ aspirante.id }}" data-status="rechazado">Rechazar</button>
-                    </td>
-                </tr>
-                {% endif %}
+                    {% if aspirante.participacion.programa_participacion == "ECA" or aspirante.participacion.programa_participacion == "ECAR" %}
+                    <tr>
+                        <td>{{ aspirante.folio }}</td>
+                        <td>
+                            {{ aspirante.datos_personales.nombre }} 
+                            {{ aspirante.datos_personales.apellidopa }} 
+                            {{ aspirante.datos_personales.apellidoma }}
+                        </td>
+                        <td>{{ aspirante.residencia.estado }}</td>
+                        <td>{{ aspirante.participacion.estado_participacion }}</td>
+                        <td>{{ aspirante.participacion.ciclo_escolar }}</td>
+                        <td>{{ aspirante.gestion.habla_lengua_indigena|yesno:"Sí,No" }}</td>
+                        <td>{{ aspirante.gestion.lengua_indigena }}</td>
+                        <td>{{ aspirante.datos_personales.formacion_academica }}</td>
+                        <td>
+                            {% if aspirante.datos_personales.documentos.certificado_estudio %}
+                            <a href="{{ aspirante.datos_personales.documentos.certificado_estudio.url }}">Ver documento</a>
+                            {% else %}
+                            No disponible
+                            {% endif %}
+                        </td>
+                        <td>{{ aspirante.participacion.contexto }}</td>
+                        <td>{{ aspirante.participacion.tipo_servicio }}</td>
+                        <td>{{ aspirante.participacion.programa_participacion }}</td>
+                        <td>
+                            <button class="btn aceptar-btn" data-aspirante-id="{{ aspirante.id }}" data-status="aceptado">Aceptar</button>
+                            <button class="btn rechazar-btn" data-aspirante-id="{{ aspirante.id }}" data-status="rechazado">Rechazar</button>
+                        </td>
+                    </tr>
+                    {% endif %}
                 {% endfor %}
             </tbody>
         </table>
@@ -150,4 +150,5 @@
         }
     });
 </script>
+
 {% endblock %}

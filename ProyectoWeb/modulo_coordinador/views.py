@@ -13,7 +13,7 @@ def empleado_view(request):
     return render(request, 'home_coordinador/home_coordinador.html')
 
 
-def dashboard_aspirantes(request):
+def dashboard_aspirantes_ec(request):
     aspirantes = (
         Aspirante.objects
         .select_related(
@@ -29,6 +29,26 @@ def dashboard_aspirantes(request):
     return render(
         request,
         "home_coordinador/dashboard_aspirante.html",
+        {"aspirantes": aspirantes},
+    )
+
+
+def dashboard_aspirantes_eca_ecar(request):
+    aspirantes = (
+        Aspirante.objects
+        .select_related(
+            "datos_personales",
+            "datos_personales__documentos",  # Relación de DocumentosPersonales
+            "residencia",
+            "participacion",
+            "gestion",
+            "usuario",
+        )
+        .filter(participacion__programa_participacion__in=["ECA", "ECAR"])
+    )
+    return render(
+        request,
+        "home_coordinador/dashboard_aspirante_ecar.html",
         {"aspirantes": aspirantes},
     )
 
@@ -71,12 +91,6 @@ def ajax_aspirante_status(request, aspirante_id):
             return JsonResponse({"success": False, "message": f"Error inesperado: {str(e)}"})
 
     return JsonResponse({"success": False, "message": "Método no permitido."})
-
-
-
-
-
-
 
 @login_required
 @role_required('CT')

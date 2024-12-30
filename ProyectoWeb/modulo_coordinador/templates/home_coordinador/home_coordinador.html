@@ -18,14 +18,14 @@
     <!-- Botón Recibir registros de nuevos EC   url 'coordinador_home:dashboard_aspirante' -->
     <div class="col-md-4 mb-4">
       <a href="{% url 'coordinador_home:dashboard_aspirante' %}" class="btn btn-info btn-block">
-        <i class="fas fa-file-import"></i> Recibir Registros de Aspirantes
+        <i class="fas fa-file-import"></i> Seleccionar Nuevos EC
       </a>
     </div>
 
     <!-- Botón Seleccionar nuevos EC, ECA y ECAR -->
     <div class="col-md-4 mb-4">
-      <a href="#" class="btn btn-success btn-block">
-        <i class="fas fa-user-check"></i> Seleccionar Nuevos EC, ECA y ECAR
+      <a href="{% url 'coordinador_home:dashboard_aspirante_eca_ecar' %}" class="btn btn-success btn-block">
+      <i class="fas fa-user-check"></i> Seleccionar Nuevos ECA y ECAR
       </a>
     </div>
 
