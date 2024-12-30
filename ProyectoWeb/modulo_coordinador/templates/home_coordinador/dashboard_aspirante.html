@@ -168,6 +168,23 @@
             });
         });
 
+        botonesRechazar.forEach((boton) => {
+            boton.addEventListener("click", function () {
+                aspiranteId = boton.getAttribute("data-aspirante-id");
+
+                // Update aspirante state to 'rechazado'
+                actualizarEstado(aspiranteId, 'rechazado')
+                    .then(() => {
+                        alert("Estado cambiado a rechazado");
+                        location.reload(); // Refresh the page to reflect changes
+                    })
+                    .catch((error) => {
+                        console.error("Error:", error);
+                        alert("Error al cambiar el estado.");
+                    });
+            });
+        });
+
         document.getElementById("formCrearUsuario").addEventListener("submit", function (e) {
             e.preventDefault();
 
@@ -181,41 +198,44 @@
         });
 
         function crearUsuario(aspiranteId, usuario, rol, contrasenia) {
-            // Update aspirante state to 'aceptado'
-            actualizarEstado(aspiranteId, 'aceptado');
-
-            // Send AJAX request to create the user
-            fetch("{% url 'coordinador_home:crear_usuario_ajax' %}", {
-                method: "POST",
-                headers: {
-                    "X-CSRFToken": "{{ csrf_token }}",
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    aspirante_id: aspiranteId,
-                    usuario: usuario,
-                    rol: rol,
-                    contrasenia: contrasenia,
-                }),
-            })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.success) {
-                    alert("Usuario creado exitosamente para el aspirante!");
-                    $('#modalCrearUsuario').modal('hide');  // Close the modal
-                    location.reload();  // Refresh page
-                } else {
-                    alert("Error: " + data.message);
-                }
-            })
-            .catch((error) => {
-                console.error("Error:", error);
-                alert("Error al crear usuario.");
-            });
+            actualizarEstado(aspiranteId, 'aceptado')
+                .then(() => {
+                    fetch("{% url 'coordinador_home:crear_usuario_ajax' %}", {
+                        method: "POST",
+                        headers: {
+                            "X-CSRFToken": "{{ csrf_token }}",
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            aspirante_id: aspiranteId,
+                            usuario: usuario,
+                            rol: rol,
+                            contrasenia: contrasenia,
+                        }),
+                    })
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (data.success) {
+                                alert("Usuario creado exitosamente para el aspirante!");
+                                $('#modalCrearUsuario').modal('hide'); // Close the modal
+                                location.reload(); // Refresh page
+                            } else {
+                                alert("Error: " + data.message);
+                            }
+                        })
+                        .catch((error) => {
+                            console.error("Error:", error);
+                            alert("Error al crear usuario.");
+                        });
+                })
+                .catch((error) => {
+                    console.error("Error al actualizar el estado:", error);
+                });
         }
 
         function actualizarEstado(aspiranteId, nuevoEstado) {
-            fetch("{% url 'coordinador_home:actualizar_status_ajax' 0 %}".replace("0", aspiranteId), {
+            console.log("Actualizando estado para aspirante ID:", aspiranteId, "Estado:", nuevoEstado);
+            return fetch("{% url 'coordinador_home:actualizar_status_ajax' 0 %}".replace("0", aspiranteId), {
                 method: "POST",
                 headers: {
                     "X-CSRFToken": "{{ csrf_token }}",
@@ -223,17 +243,13 @@
                 },
                 body: JSON.stringify({ status_seleccion: nuevoEstado }),
             })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.success) {
-                    console.log("Estado actualizado a:", nuevoEstado);
-                } else {
-                    alert("Error al actualizar el estado.");
-                }
-            })
-            .catch((error) => {
-                console.error("Error:", error);
-            });
+                .then((response) => response.json())
+                .then((data) => {
+                    console.log("Respuesta del servidor:", data);
+                    if (!data.success) {
+                        throw new Error(data.message);
+                    }
+                });
         }
     });
 </script>

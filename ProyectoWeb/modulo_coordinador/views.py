@@ -7,6 +7,7 @@ from login_app.models import UsuarioRol
 from django.db.models import Prefetch
 from django.http import JsonResponse
 import json
+from django.core.exceptions import ObjectDoesNotExist
 
 @login_required
 @role_required('CT')
@@ -55,7 +56,6 @@ def dashboard_aspirantes_eca_ecar(request):
     )
 
 
-
 def ajax_aspirante_status(request, aspirante_id):
     if request.method == "POST":
         try:
@@ -63,29 +63,24 @@ def ajax_aspirante_status(request, aspirante_id):
             data = json.loads(request.body)
             status_seleccion = data.get("status_seleccion")
 
-            print("Estado recibido:", status_seleccion)  # Verificar qué valor se recibe en el servidor
+            print("Estado recibido:", status_seleccion)  # Debug para verificar el valor recibido
 
             # Verificamos si el estado recibido es uno de los válidos
-            if status_seleccion not in ['aceptado', 'pendiente', 'rechazado']:
+            if status_seleccion not in ['aceptado', 'rechazado']:
                 return JsonResponse({"success": False, "message": "Estado no válido."})
 
             # Buscar al aspirante por ID
             aspirante = Aspirante.objects.get(id=aspirante_id)
 
-            if status_seleccion == 'rechazado':
-                # Eliminar el UsuarioRol relacionado con el aspirante
-                if aspirante.usuario and aspirante.usuario.usuario_rol:
-                    aspirante.usuario.usuario_rol.delete()  # Elimina el UsuarioRol asociado al usuario
-                    aspirante.usuario.delete()  # Eliminar también el Usuario si es necesario
-                return JsonResponse({"success": True, "message": "Aspirante y sus datos eliminados correctamente."})
-
-            # Si el estado es 'aceptado' o 'pendiente', actualizar el estado del aspirante
-            aspirante.status_seleccion = status_seleccion
+            # Actualizar el estado solo si es válido
+            aspirante.status_seleccion = status_seleccion  # Cambiar solo el estado
+            
+            # No modificar el campo folio ni otros campos, solo actualizamos status_seleccion
             aspirante.save()
 
-            return JsonResponse({"success": True, "message": "Estado actualizado correctamente."})
+            return JsonResponse({"success": True, "message": f"Estado actualizado a {aspirante.status_seleccion} correctamente."})
 
-        except Aspirante.DoesNotExist:
+        except ObjectDoesNotExist:
             return JsonResponse({"success": False, "message": "Aspirante no encontrado."})
         except json.JSONDecodeError:
             return JsonResponse({"success": False, "message": "Error al procesar los datos."})
