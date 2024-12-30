@@ -37,7 +37,7 @@
         </a>
     </div>
 
-    <h2 class="text-center mb-4">Dashboard de Aspirantes</h2>
+    <h2 class="text-center mb-4">Dashboard de Aspirantes </h2>
 
     {% if aspirantes %}
     <div class="table-responsive">
@@ -61,7 +61,7 @@
             </thead>
             <tbody>
                 {% for aspirante in aspirantes %}
-                {% if aspirante.folio %}
+                {% if aspirante.participacion.programa_participacion == "EC" %}
                 <tr>
                     <td>{{ aspirante.folio }}</td>
                     <td>
@@ -86,7 +86,7 @@
                     <td>{{ aspirante.participacion.tipo_servicio }}</td>
                     <td>{{ aspirante.participacion.programa_participacion }}</td>
                     <td>
-                        <button class="btn aceptar-btn" data-aspirante-id="{{ aspirante.id }}" data-status="aceptado">Aceptar</button>
+                        <button class="btn aceptar-btn" data-aspirante-id="{{ aspirante.id }}" data-status="aceptado" data-toggle="modal" data-target="#modalCrearUsuario">Aceptar</button>
                         <button class="btn rechazar-btn" data-aspirante-id="{{ aspirante.id }}" data-status="rechazado">Rechazar</button>
                     </td>
                 </tr>
@@ -100,37 +100,125 @@
     {% endif %}
 </div>
 
+<!-- Modal para Crear Usuario -->
+<div class="modal fade" id="modalCrearUsuario" tabindex="-1" role="dialog" aria-labelledby="modalCrearUsuarioLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCrearUsuarioLabel">Aceptar Aspirante y Crear Usuario</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formCrearUsuario">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="usuario">Nombre de Usuario</label>
+                        <input type="text" class="form-control" id="usuario" name="usuario" placeholder="Nombre de Usuario" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="rol">Rol</label>
+                        <select class="form-control" id="rol" name="rol" required>
+                            <option value="CT">Coordinador Territorial</option>
+                            <option value="DECB">Dirección de Educación Comunitaria e Inclusión Social</option>
+                            <option value="DPE">Dirección de Planeación y Evaluación</option>
+                            <option value="EC">Educador Comunitario</option>
+                            <option value="ECA">Educador Comunitario de Acompañamiento Microrregional</option>
+                            <option value="ECAR">Educador Comunitario de Acompañamiento Regional</option>
+                            <option value="APEC">Asesor de Promoción y Educación Comunitaria</option>
+                            <option value="DOT">Dirección de Operación Territorial</option>
+                            <option value="ASPIRANTE">Aspirante</option>
+                        </select>
+                    </div>
+                    
+
+                    <div class="form-group">
+                        <label for="contrasenia">Contraseña</label>
+                        <input type="password" class="form-control" id="contrasenia" name="contrasenia" placeholder="Contraseña" required>
+                    </div>
+
+                    <div class="form-group text-right">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Crear Usuario</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const botonesAceptar = document.querySelectorAll(".aceptar-btn");
         const botonesRechazar = document.querySelectorAll(".rechazar-btn");
+        let aspiranteId = null;
 
-        // Handle "aceptar" button click
         botonesAceptar.forEach((boton) => {
             boton.addEventListener("click", function () {
-                const aspiranteId = boton.getAttribute("data-aspirante-id");
+                aspiranteId = boton.getAttribute("data-aspirante-id");
 
-                // Send AJAX request to update status to 'aceptado'
-                actualizarEstado(aspiranteId, 'aceptado');
+                // Set initial modal content to accept aspirant and create user
+                document.querySelector("#modalCrearUsuarioLabel").textContent = "Aceptar Aspirante y Crear Usuario";
+                document.querySelector("#formCrearUsuario").reset(); // Reset the form fields
+
+                // Show the modal
+                $('#modalCrearUsuario').modal('show');
             });
         });
 
-        // Handle "rechazar" button click
-        botonesRechazar.forEach((boton) => {
-            boton.addEventListener("click", function () {
-                const aspiranteId = boton.getAttribute("data-aspirante-id");
+        document.getElementById("formCrearUsuario").addEventListener("submit", function (e) {
+            e.preventDefault();
 
-                // Send AJAX request to update status to 'rechazado'
-                actualizarEstado(aspiranteId, 'rechazado');
-            });
+            // Send data to create user
+            const usuario = document.getElementById("usuario").value;
+            const rol = document.getElementById("rol").value;
+            const contrasenia = document.getElementById("contrasenia").value;
+
+            // Perform AJAX request to create the user
+            crearUsuario(aspiranteId, usuario, rol, contrasenia);
         });
 
-        // Function to update aspirante status via AJAX
+        function crearUsuario(aspiranteId, usuario, rol, contrasenia) {
+            // Update aspirante state to 'aceptado'
+            actualizarEstado(aspiranteId, 'aceptado');
+
+            // Send AJAX request to create the user
+            fetch("{% url 'coordinador_home:crear_usuario_ajax' %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}",
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    aspirante_id: aspiranteId,
+                    usuario: usuario,
+                    rol: rol,
+                    contrasenia: contrasenia,
+                }),
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    alert("Usuario creado exitosamente para el aspirante!");
+                    $('#modalCrearUsuario').modal('hide');  // Close the modal
+                    location.reload();  // Refresh page
+                } else {
+                    alert("Error: " + data.message);
+                }
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+                alert("Error al crear usuario.");
+            });
+        }
+
         function actualizarEstado(aspiranteId, nuevoEstado) {
             fetch("{% url 'coordinador_home:actualizar_status_ajax' 0 %}".replace("0", aspiranteId), {
                 method: "POST",
                 headers: {
-                    "X-CSRFToken": "{{ csrf_token }}",  // CSRF token for security
+                    "X-CSRFToken": "{{ csrf_token }}",
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({ status_seleccion: nuevoEstado }),
@@ -138,10 +226,9 @@
             .then((response) => response.json())
             .then((data) => {
                 if (data.success) {
-                    alert(data.message);  // Show success message
-                    location.reload();  // Reload the page to reflect changes
+                    console.log("Estado actualizado a:", nuevoEstado);
                 } else {
-                    alert("Error: " + data.message);  // Show error message
+                    alert("Error al actualizar el estado.");
                 }
             })
             .catch((error) => {
@@ -150,4 +237,7 @@
         }
     });
 </script>
+
 {% endblock %}
+
+

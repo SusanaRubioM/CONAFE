@@ -1,7 +1,9 @@
 from django.shortcuts import render, get_object_or_404
 from login_app.decorators import role_required
 from django.contrib.auth.decorators import login_required
-from form_app.models import Aspirante
+from form_app.models import Aspirante, Usuario
+from django.contrib.auth.hashers import make_password
+from login_app.models import UsuarioRol
 from django.db.models import Prefetch
 from django.http import JsonResponse
 import json
@@ -105,3 +107,67 @@ def detalles_aspirante(request, aspirante_id):
     ), id=aspirante_id)
 
     return render(request, 'home_coordinador/detalles_aspirante.html', {'aspirante': aspirante})
+
+from django.contrib.auth.hashers import make_password
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+import json
+
+def crear_usuario_ajax(request):
+    if request.method == "POST":
+        try:
+            # Recuperar los datos enviados por la solicitud AJAX
+            data = json.loads(request.body)
+            aspirante_id = data.get('aspirante_id')
+            usuario = data.get('usuario')
+            rol = data.get('rol')
+            contrasenia = data.get('contrasenia')
+
+            # Validación de rol
+            valid_roles = [role[0] for role in Usuario._meta.get_field('rol').choices]
+            if rol not in valid_roles:
+                return JsonResponse({"success": False, "message": "Rol no válido."})
+
+            # Buscar el aspirante relacionado
+            aspirante = get_object_or_404(Aspirante, id=aspirante_id)
+
+            if aspirante.usuario and aspirante.usuario.rol == "ASPIRANTE":
+                # Actualizar usuario existente
+                user = aspirante.usuario
+                user.usuario = usuario
+                user.contrasenia = contrasenia  # Aunque será encriptada
+                user.rol = rol
+                user.usuario_rol.username = usuario
+                user.usuario_rol.password = make_password(contrasenia)
+                user.usuario_rol.role = rol
+                user.usuario_rol.save()
+                user.save()
+            else:
+                # Crear un nuevo usuario
+                usuario_rol = UsuarioRol.objects.create(
+                    username=usuario,
+                    role=rol,
+                    password=make_password(contrasenia)  # Encriptar contraseña
+                )
+                user = Usuario.objects.create(
+                    usuario_rol=usuario_rol,
+                    usuario=usuario,
+                    contrasenia=contrasenia,  # Aunque será encriptada
+                    rol=rol
+                )
+                user.save()
+
+                # Asociar el nuevo usuario al aspirante
+                aspirante.usuario = user
+                aspirante.save()
+
+            # Retornar éxito
+            return JsonResponse({"success": True, "message": "Usuario actualizado o creado exitosamente!"})
+
+        except Aspirante.DoesNotExist:
+            return JsonResponse({"success": False, "message": "Aspirante no encontrado."})
+        except Exception as e:
+            return JsonResponse({"success": False, "message": str(e)})
+
+    return JsonResponse({"success": False, "message": "Método no permitido"})
+

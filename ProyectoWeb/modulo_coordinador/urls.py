@@ -8,4 +8,5 @@ urlpatterns = [
     path('aspirante_dashboard_eca_ecar/', views.dashboard_aspirantes_eca_ecar, name='dashboard_aspirante_eca_ecar'),
     path('aspirante_detalles/<int:aspirante_id>/', views.detalles_aspirante, name='detalles_aspirante'),
     path('actualizar_status_ajax/<int:aspirante_id>/', views.ajax_aspirante_status, name='actualizar_status_ajax'),
+     path('crear_usuario_ajax/', views.crear_usuario_ajax, name='crear_usuario_ajax'),  
 ]
