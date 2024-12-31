@@ -138,12 +138,28 @@ def dashboard_aspirantes_eca_ecar(request):
 @role_required('CT')
 def dashboard_figura_educativa(request):
     """
-    Vista para mostrar el dashboard con todos los empleados.
+    Vista para mostrar el dashboard con todos los educadores filtrados por roles específicos.
     """
-    # Obtener datos de empleados desde el modelo DatosPersonales
-    empleados = DatosPersonales.objects.select_related('usuario')  # Trae relación con Usuario
+    # Filtrar los educadores según los roles permitidos
+    empleados = (
+        Aspirante.objects
+        .select_related(
+            "datos_personales",
+            "datos_personales__documentos",  # Relación de DocumentosPersonales
+            "residencia",
+            "participacion",
+            "gestion",
+            "usuario",
+            "usuario__statuses",
+        )
+        .filter(usuario__rol__in=["EC", "ECA", "ECAR"])  # Filtrar por roles específicos
+    )
+
+    # Renderizar el template con los datos filtrados
     return render(
-        request, "home_coordinador/dashboard_figuras.html", {"empleados": empleados}
+        request, 
+        "home_coordinador/dashboard_figuras.html", 
+        {"empleados": empleados}  # Cambié el nombre a empleados para que coincida con el template
     )
 
 
@@ -154,10 +170,11 @@ def detalles_educador(request, empleado_id):
     Vista para ver los detalles de un empleado en específico.
     """
     # Obtener el objeto DatosPersonales asociado al usuario con el id proporcionado
-    empleado = get_object_or_404(DatosPersonales, usuario__id=empleado_id)  # Acceder a los datos de un empleado relacionado con Usuario
+    empleado = get_object_or_404(DatosPersonales.objects.select_related("documentos"), usuario__id=empleado_id)
     
     # Pasar el objeto empleado a la plantilla
     return render(request, "home_coordinador/detalles_educador.html", {"empleado": empleado})
+
 
 @login_required
 @role_required('CT')

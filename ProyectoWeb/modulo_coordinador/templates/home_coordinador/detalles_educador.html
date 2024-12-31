@@ -36,9 +36,47 @@
                 <li class="list-group-item"><strong>CURP:</strong> {{ empleado.curp }}</li>
                 <li class="list-group-item"><strong>Rol:</strong> {{ empleado.usuario.rol }}</li>
                 <li class="list-group-item"><strong>Usuario:</strong> {{ empleado.usuario.usuario }}</li>
-                <li class="list-group-item"><strong>Contraseña:</strong> {{ empleado.usuario.contrasenia }}</li>
             </ul>
         </div>
     </div>
+
+    <!-- Sección de Documentos -->
+    <div class="mt-5">
+        <h3 class="text-center">Documentos Personales</h3>
+
+        {% if empleado.documentos %}
+        <ul class="list-group">
+            {% if empleado.documentos.identificacion_oficial %}
+                <li class="list-group-item">
+                    <strong>Identificación Oficial:</strong>
+                    <a href="{{ empleado.documentos.identificacion_oficial.url }}" target="_blank">Ver Documento</a>
+                </li>
+            {% else %}
+                <li class="list-group-item text-muted">Identificación Oficial: No disponible</li>
+            {% endif %}
+
+            {% if empleado.documentos.comprobante_domicilio %}
+                <li class="list-group-item">
+                    <strong>Comprobante de Domicilio:</strong>
+                    <a href="{{ empleado.documentos.comprobante_domicilio.url }}" target="_blank">Ver Documento</a>
+                </li>
+            {% else %}
+                <li class="list-group-item text-muted">Comprobante de Domicilio: No disponible</li>
+            {% endif %}
+
+            {% if empleado.documentos.certificado_estudio %}
+                <li class="list-group-item">
+                    <strong>Certificado de Estudio:</strong>
+                    <a href="{{ empleado.documentos.certificado_estudio.url }}" target="_blank">Ver Documento</a>
+                </li>
+            {% else %}
+                <li class="list-group-item text-muted">Certificado de Estudio: No disponible</li>
+            {% endif %}
+        </ul>
+        {% else %}
+        <p class="text-center text-muted">No hay documentos disponibles para este empleado.</p>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}
+

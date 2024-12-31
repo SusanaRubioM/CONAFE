@@ -24,28 +24,34 @@
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>Nombre</th>
-                    <th>Apellido Paterno</th>
-                    <th>Apellido Materno</th>
-                    <th>Email</th>
+                    <th>Nombre completo</th>
+                    <th>Edad</th>
                     <th>Rol</th>
-                    <th>Informacion</th>
+                    <th>Ubicacion asignada</th>
+                    <th>situacion de la figuara educativas</th>
+                    <th>tipo de servicio</th>
+                    <th>contexto</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody>
                 {% for empleado in empleados %}
-                {% if empleado.usuario.rol == "EC" or empleado.usuario.rol == "ECA" or empleado.usuario.rol == "ECAR" %}
                 <tr id="empleado_{{ empleado.id }}">
-                    <td>{{ empleado.nombre }}</td>
-                    <td>{{ empleado.apellidopa }}</td>
-                    <td>{{ empleado.apellidoma }}</td>
-                    <td>{{ empleado.correo }}</td>
+                    <td>{{ empleado.datos_personales.nombre }} 
+                        {{ empleado.datos_personales.apellidopa }} 
+                        {{ empleado.datos_personales.apellidoma }}</td>
+                    <td>{{ empleado.datos_personales.edad }}</td>
                     <td>{{ empleado.usuario.rol }}</td>
+                    <td>no asignada</td>
+                    <td>no asignada</td>
+                    <td>{{ empleado.participacion.tipo_servicio }}</td>
+                    <td>{{ empleado.participacion.contexto }}</td>
+                    <td> {{ empleado.usuario.statuses.status }} </td>
+                    
                     <td>
                         <a href="{% url 'coordinador_home:detalles_educador' empleado.id %}" class="btn btn-info">Detalles</a>
                     </td>
                 </tr>
-                {% endif %}
                 {% endfor %}
             </tbody>
         </table>
@@ -73,5 +79,6 @@
     {% endif %}
 </div>
 {% endblock %}
+
 
 
