@@ -36,7 +36,8 @@ def dashboard_aspirantes_rechazados(request):
         "home_coordinador/dashboard_aspirante_rechazados.html",
         {"aspirantes": aspirantes},
     )
-
+@login_required
+@role_required('CT')
 def dashboard_aspirantes_ec(request):
     aspirantes = (
         Aspirante.objects
@@ -56,7 +57,8 @@ def dashboard_aspirantes_ec(request):
         {"aspirantes": aspirantes},
     )
 
-
+@login_required
+@role_required('CT')
 def dashboard_aspirantes_aceptados(request):
     aspirantes = (
         Aspirante.objects
@@ -75,7 +77,8 @@ def dashboard_aspirantes_aceptados(request):
         "home_coordinador/dashboard_aspirante_aceptados.html",
         {"aspirantes": aspirantes},
     )
-
+@login_required
+@role_required('CT')
 def dashboard_aspirantes_aceptados_eca_ecar(request):
     aspirantes = (
         Aspirante.objects
@@ -94,7 +97,8 @@ def dashboard_aspirantes_aceptados_eca_ecar(request):
         "home_coordinador/dashboard_eca_aceptados.html",
         {"aspirantes": aspirantes},
     )
-
+@login_required
+@role_required('CT')
 def dashboard_aspirantes_rechazados_eca_ecar(request):
     aspirantes = (
         Aspirante.objects
@@ -114,7 +118,8 @@ def dashboard_aspirantes_rechazados_eca_ecar(request):
         {"aspirantes": aspirantes},
     )
 
-
+@login_required
+@role_required('CT')
 def dashboard_aspirantes_eca_ecar(request):
     aspirantes = (
         Aspirante.objects
