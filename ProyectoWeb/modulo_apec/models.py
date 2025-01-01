@@ -48,8 +48,6 @@ class ServicioEducativo(models.Model):
     alumnos_hombres = models.IntegerField()  # Número de alumnos hombres
     alumnos_mujeres = models.IntegerField()  # Número de alumnos mujeres
     alumnos_total = models.IntegerField(editable=False)  # Total de alumnos inscritos (calculado)
-    monto_apoyo_mensual = models.DecimalField(max_digits=10, decimal_places=2)
-    total_periodo = models.DecimalField(max_digits=10, decimal_places=2)
 
     def save(self, *args, **kwargs):
         # Calcula el total de alumnos atendidos antes de guardar
