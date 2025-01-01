@@ -51,7 +51,7 @@ class ServicioEducativo(models.Model):
 
     def save(self, *args, **kwargs):
         # Calcula el total de alumnos atendidos antes de guardar
-        self.alumnos_atendidos = self.alumnos_hombres + self.alumnos_mujeres
+        self.alumnos_total = self.alumnos_hombres + self.alumnos_mujeres
         super(ServicioEducativo, self).save(*args, **kwargs)
 
     class Meta:

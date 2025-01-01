@@ -5,6 +5,7 @@ from login_app.models import Statuses  # Importa el modelo Statuses
 from django.contrib.auth.hashers import make_password
 from login_app.models import UsuarioRol  # Lo importamos localmente dentro de save
 from modulo_apec.models import ApoyoGestion  # Importa el modelo ApoyoGestion de modulo_apec
+from modulo_apec.models import ServicioEducativo  # Importa el modelo ServicioEducativo de modulo_apec
 class Usuario(models.Model):
     usuario_rol = models.OneToOneField(UsuarioRol, null=True, blank=True, on_delete=models.CASCADE)
     usuario = models.CharField(max_length=255, unique=True,null=True, blank=True)
@@ -53,8 +54,8 @@ class Usuario(models.Model):
 
         super().save(*args, **kwargs)
 
-
-        self._handle_statuses()  # Llamar a la función para manejar los estados
+        self._handle_apoyo_gestion()  # Llamamos al método para gestionar el apoyo de gestión
+        self._handle_statuses()  
 
     def _handle_statuses(self):
             """Gestiona la creación o actualización de Statuses según el rol del usuario.
@@ -66,27 +67,31 @@ class Usuario(models.Model):
                     defaults={'status': 'activa'}
                 )
             else:
-                # Crear o actualizar el estado a 'suspendida' para el rol 'ASPIRANTE'
+
                 status, created = Statuses.objects.update_or_create(
                     usuario=self, 
                     defaults={'status': 'suspendida'}
                 )
 
     def _handle_apoyo_gestion(self):
-
-        """Gestionar el apoyo de gestión para el rol 'EC'."""
+        """Gestionar el apoyo de gestión para el rol 'EC' y crear ServicioEducativo asociado."""
         if self.rol == "EC":
-            # Crear o actualizar el apoyo de gestión
+       
             apoyo_gestion, created = ApoyoGestion.objects.update_or_create(
                 usuario=self, 
                 defaults={
                     'nombre_servicio_educativo': 'SERVICIO ED BASICA 22-2',  # Cambiar según corresponda
-                    'numero_ec_asignado': 1,  # ajustar según la lógica de negocio
-                    'meses_servicio': 12,  # ajustar según la lógica de negocio
+                    'numero_ec_asignado': 1,  # Ajustar según la lógica de negocio
+                    'meses_servicio': 12,  # Ajustar según la lógica de negocio
                     'monto_apoyo_mensual': 6000,  # Establecer un valor predeterminado
                 }
             )
-            
+
+            # Después de crear o actualizar el ApoyoGestion, recalculamos el presupuesto total
+            if not created:
+                # Si no es creado, recalculamos el presupuesto total
+                apoyo_gestion.presupuesto_total_periodo = apoyo_gestion.calcular_presupuesto_total()
+                apoyo_gestion.save()
     class Meta:
         db_table = "usuario"
 
