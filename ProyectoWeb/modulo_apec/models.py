@@ -2,6 +2,67 @@ from django.db import models
 from django.core.validators import MinValueValidator, RegexValidator
 from django.utils import timezone  # Asegúrate de importar timezone para usarlo
 
+
+from django.db import models
+
+class ApoyoGestion(models.Model):
+    usuario = models.OneToOneField('modulo_dot.Usuario', on_delete=models.CASCADE, null=True, blank=True)
+    nombre_servicio_educativo = models.CharField(max_length=255)
+    numero_ec_asignado = models.IntegerField()
+    meses_servicio = models.IntegerField()
+    monto_apoyo_mensual = models.DecimalField(max_digits=10, decimal_places=2, )
+    presupuesto_total_periodo = models.DecimalField(max_digits=15, decimal_places=2, )
+
+    def calcular_presupuesto_total(self):
+        """
+        Calcula el presupuesto total en función del número de EC, 
+        los meses del servicio y el monto mensual.
+        """
+        return self.numero_ec_asignado * self.meses_servicio * self.monto_apoyo_mensual
+
+    def save(self, *args, **kwargs):
+        """
+        Antes de guardar, asegura que el presupuesto total se calcule automáticamente.
+        """
+        self.presupuesto_total_periodo = self.calcular_presupuesto_total()
+        super(ApoyoGestion, self).save(*args, **kwargs)
+    class Meta:
+        db_table = "apoyo_gestion"
+        
+    def __str__(self):
+        return f"{self.nombre_servicio_educativo} - EC: {self.numero_ec_asignado}"
+
+class ServicioEducativo(models.Model):
+    apoyo_gestion = models.ForeignKey(ApoyoGestion, on_delete=models.CASCADE, null=True, blank=True)
+    nombre_comite = models.CharField(max_length=255)
+    clave_municipio = models.CharField(max_length=255)
+    municipio = models.CharField(max_length=255)
+    clave_localidad = models.CharField(max_length=255)
+    localidad = models.CharField(max_length=255)
+    nivel_educativo = models.CharField(max_length=255)
+    clave_centro_trabajo = models.CharField(max_length=100)
+    apec_ini = models.CharField(
+        max_length=255,
+        choices=[('APEC', 'APEC'), ('APEC-INI', 'APEC-INI')]
+    )
+    alumnos_hombres = models.IntegerField()  # Número de alumnos hombres
+    alumnos_mujeres = models.IntegerField()  # Número de alumnos mujeres
+    alumnos_total = models.IntegerField(editable=False)  # Total de alumnos inscritos (calculado)
+    monto_apoyo_mensual = models.DecimalField(max_digits=10, decimal_places=2)
+    total_periodo = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def save(self, *args, **kwargs):
+        # Calcula el total de alumnos atendidos antes de guardar
+        self.alumnos_atendidos = self.alumnos_hombres + self.alumnos_mujeres
+        super(ServicioEducativo, self).save(*args, **kwargs)
+
+    class Meta:
+        db_table = "servicio_educativo"
+    def __str__(self):
+        return f"{self.municipio} - {self.localidad} ({self.clave_centro_trabajo})"
+
+
+
 # Modelo para Estados
 class Estado(models.Model):
     cv_estado = models.CharField(
@@ -31,7 +92,7 @@ class Region(models.Model):
     )
     nombre_region = models.CharField(max_length=100, verbose_name="Nombre completo de la región")
     estado = models.ForeignKey(Estado, on_delete=models.CASCADE, related_name="regiones", verbose_name="Estado al que pertenece", null=True, blank=True)  # Hacerlo opcional
-    id_ecar = models.IntegerField(verbose_name="Identificador del responsable ECAR asignado", validators=[MinValueValidator(1)])
+    usuario = models.OneToOneField('modulo_dot.Usuario', on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateTimeField(verbose_name="Fecha de creación", default=timezone.now)  # Agregado default=timezone.now
     updated_at = models.DateTimeField(verbose_name="Fecha de última actualización", default=timezone.now)  # Agregado default=timezone.now
 
@@ -59,7 +120,7 @@ class Microrregion(models.Model):
         null=True,  # Permitir que este campo sea nulo
         blank=True  # Permite que esté vacío en formularios
     )
-    id_eca = models.IntegerField(verbose_name="Identificador del responsable ECA asignado", validators=[MinValueValidator(1)])
+    usuario = models.OneToOneField('modulo_dot.Usuario', on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateTimeField(verbose_name="Fecha de creación", default=timezone.now)  # Agregado default=timezone.now
     updated_at = models.DateTimeField(verbose_name="Fecha de última actualización", default=timezone.now)  # Agregado default=timezone.now
 
@@ -88,7 +149,7 @@ class Comunidad(models.Model):
     )
     contexto = models.TextField(verbose_name="Contexto social de la comunidad")
     tipo_servicio = models.TextField(verbose_name="Tipo de servicio educativo que se ofrece")
-    id_ec = models.IntegerField(verbose_name="Identificador del responsable EC asignado", validators=[MinValueValidator(1)])
+    usuario = models.OneToOneField('modulo_dot.Usuario', on_delete=models.CASCADE, null=True, blank=True)
     cantidad_alumnos = models.IntegerField(verbose_name="Número de alumnos en la comunidad", validators=[MinValueValidator(0)])
     estatus = models.CharField(
         max_length=8,
