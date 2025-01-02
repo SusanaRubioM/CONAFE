@@ -1,66 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator, RegexValidator
 from django.utils import timezone  # Asegúrate de importar timezone para usarlo
-
-
 from django.db import models
-
-class ApoyoGestion(models.Model):
-    usuario = models.OneToOneField('modulo_dot.Usuario', on_delete=models.CASCADE, null=True, blank=True)
-    nombre_servicio_educativo = models.CharField(max_length=255)
-    numero_ec_asignado = models.IntegerField()
-    meses_servicio = models.IntegerField()
-    monto_apoyo_mensual = models.DecimalField(max_digits=10, decimal_places=2, )
-    presupuesto_total_periodo = models.DecimalField(max_digits=15, decimal_places=2, )
-
-    def calcular_presupuesto_total(self):
-        """
-        Calcula el presupuesto total en función del número de EC, 
-        los meses del servicio y el monto mensual.
-        """
-        return self.numero_ec_asignado * self.meses_servicio * self.monto_apoyo_mensual
-
-    def save(self, *args, **kwargs):
-        """
-        Antes de guardar, asegura que el presupuesto total se calcule automáticamente.
-        """
-        self.presupuesto_total_periodo = self.calcular_presupuesto_total()
-        super(ApoyoGestion, self).save(*args, **kwargs)
-    class Meta:
-        db_table = "apoyo_gestion"
-        
-    def __str__(self):
-        return f"{self.nombre_servicio_educativo} - EC: {self.numero_ec_asignado}"
-
-class ServicioEducativo(models.Model):
-    apoyo_gestion = models.ForeignKey(ApoyoGestion, on_delete=models.CASCADE, null=True, blank=True)
-    nombre_comite = models.CharField(max_length=255)
-    clave_municipio = models.CharField(max_length=255)
-    municipio = models.CharField(max_length=255)
-    clave_localidad = models.CharField(max_length=255)
-    localidad = models.CharField(max_length=255)
-    nivel_educativo = models.CharField(max_length=255)
-    clave_centro_trabajo = models.CharField(max_length=100)
-    apec_ini = models.CharField(
-        max_length=255,
-        choices=[('APEC', 'APEC'), ('APEC-INI', 'APEC-INI')]
-    )
-    alumnos_hombres = models.IntegerField()  # Número de alumnos hombres
-    alumnos_mujeres = models.IntegerField()  # Número de alumnos mujeres
-    alumnos_total = models.IntegerField(editable=False)  # Total de alumnos inscritos (calculado)
-
-    def save(self, *args, **kwargs):
-        # Calcula el total de alumnos atendidos antes de guardar
-        self.alumnos_total = self.alumnos_hombres + self.alumnos_mujeres
-        super(ServicioEducativo, self).save(*args, **kwargs)
-
-    class Meta:
-        db_table = "servicio_educativo"
-    def __str__(self):
-        return f"{self.municipio} - {self.localidad} ({self.clave_centro_trabajo})"
-
-
-
 # Modelo para Estados
 class Estado(models.Model):
     cv_estado = models.CharField(
@@ -162,3 +103,118 @@ class Comunidad(models.Model):
 
     def __str__(self):
         return self.nombre_comunidad
+
+
+class ApoyoGestion(models.Model):
+    usuario = models.OneToOneField('modulo_dot.Usuario', on_delete=models.CASCADE, null=True, blank=True)
+    nombre_servicio_educativo = models.CharField(max_length=255)
+    numero_ec_asignado = models.IntegerField()
+    meses_servicio = models.IntegerField()
+    monto_apoyo_mensual = models.DecimalField(max_digits=10, decimal_places=2, )
+    presupuesto_total_periodo = models.DecimalField(max_digits=15, decimal_places=2, )
+
+    def calcular_presupuesto_total(self):
+        """
+        Calcula el presupuesto total en función del número de EC, 
+        los meses del servicio y el monto mensual.
+        """
+        return self.numero_ec_asignado * self.meses_servicio * self.monto_apoyo_mensual
+
+    def save(self, *args, **kwargs):
+        """
+        Antes de guardar, asegura que el presupuesto total se calcule automáticamente.
+        """
+        self.presupuesto_total_periodo = self.calcular_presupuesto_total()
+        super(ApoyoGestion, self).save(*args, **kwargs)
+    class Meta:
+        db_table = "apoyo_gestion"
+        
+    def __str__(self):
+        return f"{self.nombre_servicio_educativo} - EC: {self.numero_ec_asignado}"
+
+class ServicioEducativo(models.Model):
+    apoyo_gestion = models.ForeignKey(ApoyoGestion, on_delete=models.CASCADE, null=True, blank=True) #relacion
+    comunidad_servicio = models.ForeignKey(Comunidad, on_delete=models.CASCADE, null=True, blank=True) #relacion
+    nombre_comite = models.CharField(max_length=255, default="Nombre comite genérico")
+    clave_estado = models.CharField(max_length=255)
+    nombre_estado = models.CharField(max_length=255, default="Estado")
+    clave_region = models.CharField(max_length=255)
+    nombre_region = models.CharField(max_length=255, default="Región")
+    clave_microregion = models.CharField(max_length=255, default="Región")
+    nombre_microregion = models.CharField(max_length=255)
+    clave_comunidad = models.CharField(max_length=255)
+    nombre_comunidad = models.CharField(max_length=255, default="Nombre genérico")
+    rol_vacante = models.CharField(
+        max_length=10,
+        choices=[  # Lista de roles
+            ("EC", "Educador Comunitario"),
+            ("ECA", "Educador Comunitario de Acompañamiento Microrregional"),
+            ("ECAR", "Educador Comunitario de Acompañamiento Regional"),
+        ],
+        default="EC",
+    )
+    tipo_servicio = models.CharField(
+        max_length=255,
+        choices=[
+            ('Sin asignar', 'Sin asignar'),
+            ('Inicial', 'Inicial'),
+            ('Preescolar', 'Preescolar'),
+            ('Primaria', 'Primaria'),
+            ('Secundaria', 'Secundaria'),
+            ('Postsecundaria', 'Postsecundaria')
+        ], default='Sin asignar'
+    )
+    clave_centro_trabajo = models.CharField(max_length=100, null=True, blank=True)
+    contexto = models.CharField(
+        max_length=255,
+        choices=[
+            ('Sin asignar', 'Sin asignar'),
+            ('Rural', 'Rural'),
+            ('Urbano', 'Urbano'),
+            ('Indígena', 'Indígena'),
+            ('Mestizo', 'Mestizo'),
+            ('Migrante', 'Migrante'),
+            ('Circense', 'Circense'),
+            ('Grupos Vulnerables', 'Grupos Vulnerables'),
+            ('Excluidos del Sistema Regular', 'Excluidos del Sistema Regular'),
+        ], default='Sin asignar'
+    )
+
+    nivel_educativo = models.CharField(
+        max_length=255,
+        choices=[('APEC', 'APEC'), ('APEC-INI', 'APEC-INI')]
+    )
+    
+    contexto = models.CharField(
+        max_length=255,
+        choices=[
+            ('Sin asignar', 'Sin asignar'),
+            ('Indígena', 'Indígena'),
+            ('Mestizo', 'Mestizo'),
+            ('Migrante', 'Migrante'),
+            ('Circense', 'Circense'),
+            ('Grupos Vulnerables', 'Grupos Vulnerables'),
+            ('Excluidos del Sistema Regular', 'Excluidos del Sistema Regular')
+        ], default='Sin asignar'
+    )
+    periodo_servicio = models.CharField(
+        max_length=255,
+        choices=[
+            ('sin asignar', 'sin asignar'),
+            ('2024-2025', '2024-2025'),
+            ('2025-2026', '2025-2026')
+        ], default='sin asignar'
+    )
+    alumnos_hombres = models.IntegerField()  # Número de alumnos hombres
+    alumnos_mujeres = models.IntegerField()  # Número de alumnos mujeres
+    alumnos_total = models.IntegerField(editable=False)  # Total de alumnos inscritos (calculado)
+
+    def save(self, *args, **kwargs):
+        # Calcula el total de alumnos atendidos antes de guardar
+        self.alumnos_total = self.alumnos_hombres + self.alumnos_mujeres
+        super(ServicioEducativo, self).save(*args, **kwargs)
+
+    class Meta:
+        db_table = "servicio_educativo"
+    def __str__(self):
+        return f"{self.nombre_comunidad} - {self.nombre_region} ({self.clave_centro_trabajo})"
