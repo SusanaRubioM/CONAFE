@@ -9,6 +9,8 @@ from django.db.models import Prefetch
 from django.http import JsonResponse
 import json
 from django.core.exceptions import ObjectDoesNotExist
+# Importar la función original dashboard_vacantes
+from modulo_dot.views import dashboard_vacantes as original_dashboard_vacantes
 
 @login_required
 @role_required('CT')
@@ -195,9 +197,11 @@ def detalles_aspirante(request, aspirante_id):
 
     return render(request, 'home_coordinador/detalles_aspirante.html', {'aspirante': aspirante})
 
-
-
-
+# Customizing the original function to add new behavior
+def dashboard_vacantes_ct(request):
+    # Example: Logging the request before processing
+    print("Request received for dashboard_vacantes")
+    return original_dashboard_vacantes(request)
 
 def ajax_aspirante_status(request, aspirante_id):
     if request.method == "POST":

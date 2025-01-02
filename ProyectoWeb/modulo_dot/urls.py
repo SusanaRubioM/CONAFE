@@ -17,6 +17,7 @@ urlpatterns = [
     path('dashboard/eliminar/', views.dashboard_eleminar, name='dashboard_eleminar'),
     path('eliminar/<int:empleado_id>/', views.eliminar_empleado, name='empleado_eliminar'),
     path('visualizacion/docs/', views.visualizar_docs, name='visualizacion_docs'),
+    path('dashboard/vacantes/', views.dashboard_vacantes, name='dashboard_vacantes'),
 ]
 
 
