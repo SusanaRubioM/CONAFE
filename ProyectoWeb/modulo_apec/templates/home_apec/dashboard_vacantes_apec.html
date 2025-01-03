@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Listado de servicios educativos vacantes con detalles completos sobre las regiones, roles y contexto.">
+    <meta name="author" content="Tu Nombre">
+    <title>Servicios Educativos Vacantes Observaciones</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        :root {
+            --primary-color: #620b0b;
+            --primary-color-hover: #631818e3;
+            --secondary-color: #f8faeb;
+            --text-color: #333;
+            --header-bg-color: #f8faeb;
+            --header-text-color: #f8faeb;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--secondary-color);
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: var(--text-color);
+            margin: 0;
+        }
+        .btn-custom {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .btn-custom:hover {
+            background-color: var(--primary-color-hover);
+            color: white;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        .table {
+            min-width: 100%;
+            margin-bottom: 0;
+        }
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: #f9f9f9;
+        }
+        .table-striped tbody tr:hover {
+            background-color: #e9ecef;
+        }
+        th {
+            background-color: var(--header-bg-color);
+            color: var(--header-text-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="header-container">
+            <h1>Servicios Educativos Vacantes</h1>
+            <a href="{% url 'modulo_apec:home_apec' %}" class="btn btn-custom" aria-label="Ir al menú principal">Menú Promoción</a>
+        </div>
+        <div class="table-container">
+            <table class="table table-striped table-hover table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>Nombre Comité</th>
+                        <th>Clave Estado</th>
+                        <th>Nombre Estado</th>
+                        <th>Clave Región</th>
+                        <th>Nombre Región</th>
+                        <th>Clave Microregión</th>
+                        <th>Nombre Microregión</th>
+                        <th>Clave Comunidad</th>
+                        <th>Nombre Comunidad</th>
+                        <th>Rol Vacante</th>
+                        <th>Tipo Servicio</th>
+                        <th>Clave Centro Trabajo</th>
+                        <th>Contexto</th>
+                        <th>Nivel Educativo</th>
+                        <th>Periodo Servicio</th>
+                        <th>Alumnos Hombres</th>
+                        <th>Alumnos Mujeres</th>
+                        <th>Total Alumnos</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for servicio in servicios %}
+                    <tr>
+                        <td>{{ servicio.nombre_comite }}</td>
+                        <td>{{ servicio.clave_estado }}</td>
+                        <td>{{ servicio.nombre_estado }}</td>
+                        <td>{{ servicio.clave_region }}</td>
+                        <td>{{ servicio.nombre_region }}</td>
+                        <td>{{ servicio.clave_microregion }}</td>
+                        <td>{{ servicio.nombre_microregion }}</td>
+                        <td>{{ servicio.clave_comunidad }}</td>
+                        <td>{{ servicio.nombre_comunidad }}</td>
+                        <td>{{ servicio.get_rol_vacante_display }}</td>
+                        <td>{{ servicio.get_tipo_servicio_display }}</td>
+                        <td>{{ servicio.clave_centro_trabajo }}</td>
+                        <td>{{ servicio.get_contexto_display }}</td>
+                        <td>{{ servicio.get_nivel_educativo_display }}</td>
+                        <td>{{ servicio.get_periodo_servicio_display }}</td>
+                        <td>{{ servicio.alumnos_hombres }}</td>
+                        <td>{{ servicio.alumnos_mujeres }}</td>
+                        <td>{{ servicio.alumnos_total }}</td>
+                        <td>
+                            <form method="POST" action="{% url 'modulo_apec:observaciones' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="servicio_id" value="{{ servicio.id }}">
+                                <button type="submit" class="btn btn-custom">Asignar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

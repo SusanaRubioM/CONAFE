@@ -86,7 +86,18 @@ class Comunidad(models.Model):
         verbose_name="Microrregión a la que pertenece",
         default=1  # Valor predeterminado para microrregion
     )
-    contexto = models.TextField(verbose_name="Contexto social de la comunidad")
+    contexto_comunidad = models.CharField(
+        max_length=255,
+        choices=[
+            ('Sin asignar', 'Sin asignar'),
+            ('Indígena', 'Indígena'),
+            ('Mestizo', 'Mestizo'),
+            ('Migrante', 'Migrante'),
+            ('Circense', 'Circense'),
+            ('Grupos Vulnerables', 'Grupos Vulnerables'),
+            ('Excluidos del Sistema Regular', 'Excluidos del Sistema Regular')
+        ], default='Sin asignar'
+    )
     tipo_servicio = models.TextField(verbose_name="Tipo de servicio educativo que se ofrece")
     usuario = models.OneToOneField('modulo_dot.Usuario', on_delete=models.CASCADE, null=True, blank=True)
     cantidad_alumnos = models.IntegerField(verbose_name="Número de alumnos en la comunidad", validators=[MinValueValidator(0)])
@@ -210,10 +221,23 @@ class ServicioEducativo(models.Model):
     alumnos_total = models.IntegerField(editable=False)  # Total de alumnos inscritos (calculado)
 
     def save(self, *args, **kwargs):
+        is_new = self.pk is None  # Verifica si el objeto es nuevo
         # Calcula el total de alumnos atendidos antes de guardar
         self.alumnos_total = self.alumnos_hombres + self.alumnos_mujeres
         super(ServicioEducativo, self).save(*args, **kwargs)
+        if is_new:
 
+            self.__handle_observacion()  # Llamamos al método para gestionar la observación
+
+    def __handle_observacion(self):
+        """
+        Método privado para gestionar la creación de observaciones.
+        """
+        # Crear una observación para el servicio educativo
+        Observacion.objects.create(
+            servicio_educativo=self,
+            fecha_creacion=timezone.now(),
+        )
     class Meta:
         db_table = "servicio_educativo"
     def __str__(self):
@@ -223,9 +247,14 @@ class Observacion(models.Model):
     servicio_educativo = models.ForeignKey(
         ServicioEducativo, on_delete=models.CASCADE, null=True, blank=True
     )  # Relación con el servicio educativo
-    fecha = models.DateField()  # Fecha de la observación
-    comentario = models.TextField()  # Comentarios de la observación
-
+    fecha_creacion = models.DateField(null=True, blank=True)  # creacion del servicio
+    fecha = models.DateField(null=True, blank=True)  # Fecha de la observación
+    comentario = models.TextField(null=True, blank=True)  # Comentarios de la observación
+    candidatos = models.ManyToManyField(
+        'modulo_dot.Usuario', 
+        blank=True, 
+        related_name="observaciones"
+    )  # Relación con candidatos sugeridos
     class Meta:
         db_table = "observacion"
 
