@@ -218,3 +218,16 @@ class ServicioEducativo(models.Model):
         db_table = "servicio_educativo"
     def __str__(self):
         return f"{self.nombre_comunidad} - {self.nombre_region} ({self.clave_centro_trabajo})"
+    
+class Observacion(models.Model):
+    servicio_educativo = models.ForeignKey(
+        ServicioEducativo, on_delete=models.CASCADE, null=True, blank=True
+    )  # Relación con el servicio educativo
+    fecha = models.DateField()  # Fecha de la observación
+    comentario = models.TextField()  # Comentarios de la observación
+
+    class Meta:
+        db_table = "observacion"
+
+    def __str__(self):
+        return f"Observación del servicio educativo: {self.servicio_educativo.clave_centro_trabajo}"

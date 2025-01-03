@@ -35,6 +35,10 @@ urlpatterns = [
             namespace="coordinador_home",
         ),
     ),
+    path(
+        "apec_section/",
+        include(("modulo_apec.urls", "modulo_apec"), namespace="modulo_apec"),
+    ),
 ]
 
 
