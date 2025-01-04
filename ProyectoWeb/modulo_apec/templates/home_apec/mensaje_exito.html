@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operación Exitosa</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="alert alert-success" role="alert">
+            <h4 class="alert-heading">¡Operación Exitosa!</h4>
+            <p>La acción que realizaste se completó con éxito. Los cambios han sido guardados correctamente.</p>
+            <hr>
+            <p class="mb-0">Puedes continuar con otras tareas o volver a la vista principal.</p>
+        </div>
+        <div class="text-center">
+            <a href="{% url 'modulo_apec:observaciones' %}" class="btn btn-primary" style="background-color: #620b0b;" >Volver al inicio</a>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

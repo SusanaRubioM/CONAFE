@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password
-from modulo_dpe.models import ServicioEducativo
+from modulo_apec.models import ServicioEducativo
 from form_app.models import Aspirante
 from login_app.models import UsuarioRol  # Este modelo es para crear usuarios con roles
 from .forms import UsuarioForm, DatosPersonalesForm, DocumentosPersonalesForm, StatusesForm

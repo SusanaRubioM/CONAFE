@@ -9,12 +9,13 @@ from django.http import HttpResponse
 from modulo_dot.models import Usuario
 
 @login_required
-@role_required('DPE')
+@role_required('APEC')
 def home_view(request):
-    return render(request, 'home_dpe/home_dpe.html')
+    return render(request, 'home_apec/home_apec.html')
+
 
 @login_required
-@role_required('DPE')
+@role_required('APEC')
 def observaciones_view(request):
     servicios = ServicioEducativo.objects.all()
 
@@ -33,14 +34,14 @@ def observaciones_view(request):
             observacion.save()
 
             # Redirigir a la página de asignación de vacantes
-            return redirect('modulo_dpe:asignacion_vacantes', servicio_id=servicio.id)
+            return redirect('modulo_apec:asignacion_vacantes', servicio_id=servicio.id)
         else:
             return HttpResponse("Formulario no válido", status=400)
 
-    return render(request, 'home_dpe/dashboard_vacantes_dpe.html', {'servicios': servicios})
+    return render(request, 'home_apec/dashboard_vacantes_apec.html', {'servicios': servicios})
 
 @login_required
-@role_required('DPE')
+@role_required('APEC')
 def asignacion_vacantes_view(request, servicio_id):
     try:
         servicio = ServicioEducativo.objects.get(id=servicio_id)
@@ -77,12 +78,14 @@ def asignacion_vacantes_view(request, servicio_id):
             observacion.candidatos.set(candidatos)
         observacion.save()
 
-
-        # Redirigir a la lista de observaciones con el mensaje de éxito
-        return redirect('modulo_dpe:observaciones')
+        
+        return redirect('modulo_apec:view_exito')
 
     return render(
         request,
-        'home_dpe/asignacion_vacantes.html',
+        'home_apec/asignacion_vacantes.html',
         {'servicio': servicio, 'usuarios': usuarios}
     )
+
+def exito_view(request):
+    return render(request, 'home_apec/mensaje_exito.html')

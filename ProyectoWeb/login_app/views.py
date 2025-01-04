@@ -24,9 +24,9 @@ def login_view(request):
             elif user.role == 'CT':
                 # Redirige al Empleado
                 return redirect('coordinador_home:home_coordinador')
-            elif user.role == 'DPE':
+            elif user.role == 'APEC':
                 # Redirige al APEC
-                return redirect('modulo_dpe:home_dpe')
+                return redirect('modulo_apec:home_apec')
             else:
                 return HttpResponse("Access Denied: User has no role.")
         else:

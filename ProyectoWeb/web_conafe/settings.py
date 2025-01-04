@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     "modulo_coordinador",
     "form_app",
     "widget_tweaks",
-    "modulo_dpe"
+    "modulo_apec"
 ]
 
 MIDDLEWARE = [

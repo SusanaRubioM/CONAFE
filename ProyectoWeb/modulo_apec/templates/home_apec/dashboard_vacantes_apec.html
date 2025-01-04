@@ -10,7 +10,7 @@
     <style>
         :root {
             --primary-color: #620b0b;
-            --primary-color-hover: #631818e3;
+            --primary-color-hover: hsla(0, 61%, 24%, 0.89);
             --secondary-color: #f8faeb;
             --text-color: #333;
             --header-bg-color: #f8faeb;
@@ -69,7 +69,7 @@
     <div class="container mt-3">
         <div class="header-container">
             <h1>Servicios Educativos Vacantes</h1>
-            <a href="{% url 'modulo_dpe:home_dpe' %}" class="btn btn-custom" aria-label="Ir al menú principal">Menú Promoción</a>
+            <a href="{% url 'modulo_apec:home_apec' %}" class="btn btn-custom" aria-label="Ir al menú principal">Menú Promoción</a>
         </div>
         <div class="table-container">
             <table class="table table-striped table-hover table-bordered">
@@ -102,7 +102,7 @@
                         <td>{{ servicio.alumnos_mujeres }}</td>
                         <td>{{ servicio.alumnos_total }}</td>
                         <td>
-                            <form method="POST" action="{% url 'modulo_dpe:observaciones' %}">
+                            <form method="POST" action="{% url 'modulo_apec:observaciones' %}">
                                 {% csrf_token %}
                                 <input type="hidden" name="servicio_id" value="{{ servicio.id }}">
                                 <button type="submit" class="btn btn-custom">Asignar</button>

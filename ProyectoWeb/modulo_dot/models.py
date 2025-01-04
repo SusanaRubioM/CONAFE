@@ -4,8 +4,8 @@ from login_app.models import UsuarioRol  # Importa el modelo UsuarioRol de login
 from login_app.models import Statuses  # Importa el modelo Statuses
 from django.contrib.auth.hashers import make_password
 from login_app.models import UsuarioRol  # Lo importamos localmente dentro de save
-from modulo_dpe.models import ApoyoGestion  # Importa el modelo ApoyoGestion de modulo_apec
-from modulo_dpe.models import ServicioEducativo  # Importa el modelo ServicioEducativo de modulo_apec
+from modulo_apec.models import ApoyoGestion  # Importa el modelo ApoyoGestion de modulo_apec
+from modulo_apec.models import ServicioEducativo  # Importa el modelo ServicioEducativo de modulo_apec
 class Usuario(models.Model):
     usuario_rol = models.OneToOneField(UsuarioRol, null=True, blank=True, on_delete=models.CASCADE)
     usuario = models.CharField(max_length=255, unique=True,null=True, blank=True)
