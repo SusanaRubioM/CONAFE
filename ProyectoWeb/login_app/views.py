@@ -27,6 +27,8 @@ def login_view(request):
             elif user.role == 'APEC':
                 # Redirige al APEC
                 return redirect('modulo_apec:home_apec')
+            elif user.role == 'DPE':
+                return redirect('modulo_dpe:home_dpe')
             else:
                 return HttpResponse("Access Denied: User has no role.")
         else:
