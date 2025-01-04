@@ -5,3 +5,4 @@ class ObservacionForm(forms.ModelForm):
     class Meta:
         model = Observacion
         fields = ['comentario']
+

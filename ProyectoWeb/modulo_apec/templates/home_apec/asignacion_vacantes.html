@@ -57,26 +57,26 @@
 
             <form method="POST">
                 {% csrf_token %}
-                <input type="hidden" name="servicio_id" value="{{ servicio.id }}">
-
-                <!-- Comentario -->
-                <div class="mb-3">
-                    <label for="comentario" class="form-label">Comentario</label>
-                    <textarea name="comentario" class="form-control" id="comentario" rows="3" placeholder="Escribe un comentario"></textarea>
+                {{ form.as_p }}
+            
+                <!-- Campo de comentario -->
+                <div class="form-group">
+                    <label for="id_comentario">Comentario:</label>
+                    <textarea name="comentario" id="id_comentario" rows="4" class="form-control" required></textarea>
                 </div>
-
-                <!-- Sugerir Candidatos EC -->
-                <div class="mb-3">
-                    <label for="candidatos" class="form-label">Selecciona candidatos EC</label>
-                    <select name="candidatos" id="candidatos" class="form-control" multiple>
-                        <option value="" disabled selected>Selecciona candidatos (opcional)</option>
+            
+                <!-- Campo de selección de candidatos -->
+                <div class="form-group">
+                    <label for="id_candidatos">Seleccionar Candidatos:</label>
+                    <select name="candidatos" id="id_candidatos" class="form-control" multiple>
                         {% for usuario in usuarios %}
-                            <option value="{{ usuario.id }}">{{ usuario.nombre }}</option>
+                            <option value="{{ usuario.id }}">{{ usuario.usuario }}</option>
                         {% endfor %}
                     </select>
-                    <small class="form-text text-muted">Puedes seleccionar varios candidatos. Si no hay candidatos, puedes dejarlo en blanco.</small>
                 </div>
-                <button type="submit" class="btn btn-custom">Guardar Observación y Asignar Candidatos</button>
+            
+                <!-- Botón para guardar y asignar candidatos -->
+                <button type="submit" class="btn btn-primary" style="background-color: #620b0b;">Guardar Observación y Asignar Candidatos</button>
             </form>
         </div>
     </div>

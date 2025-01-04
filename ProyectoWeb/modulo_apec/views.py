@@ -52,12 +52,26 @@ def asignacion_vacantes_view(request, servicio_id):
         candidatos_ids = request.POST.getlist('candidatos')
         candidatos = Usuario.objects.filter(id__in=candidatos_ids)
 
-        # Guardar los candidatos sugeridos en la observación
-        observacion = Observacion.objects.create(
-            servicio_educativo=servicio,
-            fecha_creacion=timezone.now(),
-            comentario=request.POST.get('comentario'),
-        )
+        # Obtener el comentario del formulario, y si está vacío, asignar None
+        comentario = request.POST.get('comentario')
+        if comentario == "":
+            comentario = None  # Si el comentario está vacío, asignar None (null en la base de datos)
+
+        # Buscar la observación existente, si hay más de una, tomar la primera
+        observacion = Observacion.objects.filter(servicio_educativo=servicio).first()
+        if observacion:
+            # Si se encuentra la observación, actualizamos el comentario
+            observacion.comentario = comentario
+            observacion.fecha = timezone.now()
+        else:
+            # Si no se encuentra, se crea una nueva observación
+            observacion = Observacion.objects.create(
+                servicio_educativo=servicio,
+                fecha_creacion=timezone.now(),
+                comentario=comentario,  # Puede ser None (null) si el campo es opcional
+            )
+
+        # Asociar los candidatos a la observación
         observacion.candidatos.set(candidatos)
         observacion.save()
 

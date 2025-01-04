@@ -166,13 +166,17 @@ def modificar_empleado(request, empleado_id):
         if usuario_form.is_valid() and datos_personales_form.is_valid() and documentos_form.is_valid():
             try:
                 # Revisar si se cambió la contraseña
+                nuevo_usuario = usuario_form.cleaned_data.get('usuario')
                 nueva_contrasenia = usuario_form.cleaned_data.get('contrasenia')
+                nuevo_rol = usuario_form.cleaned_data.get('rol')
 
                 if nueva_contrasenia:
                     # Encriptar la nueva contraseña y actualizarla en el modelo UsuarioRol
+                    usuario.usuario_rol.username = nuevo_usuario  # Actualizar el nombre de usuario
                     usuario.usuario_rol.password = make_password(nueva_contrasenia)  # Encriptada en UsuarioRol
-                    empleado.contrasenia = nueva_contrasenia  # Guardar la contraseña en texto plano en Empleado
-
+                    usuario.contrasenia = nueva_contrasenia  # Guardar la contraseña en texto plano en Empleado
+                    usuario.usuario_rol.role = nuevo_rol  # Actualizar el rol en UsuarioRol
+                    
                 # Mantener valor original para 'sexo' en datos personales si no se cambia
                 datos_personales_form.instance.sexo = empleado.sexo
 
