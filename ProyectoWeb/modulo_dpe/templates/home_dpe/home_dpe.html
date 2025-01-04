@@ -1,18 +1,16 @@
 {% extends "base.html" %} <!-- Extiende una plantilla base para consistencia en el diseño -->
 
-{% block title %}Home Promotora de
-Educación{% endblock %}
+{% block title %}Home Director de Operaciones{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-  <h2 class="mb-4 text-center">Home Promotora de
-    Educación</h2>
-  <p class="text-center">Bienvenido Promotor!</p>
+  <h2 class="mb-4 text-center">Home Director de Operaciones</h2>
+  <p class="text-center">Bienvenido Director de Operaciones!</p>
 
   <div class="row text-center">
     <!-- Botón Crear y enviar plan de captación -->
     <div class="col-md-4 mb-4">
-      <a href="{% url 'modulo_apec:observaciones' %}" class="btn btn-primary btn-block">
+      <a href="{% url 'modulo_dpe:observaciones' %}" class="btn btn-primary btn-block">
       <i class="fas fa-file-signature"></i> Observaciones y Enviar Plan de Captación
       </a>
     </div>

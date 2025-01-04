@@ -4,16 +4,17 @@ from login_app.decorators import role_required
 from .models import ServicioEducativo, Observacion
 from .forms import ObservacionForm
 from django.utils import timezone
+from django.contrib import messages
 from django.http import HttpResponse
 from modulo_dot.models import Usuario
 
 @login_required
-@role_required('APEC')
+@role_required('DPE')
 def home_view(request):
-    return render(request, 'home_apec/home_apec.html')
+    return render(request, 'home_dpe/home_dpe.html')
 
 @login_required
-@role_required('APEC')
+@role_required('DPE')
 def observaciones_view(request):
     servicios = ServicioEducativo.objects.all()
 
@@ -32,14 +33,14 @@ def observaciones_view(request):
             observacion.save()
 
             # Redirigir a la página de asignación de vacantes
-            return redirect('modulo_apec:asignacion_vacantes', servicio_id=servicio.id)
+            return redirect('modulo_dpe:asignacion_vacantes', servicio_id=servicio.id)
         else:
             return HttpResponse("Formulario no válido", status=400)
 
-    return render(request, 'home_apec/dashboard_vacantes_apec.html', {'servicios': servicios})
+    return render(request, 'home_dpe/dashboard_vacantes_dpe.html', {'servicios': servicios})
 
 @login_required
-@role_required('APEC')
+@role_required('DPE')
 def asignacion_vacantes_view(request, servicio_id):
     try:
         servicio = ServicioEducativo.objects.get(id=servicio_id)
@@ -50,7 +51,7 @@ def asignacion_vacantes_view(request, servicio_id):
 
     if request.method == 'POST':
         candidatos_ids = request.POST.getlist('candidatos')
-        candidatos = Usuario.objects.filter(id__in=candidatos_ids)
+        candidatos = Usuario.objects.filter(id__in=candidatos_ids) if candidatos_ids else []  # Si no hay candidatos seleccionados, lista vacía
 
         # Obtener el comentario del formulario, y si está vacío, asignar None
         comentario = request.POST.get('comentario')
@@ -71,15 +72,17 @@ def asignacion_vacantes_view(request, servicio_id):
                 comentario=comentario,  # Puede ser None (null) si el campo es opcional
             )
 
-        # Asociar los candidatos a la observación
-        observacion.candidatos.set(candidatos)
+        # Asociar los candidatos a la observación (si los hay)
+        if candidatos:
+            observacion.candidatos.set(candidatos)
         observacion.save()
 
-        # Redirigir a la lista de observaciones
-        return redirect('modulo_apec:observaciones')
+
+        # Redirigir a la lista de observaciones con el mensaje de éxito
+        return redirect('modulo_dpe:observaciones')
 
     return render(
         request,
-        'home_apec/asignacion_vacantes.html',
+        'home_dpe/asignacion_vacantes.html',
         {'servicio': servicio, 'usuarios': usuarios}
     )

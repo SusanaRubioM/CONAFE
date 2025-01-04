@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     "modulo_coordinador",
     "form_app",
     "widget_tweaks",
-    "modulo_apec"
+    "modulo_dpe"
 ]
 
 MIDDLEWARE = [
@@ -157,7 +157,7 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 
-
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 
 # Default primary key field type

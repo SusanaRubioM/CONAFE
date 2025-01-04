@@ -37,7 +37,7 @@ urlpatterns = [
     ),
     path(
         "apec_section/",
-        include(("modulo_apec.urls", "modulo_apec"), namespace="modulo_apec"),
+        include(("modulo_dpe.urls", "modulo_dpe"), namespace="modulo_dpe"),
     ),
 ]
 

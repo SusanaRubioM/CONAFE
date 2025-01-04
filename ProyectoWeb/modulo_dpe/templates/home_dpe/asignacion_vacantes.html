@@ -49,8 +49,17 @@
     <div class="container mt-5">
         <div class="header-container">
             <h1>Asignación de Candidatos a Servicio Educativo: {{ servicio.nombre_comunidad }}</h1>
-            <a href="{% url 'modulo_apec:home_apec' %}" class="btn btn-custom">Menú Promoción</a>
+            <a href="{% url 'modulo_dpe:home_dpe' %}" class="btn btn-custom">Menú Promoción</a>
         </div>
+
+        <!-- Mensajes Flash -->
+        {% if messages %}
+            <div class="alert alert-success">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
 
         <div class="form-container">
             <h3>Formulario de Observación</h3>
@@ -62,12 +71,12 @@
                 <!-- Campo de comentario -->
                 <div class="form-group">
                     <label for="id_comentario">Comentario:</label>
-                    <textarea name="comentario" id="id_comentario" rows="4" class="form-control" required></textarea>
+                    <textarea name="comentario" id="id_comentario" rows="4" class="form-control"></textarea>
                 </div>
             
                 <!-- Campo de selección de candidatos -->
                 <div class="form-group">
-                    <label for="id_candidatos">Seleccionar Candidatos:</label>
+                    <label for="id_candidatos">Seleccionar Candidatos (Opcional):</label>
                     <select name="candidatos" id="id_candidatos" class="form-control" multiple>
                         {% for usuario in usuarios %}
                             <option value="{{ usuario.id }}">{{ usuario.usuario }}</option>
