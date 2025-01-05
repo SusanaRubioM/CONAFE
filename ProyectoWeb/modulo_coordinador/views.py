@@ -260,52 +260,50 @@ def dashboard_asignar(request):
     return render(request, 'home_coordinador/dashboard_vacantes_ct.html', {'servicios': servicios})
 
 from modulo_apec.models import Observacion
+
 @login_required
 @role_required('CT')
 def asignacion_vacantes_view_ct(request, servicio_id):
-    try:
-        servicio = ServicioEducativo.objects.get(id=servicio_id)
-    except ServicioEducativo.DoesNotExist:
-        return HttpResponse("Servicio no encontrado", status=404)
+    servicio = get_object_or_404(ServicioEducativo, id=servicio_id)
 
-    usuarios = Usuario.objects.filter(rol='EC')  # Obtener usuarios con rol de EC
+    # Consulta optimizada con el nombre correcto del campo relacionado
+    usuarios = Usuario.objects.filter(rol__in=['EC', 'ECA', 'ECAR']).select_related('datospersonales', 'aspirante__residencia')
+
+    # Obtención de la observación asociada al servicio educativo
+    observacion = Observacion.objects.filter(servicio_educativo=servicio).first()
 
     if request.method == 'POST':
         candidatos_ids = request.POST.getlist('candidatos')
-        candidatos = Usuario.objects.filter(id__in=candidatos_ids) if candidatos_ids else []  # Si no hay candidatos seleccionados, lista vacía
+        candidatos = Usuario.objects.filter(id__in=candidatos_ids).select_related('datospersonales', 'aspirante__residencia')
 
-        # Obtener el comentario del formulario, y si está vacío, asignar None
         comentario = request.POST.get('comentario')
-        if comentario == "":
-            comentario = None  # Si el comentario está vacío, asignar None (null en la base de datos)
+        rol = request.POST.get('rol')
+        ciclo = request.POST.get('ciclo')
 
-        # Buscar la observación existente, si hay más de una, tomar la primera
-        observacion = Observacion.objects.filter(servicio_educativo=servicio).first()
         if observacion:
-            # Si se encuentra la observación, actualizamos el comentario
-            observacion.comentario = comentario
-            observacion.fecha = timezone.now()
+            observacion.comentario = comentario if comentario else observacion.comentario
+            observacion.save()
         else:
-            # Si no se encuentra, se crea una nueva observación
             observacion = Observacion.objects.create(
                 servicio_educativo=servicio,
                 fecha_creacion=timezone.now(),
-                comentario=comentario,  # Puede ser None (null) si el campo es opcional
+                comentario=comentario,
             )
 
-        # Asociar los candidatos a la observación (si los hay)
+        servicio.rol_vacante = rol if rol else 'NP'
+        servicio.periodo_servicio = ciclo if ciclo else 'Sin asignar'
+        servicio.save()
+
         if candidatos:
             observacion.candidatos.set(candidatos)
-        observacion.save()
+            observacion.save()
 
-        
         return redirect('coordinador_home:asignacion_vacantes_ct', servicio_id=servicio.id)
-
 
     return render(
         request,
         'home_coordinador/vacante_asignacion_ct.html',
-        {'servicio': servicio, 'usuarios': usuarios}
+        {'servicio': servicio, 'usuarios': usuarios, 'observacion': observacion}
     )
 
 def exito_view_ct(request):
