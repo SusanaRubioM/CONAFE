@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from login_app.decorators import role_required
 from django.contrib.auth.decorators import login_required
 from form_app.models import Aspirante, Usuario
@@ -6,12 +6,13 @@ from django.contrib.auth.hashers import make_password
 from login_app.models import UsuarioRol
 from modulo_dot.models import DatosPersonales 
 from django.db.models import Prefetch
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 import json
+from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
-# Importar la función original dashboard_vacantes
 from modulo_dot.views import dashboard_vacantes as original_dashboard_vacantes
-
+from modulo_apec.models import ServicioEducativo
+from modulo_apec.forms import ObservacionForm
 @login_required
 @role_required('CT')
 def empleado_view(request):
@@ -197,11 +198,120 @@ def detalles_aspirante(request, aspirante_id):
 
     return render(request, 'home_coordinador/detalles_aspirante.html', {'aspirante': aspirante})
 
+
+#Modulo observaciones
+
+@login_required
+@role_required('CT')
+def observaciones_view(request):
+    servicios = ServicioEducativo.objects.all()
+
+    if request.method == 'POST':
+        servicio_id = request.POST.get('servicio_id')
+        try:
+            servicio = ServicioEducativo.objects.get(id=servicio_id)
+        except ServicioEducativo.DoesNotExist:
+            return HttpResponse("Servicio no encontrado", status=404)
+
+        form = ObservacionForm(request.POST)
+        if form.is_valid():
+            observacion = form.save(commit=False)
+            observacion.servicio_educativo = servicio
+            observacion.fecha_creacion = timezone.now()
+            observacion.save()
+
+            # Redirigir a la página de asignación de vacantes
+            return redirect('home_coordinador:asignacion_vacantes', servicio_id=servicio.id)
+        else:
+            return HttpResponse("Formulario no válido", status=400)
+
+    return render(request, 'home_coordinador/dashboard_vacantes_ct.html', {'servicios': servicios})
+
 # Customizing the original function to add new behavior
 def dashboard_vacantes_ct(request):
     # Example: Logging the request before processing
     print("Request received for dashboard_vacantes")
     return original_dashboard_vacantes(request)
+
+@login_required
+@role_required('CT')
+def dashboard_asignar(request):
+    servicios = ServicioEducativo.objects.all()
+
+    if request.method == 'POST':
+        servicio_id = request.POST.get('servicio_id')
+        try:
+            servicio = ServicioEducativo.objects.get(id=servicio_id)
+        except ServicioEducativo.DoesNotExist:
+            return HttpResponse("Servicio no encontrado", status=404)
+
+        form = ObservacionForm(request.POST)
+        if form.is_valid():
+            observacion = form.save(commit=False)
+            observacion.servicio_educativo = servicio
+            observacion.fecha_creacion = timezone.now()
+            observacion.save()
+
+            # Redirigir a la página de asignación de vacantes
+            return redirect('coordinador_home:asignacion_vacantes_ct', servicio_id=servicio.id)
+        else:
+            return HttpResponse("Formulario no válido", status=400)
+
+    return render(request, 'home_coordinador/dashboard_vacantes_ct.html', {'servicios': servicios})
+
+from modulo_apec.models import Observacion
+@login_required
+@role_required('CT')
+def asignacion_vacantes_view_ct(request, servicio_id):
+    try:
+        servicio = ServicioEducativo.objects.get(id=servicio_id)
+    except ServicioEducativo.DoesNotExist:
+        return HttpResponse("Servicio no encontrado", status=404)
+
+    usuarios = Usuario.objects.filter(rol='EC')  # Obtener usuarios con rol de EC
+
+    if request.method == 'POST':
+        candidatos_ids = request.POST.getlist('candidatos')
+        candidatos = Usuario.objects.filter(id__in=candidatos_ids) if candidatos_ids else []  # Si no hay candidatos seleccionados, lista vacía
+
+        # Obtener el comentario del formulario, y si está vacío, asignar None
+        comentario = request.POST.get('comentario')
+        if comentario == "":
+            comentario = None  # Si el comentario está vacío, asignar None (null en la base de datos)
+
+        # Buscar la observación existente, si hay más de una, tomar la primera
+        observacion = Observacion.objects.filter(servicio_educativo=servicio).first()
+        if observacion:
+            # Si se encuentra la observación, actualizamos el comentario
+            observacion.comentario = comentario
+            observacion.fecha = timezone.now()
+        else:
+            # Si no se encuentra, se crea una nueva observación
+            observacion = Observacion.objects.create(
+                servicio_educativo=servicio,
+                fecha_creacion=timezone.now(),
+                comentario=comentario,  # Puede ser None (null) si el campo es opcional
+            )
+
+        # Asociar los candidatos a la observación (si los hay)
+        if candidatos:
+            observacion.candidatos.set(candidatos)
+        observacion.save()
+
+        
+        return redirect('coordinador_home:asignacion_vacantes_ct', servicio_id=servicio.id)
+
+
+    return render(
+        request,
+        'home_coordinador/vacante_asignacion_ct.html',
+        {'servicio': servicio, 'usuarios': usuarios}
+    )
+
+def exito_view_ct(request):
+    return render(request, 'home_coordinador/mensaje_exito_ct.html')
+
+# aqui termina
 
 def ajax_aspirante_status(request, aspirante_id):
     if request.method == "POST":

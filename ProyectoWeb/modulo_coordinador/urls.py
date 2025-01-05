@@ -16,5 +16,9 @@ urlpatterns = [
     path('dashboard/figura/educativas/', views.dashboard_figura_educativa, name='dashboard_figura_educativa'),
     path('detalles_educador/<int:empleado_id>/', views.detalles_educador, name='detalles_educador'),
     path('vacantes/dashboard/ct', views.dashboard_vacantes_ct, name='dashboard_vacantes_ct'),
-      
+    #aq
+    path('asignar/vacantes', views.dashboard_asignar, name='asignar_dashboard'),
+    path('vacantes/dashboards/asignacion_vacantes/<int:servicio_id>/', views.asignacion_vacantes_view_ct, name='asignacion_vacantes_ct'),
+    path('observacion/exitosa', views.exito_view_ct, name='view_exito_ct'),
 ]
+      
