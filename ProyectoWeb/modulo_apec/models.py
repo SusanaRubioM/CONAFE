@@ -11,8 +11,6 @@ class Estado(models.Model):
         validators=[RegexValidator(regex='^[A-Za-z0-9]+$', message="Solo se permiten letras y números.")]
     )
     nombre_estado = models.CharField(max_length=100, verbose_name="Nombre completo del estado")
-    created_at = models.DateTimeField(verbose_name="Fecha de creación", default=timezone.now)  # Agregado default=timezone.now
-    updated_at = models.DateTimeField(verbose_name="Fecha de última actualización", default=timezone.now)  # Agregado default=timezone.now
 
     class Meta:
         db_table = "estado"
@@ -32,8 +30,6 @@ class Region(models.Model):
     nombre_region = models.CharField(max_length=100, verbose_name="Nombre completo de la región")
     estado = models.ForeignKey(Estado, on_delete=models.CASCADE, related_name="regiones", verbose_name="Estado al que pertenece", null=True, blank=True)  # Hacerlo opcional
     usuario = models.OneToOneField('modulo_dot.Usuario', on_delete=models.CASCADE, null=True, blank=True)
-    created_at = models.DateTimeField(verbose_name="Fecha de creación", default=timezone.now)  # Agregado default=timezone.now
-    updated_at = models.DateTimeField(verbose_name="Fecha de última actualización", default=timezone.now)  # Agregado default=timezone.now
 
     class Meta:
         db_table = "region"
@@ -60,8 +56,6 @@ class Microrregion(models.Model):
         blank=True  # Permite que esté vacío en formularios
     )
     usuario = models.OneToOneField('modulo_dot.Usuario', on_delete=models.CASCADE, null=True, blank=True)
-    created_at = models.DateTimeField(verbose_name="Fecha de creación", default=timezone.now)  # Agregado default=timezone.now
-    updated_at = models.DateTimeField(verbose_name="Fecha de última actualización", default=timezone.now)  # Agregado default=timezone.now
 
     class Meta:
         db_table = "microrregion"
@@ -106,9 +100,7 @@ class Comunidad(models.Model):
         choices=[('Activo', 'Activo'), ('Inactivo', 'Inactivo')],
         verbose_name="Estado actual de la comunidad"
     )
-    created_at = models.DateTimeField(verbose_name="Fecha de creación", default=timezone.now, null=True, blank=True)  # Agregado default=timezone.now
-    updated_at = models.DateTimeField(verbose_name="Fecha de última actualización", default=timezone.now, null=True, blank=True)  # Agregado default=timezone.now
-
+    
     class Meta:
         db_table = "comunidad"
 
