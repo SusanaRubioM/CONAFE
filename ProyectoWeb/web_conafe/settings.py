@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-0fp9evx!mdv3ewu&u@f2nqx07=h5ff$#-7y8$bynzei1*7)zb5
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 
@@ -89,9 +89,9 @@ WSGI_APPLICATION = "web_conafe.wsgi.application"
 try:
     # Verifica si puedes acceder a la IP pública de Google Cloud
     socket.create_connection(("34.118.149.167", 3306), timeout=1)
-    is_online = False
-except OSError:
     is_online = True
+except OSError:
+    is_online = False
 
 if is_online:
     # Configuración para Google Cloud
@@ -111,7 +111,7 @@ else:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.mysql",
-            "HOST": "127.0.0.1",  # IP local
+            "HOST": "db",  # IP local
             "PORT": "3306",  # Puerto local
             "NAME": "conafe_local",
             "USER": "root",
@@ -157,6 +157,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
