@@ -75,32 +75,32 @@
             <table class="table table-striped table-hover table-bordered">
                 <thead>
                     <tr>
-                        <th>Clave</th>
+                        <th>CvEstado</th>
+                        <th>Estado</th>
+                        <th>Cv Región</th>
+                        <th>Región</th>
+                        <th>CvMicrorregión</th>
+                        <th>Microrregión</th>
+                        <th>CvComunidad</th>
                         <th>Comunidad</th>
-                        <th>Rol</th>
-                        <th>Servicio</th>
-                        <th>Contexto</th>
-                        <th>Nivel</th>
-                        <th>Periodo</th>
-                        <th>Hombres</th>
-                        <th>Mujeres</th>
-                        <th>Total</th>
+                        <th>Rol Vacante</th>
+                        <th>Tipo Servicio</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for servicio in servicios %}
                     <tr>
+                        <td>{{ servicio.clave_estado }}</td>
+                        <td>{{ servicio.nombre_estado }}</td>
+                        <td>{{ servicio.clave_region }}</td>
+                        <td>{{ servicio.nombre_region }}</td>
+                        <td>{{ servicio.clave_microregion }}</td>
+                        <td>{{ servicio.nombre_microregion }}</td>
                         <td>{{ servicio.clave_comunidad }}</td>
                         <td>{{ servicio.nombre_comunidad }}</td>
-                        <td>{{ servicio.get_rol_vacante_display }}</td>
-                        <td>{{ servicio.get_tipo_servicio_display }}</td>
-                        <td>{{ servicio.get_contexto_display }}</td>
-                        <td>{{ servicio.get_nivel_educativo_display }}</td>
-                        <td>{{ servicio.get_periodo_servicio_display }}</td>
-                        <td>{{ servicio.alumnos_hombres }}</td>
-                        <td>{{ servicio.alumnos_mujeres }}</td>
-                        <td>{{ servicio.alumnos_total }}</td>
+                        <td>{{ servicio.rol_vacante }}</td>
+                        <td>{{ servicio.tipo_servicio }}</td>
                         <td>
                             <form method="POST" action="{% url 'coordinador_home:asignacion_vacantes_ct' servicio.id %}">
                                 {% csrf_token %}

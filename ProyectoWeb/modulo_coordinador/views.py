@@ -10,6 +10,7 @@ from django.http import JsonResponse, HttpResponse
 import json
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib import messages
 from modulo_dot.views import dashboard_vacantes as original_dashboard_vacantes
 from modulo_apec.models import ServicioEducativo
 from modulo_apec.forms import ObservacionForm
@@ -253,7 +254,7 @@ def dashboard_asignar(request):
             observacion.save()
 
             # Redirigir a la página de asignación de vacantes
-            return redirect('coordinador_home:asignacion_vacantes_ct', servicio_id=servicio.id)
+            return redirect('coordinador_home:vacante_asignacion_ct', servicio_id=servicio.id)
         else:
             return HttpResponse("Formulario no válido", status=400)
 
@@ -298,7 +299,7 @@ def asignacion_vacantes_view_ct(request, servicio_id):
             observacion.candidatos.set(candidatos)
             observacion.save()
 
-        return redirect('coordinador_home:asignacion_vacantes_ct', servicio_id=servicio.id)
+        messages.success(request, "¡Operación Exitosa! Los cambios han sido guardados correctamente.")
 
     return render(
         request,

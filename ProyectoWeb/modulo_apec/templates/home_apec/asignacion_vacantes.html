@@ -75,11 +75,21 @@
                 </div>
             
                 <!-- Campo de selección de candidatos -->
+                <!-- Campo de selección de candidatos -->
                 <div class="form-group">
-                    <label for="id_candidatos">Seleccionar Candidatos (Opcional):</label>
-                    <select name="candidatos" id="id_candidatos" class="form-control" multiple>
+                    <label for="id_candidatos">Seleccionar Candidatos <span class="text-danger">*</span>:</label>
+                    <select name="candidatos" id="id_candidatos" class="form-control" multiple required>
                         {% for usuario in usuarios %}
-                            <option value="{{ usuario.id }}">{{ usuario.usuario }}</option>
+                            <option value="{{ usuario.id }}">
+                                {{ usuario.usuario }} {{ usuario.rol }} 
+                                {{ usuario.datospersonales.nombre }}
+                                {{ usuario.datospersonales.apellidopa}}
+                                {{ usuario.datospersonales.apellidoma}}
+                                {{ usuario.aspirante.residencia.calle }}, 
+                                {{ usuario.aspirante.residencia.colonia }},
+                                {{ usuario.aspirante.residencia.municipio_alcaldia }},
+                                {{ usuario.aspirante.residencia.estado }}
+                            </option>
                         {% endfor %}
                     </select>
                 </div>

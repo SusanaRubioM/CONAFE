@@ -146,7 +146,6 @@ class ApoyoGestion(models.Model):
 class ServicioEducativo(models.Model):
     apoyo_gestion = models.ForeignKey(ApoyoGestion, on_delete=models.CASCADE, null=True, blank=True) #relacion
     comunidad_servicio = models.ForeignKey(Comunidad, on_delete=models.CASCADE, null=True, blank=True) #relacion
-    nombre_comite = models.CharField(max_length=255, default="Nombre comite genérico")
     clave_estado = models.CharField(max_length=255)
     nombre_estado = models.CharField(max_length=255, default="Estado")
     clave_region = models.CharField(max_length=255)
@@ -216,14 +215,9 @@ class ServicioEducativo(models.Model):
             ('2025-2026', '2025-2026')
         ], default='sin asignar'
     )
-    alumnos_hombres = models.IntegerField()  # Número de alumnos hombres
-    alumnos_mujeres = models.IntegerField()  # Número de alumnos mujeres
-    alumnos_total = models.IntegerField(editable=False)  # Total de alumnos inscritos (calculado)
-
     def save(self, *args, **kwargs):
         is_new = self.pk is None  # Verifica si el objeto es nuevo
         # Calcula el total de alumnos atendidos antes de guardar
-        self.alumnos_total = self.alumnos_hombres + self.alumnos_mujeres
         super(ServicioEducativo, self).save(*args, **kwargs)
         if is_new:
 
