@@ -59,7 +59,7 @@ class UsuarioForm(forms.ModelForm):
 
 from django import forms
 from .models import Statuses
-
+from modulo_coordinador.models import ConveniosFiguras
 class StatusesForm(forms.ModelForm):
     class Meta:
         model = Statuses
@@ -74,6 +74,8 @@ class StatusesForm(forms.ModelForm):
                 field.widget.attrs['readonly'] = True
                 field.required = False
 
+class FirmaDigitalForm(forms.Form):
+    firma_digital = forms.FileField(required=True)
 
 # Formulario para el modelo DatosPersonales
 

@@ -1,3 +1,4 @@
+import os
 from django.db import models
 from django.core.validators import FileExtensionValidator
 from login_app.models import UsuarioRol  # Importa el modelo UsuarioRol de login_app
@@ -5,11 +6,12 @@ from login_app.models import Statuses  # Importa el modelo Statuses
 from django.contrib.auth.hashers import make_password
 from login_app.models import UsuarioRol  # Lo importamos localmente dentro de save
 from modulo_apec.models import ApoyoGestion  # Importa el modelo ApoyoGestion de modulo_apec
+from modulo_coordinador.models import ConveniosFiguras
 from modulo_apec.models import ServicioEducativo  # Importa el modelo ServicioEducativo de modulo_apec
 class Usuario(models.Model):
     usuario_rol = models.OneToOneField(UsuarioRol, null=True, blank=True, on_delete=models.CASCADE)
-    usuario = models.CharField(max_length=255, unique=True,null=True, blank=True)
-    contrasenia = models.CharField(max_length=255,null=True, blank=True)  # Contraseña en texto plano
+    usuario = models.CharField(max_length=255, unique=True, null=True, blank=True)
+    contrasenia = models.CharField(max_length=255, null=True, blank=True)  # Contraseña en texto plano
     rol = models.CharField(
         max_length=10,
         choices=[  # Lista de roles
@@ -54,29 +56,44 @@ class Usuario(models.Model):
 
         super().save(*args, **kwargs)
 
-        self._handle_apoyo_gestion()  # Llamamos al método para gestionar el apoyo de gestión
-        self._handle_statuses()  
+        # Llamamos a los métodos para gestionar el convenio, apoyo de gestión y estado
+        self._handle_convenio()
+        self._handle_apoyo_gestion()  
+        self._handle_statuses()
+
+    def _handle_convenio(self):
+        """Gestiona la creación del objeto ConveniosFiguras para el rol 'EC', 'ECA', y 'ECAR'."""
+        if self.rol in ["EC", "ECA", "ECAR"]:
+            # Comprobamos si ya existe un convenio para el usuario con rol "EC", "ECA" o "ECAR"
+            convenio, created = ConveniosFiguras.objects.update_or_create(
+                usuario=self,
+                defaults={
+                    'convenio_pdf': os.path.join('documentos', 'Convenio_figuras.pdf'),
+                    'firma_digital': None,  # Puedes asignar la firma digital más tarde
+                }
+            )
+            if created:
+                print(f"Convenio creado para el usuario {self.usuario}")
+            else:
+                print(f"Convenio actualizado para el usuario {self.usuario}")
 
     def _handle_statuses(self):
-            """Gestiona la creación o actualización de Statuses según el rol del usuario.
-            """
-            if self.rol != "ASPIRANTE":
-                # Crear o actualizar el estado a 'activa' para roles distintos de 'ASPIRANTE'
-                status, created = Statuses.objects.update_or_create(
-                    usuario=self, 
-                    defaults={'status': 'activa'}
-                )
-            else:
-
-                status, created = Statuses.objects.update_or_create(
-                    usuario=self, 
-                    defaults={'status': 'suspendida'}
-                )
+        """Gestiona la creación o actualización de Statuses según el rol del usuario."""
+        if self.rol != "ASPIRANTE":
+            # Crear o actualizar el estado a 'activa' para roles distintos de 'ASPIRANTE'
+            status, created = Statuses.objects.update_or_create(
+                usuario=self, 
+                defaults={'status': 'activa'}
+            )
+        else:
+            status, created = Statuses.objects.update_or_create(
+                usuario=self, 
+                defaults={'status': 'suspendida'}
+            )
 
     def _handle_apoyo_gestion(self):
         """Gestionar el apoyo de gestión para el rol 'EC' y crear ServicioEducativo asociado."""
         if self.rol == "EC":
-       
             apoyo_gestion, created = ApoyoGestion.objects.update_or_create(
                 usuario=self, 
                 defaults={
@@ -92,6 +109,7 @@ class Usuario(models.Model):
                 # Si no es creado, recalculamos el presupuesto total
                 apoyo_gestion.presupuesto_total_periodo = apoyo_gestion.calcular_presupuesto_total()
                 apoyo_gestion.save()
+
     class Meta:
         db_table = "usuario"
 

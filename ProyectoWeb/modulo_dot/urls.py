@@ -18,6 +18,10 @@ urlpatterns = [
     path('eliminar/<int:empleado_id>/', views.eliminar_empleado, name='empleado_eliminar'),
     path('visualizacion/docs/', views.visualizar_docs, name='visualizacion_docs'),
     path('dashboard/vacantes/', views.dashboard_vacantes, name='dashboard_vacantes'),
+     path('dashboard/convenios/', views.dashboard_convenios, name='dashboard_convenios'),
+    
+
+
 ]
 
 

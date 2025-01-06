@@ -5,7 +5,7 @@ from django.contrib.auth.hashers import make_password
 from modulo_apec.models import ServicioEducativo
 from form_app.models import Aspirante
 from login_app.models import UsuarioRol  # Este modelo es para crear usuarios con roles
-from .forms import UsuarioForm, DatosPersonalesForm, DocumentosPersonalesForm, StatusesForm
+from .forms import UsuarioForm, DatosPersonalesForm, DocumentosPersonalesForm, StatusesForm, FirmaDigitalForm
 from login_app.decorators import role_required
 from .models import Usuario, UsuarioRol
 from modulo_dot.models import DatosPersonales
@@ -16,7 +16,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 import os
 from django.db import transaction
-
+from modulo_coordinador.models import ConveniosFiguras
 @login_required
 @role_required("DOT")  # Solo los usuarios con rol 'DOT' pueden acceder
 def home_view(request):
@@ -236,9 +236,7 @@ def status_empleado(request):
 
 
 
-@login_required
-@role_required("DOT")
-@csrf_exempt
+
 def actualizar_status_ajax(request, empleado_id):
     if request.method == "POST":
         try:
@@ -317,7 +315,28 @@ def dashboard_vacantes(request):
     return render(request, 'home_dot/dashboard_vacantes.html', {'servicios': servicios})
 
 
+@login_required
+@role_required("DOT")
+def dashboard_convenios(request):
+    convenios = ConveniosFiguras.objects.all()
 
+    if request.method == 'POST' and 'agregar_firma' in request.POST:
+        convenio_id = request.POST.get('convenio_id')
+        convenio = ConveniosFiguras.objects.get(id=convenio_id)
+
+        # Procesamos la firma digital
+        form = FirmaDigitalForm(request.POST, request.FILES)
+        if form.is_valid():
+            convenio.firma_digital = form.cleaned_data['firma_digital']
+            convenio.save()
+            return redirect('dot_home:dashboard_convenios')
+    else:
+        form = FirmaDigitalForm()
+
+    return render(request, 'home_dot/dashboard_convenios.html', {
+        'convenios': convenios,
+        'form': form
+    })
 
 
 
