@@ -14,6 +14,7 @@ from django.contrib import messages
 from modulo_dot.views import dashboard_vacantes as original_dashboard_vacantes
 from modulo_apec.models import ServicioEducativo
 from modulo_apec.forms import ObservacionForm
+from modulo_dpe.models import Reporte
 @login_required
 @role_required('CT')
 def empleado_view(request):
@@ -311,6 +312,84 @@ def exito_view_ct(request):
     return render(request, 'home_coordinador/mensaje_exito_ct.html')
 
 # aqui termina
+
+# menu reportes 
+@login_required
+@role_required('CT')
+def menu_reportes_ct(request):
+    return render(request, 'home_coordinador/dashboard_equipo_pdf.html')
+
+"""
+@login_required
+@role_required('CT')
+def dashborard_equipamiento(request):
+    # Filtrar reportes según la categoría seleccionada (si es que se ha seleccionado alguna)
+    categoria = request.GET.get('categoria', '')  # Obtiene la categoría desde el query string
+    if categoria:
+        # Filtra reportes por categoría y estado "pendiente"
+        reportes = Reporte.objects.filter(categoria=categoria, estado='pendiente')
+    else:
+        # Si no se filtra por categoría, solo muestra los reportes con estado "pendiente"
+        reportes = Reporte.objects.filter(estado='pendiente')  # Solo reportes pendientes
+
+    return render(request, 'home_coordinador/dashboard_equipo_pdf.html', {'reportes': reportes})
+
+"""
+
+@login_required
+@role_required('CT')
+def dashborard_equipamiento(request):
+    # Filtrar reportes según la categoría seleccionada (si es que se ha seleccionado alguna)
+    categoria = request.GET.get('categoria', '')  # Obtiene la categoría desde el query string
+    if categoria:
+        reportes = Reporte.objects.filter(categoria=categoria)  # Filtra reportes por categoría
+    else:
+        reportes = Reporte.objects.all()  # Si no se filtra, muestra todos los reportes
+
+    return render(request, 'home_coordinador/dashboard_equipo_pdf.html', {'reportes': reportes})
+
+@login_required
+@role_required('CT')
+def dashboard_capacitacion_pdf(request):
+    # Filtrar reportes según la categoría "capacitación"
+    categoria = 'capacitación'  # Definir directamente la categoría
+    reportes = Reporte.objects.filter(categoria=categoria)
+
+    return render(request, 'home_coordinador/dashboard_capacitacion_pdf.html', {'reportes': reportes})
+
+@login_required
+@role_required('CT')
+def dashboard_seguim_pdf(request):
+    # Filtrar reportes según la categoría "seguimiento"
+    categoria = 'seguimiento'  # Definir directamente la categoría
+    reportes = Reporte.objects.filter(categoria=categoria)
+
+    return render(request, 'home_coordinador/dashboard_seguim_pdf.html', {'reportes': reportes})
+
+
+@login_required
+@role_required('CT')
+def validar_rechazar_reporte(request, reporte_id):
+    # Obtener el reporte
+    try:
+        reporte = Reporte.objects.get(id=reporte_id)
+    except Reporte.DoesNotExist:
+        return redirect('coordinador_home:dashboard_equipamiento')  # Si no existe el reporte, redirige
+
+    # Obtener la acción (validar o rechazar) desde el formulario
+    if request.method == "POST":
+        accion = request.POST.get('accion')
+
+        if accion == 'validar':
+            reporte.estado = 'validado'
+        elif accion == 'rechazar':
+            reporte.estado = 'rechazado'
+
+        # Guardamos el reporte con el nuevo estado
+        reporte.save()
+
+    # Redirigir al dashboard de equipamiento después de la acción
+    return redirect('coordinador_home:dashboard_equipamiento')
 
 def ajax_aspirante_status(request, aspirante_id):
     if request.method == "POST":

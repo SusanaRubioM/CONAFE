@@ -20,5 +20,11 @@ urlpatterns = [
     path('asignar/vacantes', views.dashboard_asignar, name='asignar_dashboard'),
     path('vacantes/dashboards/asignacion_vacantes/<int:servicio_id>/', views.asignacion_vacantes_view_ct, name='asignacion_vacantes_ct'),
     path('observacion/exitosa', views.exito_view_ct, name='view_exito_ct'),
+    #reportes
+    path('menu/reportes', views.menu_reportes_ct, name='menu_reportes_ct'),
+    path('dashboard/equipamiento', views.dashborard_equipamiento, name='dashboard_equipamiento'),
+     path('dashboard/capacitacion/', views.dashboard_capacitacion_pdf, name='dashboard_capacitacion_pdf'),
+    path('dashboard/seguimiento/', views.dashboard_seguim_pdf, name='dashboard_seguim_pdf'),
+    path('reporte/<int:reporte_id>/validar-rechazar', views.validar_rechazar_reporte, name='validar_rechazar_reporte'),
 ]
       

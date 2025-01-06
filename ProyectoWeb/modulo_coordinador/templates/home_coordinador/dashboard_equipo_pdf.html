@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Equipamiento{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4 text-center">Dashboard de Equipamiento</h2>
+  <p class="text-center">Aquí puedes validar los reportes enviados por los ECA y ECAR</p>
+
+  <!-- Filtros de Reportes -->
+  <div class="mb-4">
+    <form method="GET" action="{% url 'coordinador_home:dashboard_equipamiento' %}">
+      <div class="row">
+        <div class="col-md-4">
+          <select class="form-control" name="categoria">
+            <option value="">Seleccionar Categoría</option>
+            <option value="capacitación">Capacitación</option>
+            <option value="equipamiento">Equipamiento</option>
+            <option value="seguimiento">Seguimiento</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <button type="submit" class="btn btn-primary">Filtrar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Lista de Reportes -->
+  <div class="table-responsive">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Educador</th>
+          <th>Periodo</th>
+          <th>Categoría</th>
+          <th>Reporte</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for reporte in reportes %}
+        <tr>
+          <td>{{ reporte.usuario.usuario }}</td>
+          <td>{{ reporte.periodo }}</td>
+          <td>{{ reporte.categoria }}</td>
+          <td><a href="{{ reporte.reporte.url }}" target="_blank">Ver Reporte</a></td>
+          <td>
+            <form method="POST" action="{% url 'coordinador_home:validar_rechazar_reporte' reporte.id %}">
+              {% csrf_token %}
+              <button type="submit" name="accion" value="validar" class="btn btn-success btn-sm">Validar</button>
+              <button type="submit" name="accion" value="rechazar" class="btn btn-danger btn-sm">Rechazar</button>
+            </form>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5" class="text-center">No hay reportes para mostrar</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

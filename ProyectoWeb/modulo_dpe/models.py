@@ -4,7 +4,12 @@ from modulo_apec.models import Comunidad
 
 class Reporte(models.Model):
     periodo = models.CharField(max_length=50)
-    estado = models.CharField(max_length=50)
+    estado = models.CharField(max_length=50, default="pendiente")
+    categoria = models.CharField(max_length=50, choices=[('capacitación', 'Capacitación'), 
+                                                         ('equipamiento', 'Equipamiento'), 
+                                                         ('seguimiento', 'Seguimiento'),
+                                                          ('sin_asignar', 'Sin asignar')],
+                                                         default='sin_asignar')
     reporte = models.FileField(upload_to='reporte_pdfs/')
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
 
