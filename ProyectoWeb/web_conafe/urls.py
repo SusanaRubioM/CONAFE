@@ -13,7 +13,15 @@ def redirect_to_login(request):
 
 
 urlpatterns = [
+
+    path('capacitacion/', include('modulo_capacitacion.urls')),
+    path('modulo_educadores/', include('modulo_educadores.urls')),
+
+    path('modulo_pagos/', include('modulo_pagos.urls')),  # Incluye las rutas de modulo_pagos
+    path('modulo_calendario/', include('modulo_calendario.urls')),  # Incluye las rutas de modulo_calendario
+
     path("admin/", admin.site.urls),
+    path('modulo_DECB/', include('modulo_DECB.urls')),  # Incluye las rutas del módulo DECB
     path(
         "", redirect_to_login
     ),  # Redirige a la página de login cuando acceden a la raíz

@@ -15,6 +15,9 @@ from modulo_dot.views import dashboard_vacantes as original_dashboard_vacantes
 from modulo_apec.models import ServicioEducativo
 from modulo_apec.forms import ObservacionForm
 from modulo_dpe.models import Reporte
+from .models import ActividadCalendario
+from modulo_DECB.models import CalendarEvent  # Importar el modelo de eventos del módulo DECB
+
 @login_required
 @role_required('CT')
 def empleado_view(request):
@@ -483,3 +486,29 @@ def crear_usuario_ajax(request):
 
     return JsonResponse({"success": False, "message": "Método no permitido"})
 
+@login_required
+@role_required('CT')  # Decorador personalizado
+def eventos_calendario(request):
+    try:
+        actividades = ActividadCalendario.objects.all()
+        eventos = []
+        for actividad in actividades:
+            eventos.append({
+                "title": actividad.titulo,
+                "start": actividad.fecha_inicio.isoformat(),
+                "end": actividad.fecha_fin.isoformat(),
+                "description": actividad.descripcion or "Sin descripción",
+            })
+        return JsonResponse(eventos, safe=False)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+@login_required
+@role_required('CT')
+def calendario_view(request):
+    return render(request, 'home_coordinador/calendario.html')
+
+@login_required
+def calendario_eventos(request):
+    eventos = CalendarEvent.objects.all().order_by('date')  # Consulta los eventos
+    return render(request, 'home_coordinador/calendario_eventos.html', {'eventos': eventos})

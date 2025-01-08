@@ -23,8 +23,11 @@ urlpatterns = [
     #reportes
     path('menu/reportes', views.menu_reportes_ct, name='menu_reportes_ct'),
     path('dashboard/equipamiento', views.dashborard_equipamiento, name='dashboard_equipamiento'),
-     path('dashboard/capacitacion/', views.dashboard_capacitacion_pdf, name='dashboard_capacitacion_pdf'),
+    path('dashboard/capacitacion/', views.dashboard_capacitacion_pdf, name='dashboard_capacitacion_pdf'),
     path('dashboard/seguimiento/', views.dashboard_seguim_pdf, name='dashboard_seguim_pdf'),
     path('reporte/<int:reporte_id>/validar-rechazar', views.validar_rechazar_reporte, name='validar_rechazar_reporte'),
+    path('calendario/eventos/', views.calendario_view, name='calendario_view'),
+    path('api/eventos/', views.eventos_calendario, name='eventos_calendario'),
+    path('calendario-eventos/', views.calendario_eventos, name='calendario_eventos'), 
 ]
       

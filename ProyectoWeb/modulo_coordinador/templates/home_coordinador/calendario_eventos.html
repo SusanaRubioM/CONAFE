@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Calendario de Eventos{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Calendario de Eventos</h1>
+    <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Fecha</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for evento in eventos %}
+            <tr>
+                <td>{{ evento.date }}</td>
+                <td>{{ evento.description }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="2" class="text-center">No hay eventos programados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="text-center">
+        <a href="{% url 'coordinador_home:home_coordinador' %}" class="btn btn-secondary">Regresar</a>
+    </div>
+</div>
+{% endblock %}

@@ -47,6 +47,9 @@ INSTALLED_APPS = [
     "widget_tweaks",
     "modulo_apec",
     "modulo_dpe",
+    'modulo_DECB',
+    'modulo_educadores',
+    'modulo_capacitacion',
 ]
 
 MIDDLEWARE = [
@@ -89,9 +92,9 @@ WSGI_APPLICATION = "web_conafe.wsgi.application"
 try:
     # Verifica si puedes acceder a la IP pública de Google Cloud
     socket.create_connection(("34.118.149.167", 3306), timeout=1)
-    is_online = True
-except OSError:
     is_online = False
+except OSError:
+    is_online = True
 
 if is_online:
     # Configuración para Google Cloud
@@ -111,7 +114,7 @@ else:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.mysql",
-            "HOST": "db",  # IP local
+            "HOST": "127.0.0.1",  # IP local
             "PORT": "3306",  # Puerto local
             "NAME": "conafe_local",
             "USER": "root",

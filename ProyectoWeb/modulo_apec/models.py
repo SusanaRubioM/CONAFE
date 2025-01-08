@@ -18,6 +18,7 @@ class Estado(models.Model):
     def __str__(self):
         return self.nombre_estado
 
+
 class Municipio(models.Model):
     cv_municipio = models.CharField(
         max_length=10,
@@ -33,7 +34,8 @@ class Municipio(models.Model):
 
     def __str__(self):
         return self.nombre_municipio
-    
+
+
 # Modelo para Regiones
 class Region(models.Model):
     cv_region = models.CharField(
@@ -45,7 +47,8 @@ class Region(models.Model):
     nombre_region = models.CharField(max_length=100, verbose_name="Nombre completo de la región")
     estado = models.ForeignKey(Estado, on_delete=models.CASCADE, related_name="regiones", verbose_name="Estado al que pertenece", null=True, blank=True)
     usuario = models.OneToOneField('modulo_dot.Usuario', on_delete=models.CASCADE, null=True, blank=True)
-    municipio = models.ForeignKey(Municipio, on_delete=models.CASCADE, related_name="regiones", verbose_name="Municipio al que pertenece", null=True, blank=True)
+    municipios_region = models.CharField(max_length=255, verbose_name="Municipios que pertenecen a la región", null=True, blank=True)
+
     class Meta:
         db_table = "region"
 
@@ -67,8 +70,7 @@ class Microrregion(models.Model):
         on_delete=models.CASCADE, 
         related_name="microrregiones", 
         verbose_name="Región a la que pertenece",
-        null=True,  # Permitir que este campo sea nulo
-        blank=True
+        null=True, blank=True
     )
     usuario = models.OneToOneField('modulo_dot.Usuario', on_delete=models.CASCADE, null=True, blank=True)
 
@@ -93,9 +95,7 @@ class Comunidad(models.Model):
         on_delete=models.CASCADE,
         related_name="comunidades",
         verbose_name="Microrregión a la que pertenece",
-        null=True,  # Permitir que este campo sea nulo
-        blank=True,
-        default=1  # Valor predeterminado para microrregion
+        null=True, blank=True
     )
     contexto_comunidad = models.CharField(
         max_length=255,
@@ -107,9 +107,9 @@ class Comunidad(models.Model):
             ('Circense', 'Circense'),
             ('Grupos Vulnerables', 'Grupos Vulnerables'),
             ('Excluidos del Sistema Regular', 'Excluidos del Sistema Regular')
-        ], default='Sin asignar',
-        null=True,  # Permitir que este campo sea nulo
-        blank=True
+        ], 
+        default='Sin asignar',
+        null=True, blank=True
     )
     tipo_servicio = models.TextField(verbose_name="Tipo de servicio educativo que se ofrece", null=True, blank=True)
     usuario = models.OneToOneField('modulo_dot.Usuario', on_delete=models.CASCADE, null=True, blank=True)
@@ -117,10 +117,14 @@ class Comunidad(models.Model):
         max_length=8,
         choices=[('Activo', 'Activo'), ('Inactivo', 'Inactivo')],
         verbose_name="Estado actual de la comunidad",
-        null=True,  # Permitir que este campo sea nulo
-        blank=True
+        null=True, blank=True
     )
-    
+    localizacion = models.FileField(
+        upload_to='comunidades/', 
+        verbose_name="Archivo asociado a la comunidad", 
+        null=True, blank=True
+    )
+
     class Meta:
         db_table = "comunidad"
 

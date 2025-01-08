@@ -11,11 +11,11 @@
     <!-- Botón Crear y enviar plan de captación -->
     <div class="col-md-4 mb-4">
       <a href="{% url 'coordinador_home:dashboard_equipamiento' %}" class="btn btn-primary btn-block">
-        <i class="fas fa-file-signature"></i> Validacion de Reportes
+        <i class="fas fa-file-signature"></i> Validación de Reportes
       </a>
     </div>
 
-    <!-- Botón Recibir registros de nuevos EC   url 'coordinador_home:dashboard_aspirante' -->
+    <!-- Botón Recibir registros de nuevos EC -->
     <div class="col-md-4 mb-4">
       <a href="{% url 'coordinador_home:dashboard_aspirante' %}" class="btn btn-info btn-block">
         <i class="fas fa-file-import"></i> Seleccionar Nuevos EC
@@ -25,7 +25,7 @@
     <!-- Botón Seleccionar nuevos EC, ECA y ECAR -->
     <div class="col-md-4 mb-4">
       <a href="{% url 'coordinador_home:dashboard_aspirante_eca_ecar' %}" class="btn btn-success btn-block">
-      <i class="fas fa-user-check"></i> Seleccionar Nuevos ECA y ECAR
+        <i class="fas fa-user-check"></i> Seleccionar Nuevos ECA y ECAR
       </a>
     </div>
 
@@ -39,7 +39,7 @@
     <!-- Botón Visualizar y gestionar microrregiones y regiones -->
     <div class="col-md-4 mb-4">
       <a href="{% url 'coordinador_home:dashboard_vacantes_ct' %}" class="btn btn-warning btn-block">
-      <i class="fas fa-map-marked-alt"></i> Gestionar Microrregiones y Regiones
+        <i class="fas fa-map-marked-alt"></i> Gestionar Microrregiones y Regiones
       </a>
     </div>
 
@@ -47,6 +47,34 @@
     <div class="col-md-4 mb-4">
       <a href="{% url 'coordinador_home:asignar_dashboard' %}" class="btn btn-danger btn-block">
         <i class="fas fa-map-pin"></i> Asignar EC, ECA y ECAR a Zonas
+      </a>
+    </div>
+
+    <!-- Botón Ver Calendario de Actividades (oculto) -->
+    <div class="col-md-4 mb-4">
+      <a href="{% url 'coordinador_home:calendario_view' %}" class="btn btn-primary btn-block" hidden>
+        <i class="fas fa-calendar-alt"></i> Ver Calendario de Actividades
+      </a>
+    </div>
+
+    <!-- Botón Crear Capacitación -->
+    <div class="col-md-4 mb-4">
+      <a href="{% url 'modulo_capacitacion:crear_capacitacion' %}" class="btn btn-outline-primary btn-block">
+        <i class="fas fa-calendar-plus"></i> Crear Capacitación
+      </a>
+    </div>
+
+    <!-- Botón Visualizar Capacitaciones -->
+    <div class="col-md-4 mb-4">
+      <a href="{% url 'modulo_capacitacion:lista_capacitaciones' %}" class="btn btn-outline-info btn-block">
+        <i class="fas fa-calendar-alt"></i> Ver Capacitaciones
+      </a>
+    </div>
+    
+    <!-- Botón Ver Calendario de Eventos -->
+    <div class="col-md-4 mb-4">
+      <a href="{% url 'coordinador_home:calendario_eventos' %}" class="btn btn-outline-warning btn-block">
+        <i class="fas fa-calendar-alt"></i> Ver Calendario de Eventos
       </a>
     </div>
   </div>

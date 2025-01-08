@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Capacitaciones</title>
+</head>
+<body>
+    <h1>Capacitaciones Iniciales</h1>
+    <a href="{% url 'modulo_capacitacion:crear_capacitacion' %}">Crear Nueva Capacitación</a>
+    <table>
+        <tr>
+            <th>Nombre del EC</th>
+            <th>Ciclo Asignado</th>
+            <th>Horas Cubiertas</th>
+            <th>Acciones</th>
+        </tr>
+        {% for capacitacion in capacitaciones %}
+            <tr>
+                <td>{{ capacitacion.nombre_ec }}</td>
+                <td>{{ capacitacion.ciclo_asignado }}</td>
+                <td>{{ capacitacion.horas_cubiertas }}</td>
+                <td>
+                    <a href="{% url 'modulo_capacitacion:editar_capacitacion' capacitacion.id %}" class="btn btn-warning btn-sm">Editar</a>
+                    {% if capacitacion.horas_cubiertas >= 240 %}
+                        <a href="{% url 'modulo_capacitacion:finalizar_capacitacion' capacitacion.id %}" class="btn btn-danger btn-sm">Finalizar</a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

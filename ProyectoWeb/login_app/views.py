@@ -29,6 +29,8 @@ def login_view(request):
                 return redirect('modulo_apec:home_apec')
             elif user.role == 'DPE':
                 return redirect('modulo_dpe:home_dpe')
+            elif user.role == ('DECB'):
+                return redirect('modulo_DECB:home')  # Define la URL de inicio para DECB
             else:
                 return HttpResponse("Access Denied: User has no role.")
         else:

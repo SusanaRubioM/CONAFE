@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmar Recepción</title>
+</head>
+<body>
+    <h1>Confirmar Recepción de Pago</h1>
+    <p>Fecha: {{ payment.payment_date }}</p>
+    <p>Tipo de Pago: {{ payment.get_payment_type_display }}</p>
+    <p>Monto: ${{ payment.amount }}</p>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Confirmar</button>
+    </form>
+
+    <a href="{% url 'modulo_educadores:calendario_educador' %}" class="btn btn-secondary">Cancelar</a>
+</body>
+</html>
