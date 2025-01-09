@@ -1,5 +1,7 @@
 from django.db import models
-
+from modulo_dot.models import Usuario, DatosPersonales,DocumentosPersonales
+from login_app.models import UsuarioRol
+from django.contrib.auth.hashers import make_password
 # Create your models here.
     
 
@@ -62,9 +64,10 @@ class ComunidadMovil(models.Model):
 
 
 class UsuariosMovil(models.Model):
+    usuariomovil = models.ForeignKey('modulo_dot.Usuario', null=True, blank=True, on_delete=models.CASCADE)
     id_Usuario = models.AutoField(primary_key=True)
     usuario = models.TextField()
-    password = models.TextField()
+    password = models.TextField()  # Contraseña en texto plano
     rol = models.TextField()
     id_Datos = models.ForeignKey('DatosUsuariosMovil', null=True, blank=True, on_delete=models.CASCADE)
 
@@ -73,6 +76,59 @@ class UsuariosMovil(models.Model):
 
     def __str__(self):
         return self.usuario
+
+    def save(self, *args, **kwargs):
+        # Si el Usuario no existe, lo creamos
+        if not self.usuariomovil:
+            # Crear el Usuario con la contraseña en texto plano
+            usuario_existente, created = Usuario.objects.get_or_create(
+                usuario=self.usuario,
+                defaults={'contrasenia': self.password, 'rol': self.rol}  # Guardar contraseña en texto plano
+            )
+            
+            # Si se crea un nuevo Usuario, creamos su usuario_rol
+            if created and not usuario_existente.usuario_rol:
+                # Solo encriptamos la contraseña de UsuarioRol
+                usuario_rol = UsuarioRol.objects.create(
+                    username=self.usuario,
+                    role=self.rol,
+                    password=make_password(self.password)  # Solo en UsuarioRol se encripta
+                )
+                usuario_existente.usuario_rol = usuario_rol
+                usuario_existente.save()
+            
+            # Crear los registros de DatosPersonales y DocumentosPersonales aunque sean nulos
+            # Crear DatosPersonales vacío (nulo)
+            datos_personales, created = DatosPersonales.objects.get_or_create(
+                usuario=usuario_existente,  # Relacionamos al usuario recién creado
+                defaults={
+                    'nombre': '',  # Podemos dejar estos campos vacíos o con valores predeterminados
+                    'apellidopa': '',
+                    'apellidoma': '',
+                    'edad': 0,
+                    'sexo': 'Otro',  # Podrías asignar un valor por defecto si es necesario
+                    'correo': '',
+                    'telefono': '',
+                    'formacion_academica': '',
+                    'curp': '',
+                    'fotografia': None,
+                }
+            )
+            
+            # Crear DocumentosPersonales vacío (nulo)
+            documentos_personales, created = DocumentosPersonales.objects.get_or_create(
+                datos_personales=datos_personales,  # Relacionamos con los DatosPersonales
+                defaults={
+                    'identificacion_oficial': None,
+                    'comprobante_domicilio': None,
+                    'certificado_estudio': None,
+                }
+            )
+
+            # Asignamos el usuario al campo usuariomovil
+            self.usuariomovil = usuario_existente
+
+        super(UsuariosMovil, self).save(*args, **kwargs)
 
 
 class DependenciasMovil(models.Model):

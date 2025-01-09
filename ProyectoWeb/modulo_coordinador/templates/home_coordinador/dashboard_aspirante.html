@@ -38,21 +38,24 @@
     </div>
 
 
-    <!-- Enlace posicionado en la esquina superior izquierda -->
-    <a href="{% url 'coordinador_home:dashboard_aspirante_aceptado' %}" class="btn btn-danger" 
-       style="background-color: #620b0b; color:white; position: absolute; top:100px; right: 225px;">
-        Ver Aspirantes Aceptados
-    </a>
-
-    <a href="{% url 'coordinador_home:dashboard_aspirante_rechazado' %}" class="btn btn-danger" 
-       style="background-color: #620b0b; color:white; position: absolute; top:100px; right: 5px;">
-        Ver Aspirantes Rechazados
-    </a>
-</div>
+    <div class="d-flex justify-content-between mb-3">
+        <a href="{% url 'coordinador_home:dashboard_aspirante_aceptado' %}" 
+           class="btn btn-danger" 
+           style="background-color: #620b0b; color: white;">
+            Ver Aspirantes Aceptados
+        </a>
+        <a href="{% url 'coordinador_home:dashboard_aspirante_rechazado' %}" 
+           class="btn btn-danger" 
+           style="background-color: #620b0b; color: white;">
+            Ver Aspirantes Rechazados
+        </a>
+    </div>
 
     
 </div>
-    <h2 class="text-center mb-4">Seleccion de Aspirantes a EC </h2>
+    <h2 class="text-center mb-4 mt-4">Selección de Aspirantes a EC</h2>
+
+
 
     {% if aspirantes %}
     <div class="table-responsive">
