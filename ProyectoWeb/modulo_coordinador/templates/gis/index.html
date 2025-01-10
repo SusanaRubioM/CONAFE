@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        {% load static %}
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="{% static 'css/leaflet.css' %}">
+        <link rel="stylesheet" href="{% static 'css/L.Control.Layers.Tree.css' %}">
+        <link rel="stylesheet" href="{% static 'css/L.Control.Locate.min.css' %}">
+        <link rel="stylesheet" href="{% static 'css/qgis2web.css' %}">
+        <link rel="stylesheet" href="{% static 'css/fontawesome-all.min.css' %}">
+        <link rel="stylesheet" href="{% static 'css/leaflet-control-geocoder.Geocoder.css' %}">
+        <style>
+            html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            #container {
+                display: flex;
+                flex-direction: row-reverse;
+                width: 100%;
+                height: 100%;
+            }
+            #sidebar {
+                width: 15%;
+                background-color: #f8f9fa;
+                padding: 10px;
+                box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1); 
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+            #sidebar button {
+                background-color: #007bff;
+                color: white;
+                border: none;
+                padding: 10px;
+                cursor: pointer;
+                border-radius: 5px;
+            }
+            #sidebar button:hover {
+                background-color: #0056b3;
+            }
+            #map {
+                flex-grow: 1;
+                height: 100%;
+            }
+        </style>
+        
+        <title>Gestion de Regiones y Microregiones</title>
+    </head>
+    <body>
+        <div id="container">
+            <div id="sidebar">
+
+
+                <div class="table-container">
+                    <table id="tabla-estados" class="table table-striped table-hover table-bordered">
+                        <thead>
+                            <tr>
+                                <th>CvEstado</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for estado in estados %}
+                                <tr class="estado-row" data-nombre="{{ estado.nombre_estado }}" style="display: none;">
+                                    <td>{{ estado.cv_estado }}</td>
+                                    <td>{{ estado.nombre_estado }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+
+                <a href="{% url 'coordinador_home:estado_estado' %}" class="btn btn-custom" aria-label="Seleccionar Estado">Seleccionar Estado</a>
+
+            </div>
+
+            <div id="map"></div>
+            <script src="{% static 'js/qgis2web_expressions.js' %}"></script>
+            <script src="{% static 'js/leaflet.js' %}"></script>
+            <script src="{% static 'js/L.Control.Layers.Tree.min.js' %}"></script>
+            <script src="{% static 'js/L.Control.Locate.min.js' %}"></script>
+            <script src="{% static 'js/leaflet.rotatedMarker.js' %}"></script>
+            <script src="{% static 'js/leaflet.pattern.js' %}"></script>
+            <script src="{% static 'js/leaflet-hash.js' %}"></script>
+            <script src="{% static 'js/Autolinker.min.js' %}"></script>
+            <script src="{% static 'js/rbush.min.js' %}"></script>
+            <script src="{% static 'js/labelgun.min.js' %}"></script>
+            <script src="{% static 'js/labels.js' %}"></script>
+            <script src="{% static 'js/leaflet-control-geocoder.Geocoder.js' %}"></script>
+            <script src="{% static 'data/Chiapas_1.js' %}"></script>
+            <script src="{% static 'data/Tabasco_2.js' %}"></script>
+            <script>
+            var map = L.map('map', {
+                zoomControl:false, maxZoom:28, minZoom:1
+            }).fitBounds([[15.398864859726629,-94.73282234524964],[17.791971655762865,-89.99022654739184]]);
+            var hash = new L.Hash(map);
+            map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+            var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+            // remove popup's row if "visible-with-data"
+            function removeEmptyRowsFromPopupContent(content, feature) {
+                var tempDiv = document.createElement('div');
+                tempDiv.innerHTML = content;
+                var rows = tempDiv.querySelectorAll('tr');
+                    for (var i = 0; i < rows.length; i++) {
+                        var td = rows[i].querySelector('td.visible-with-data');
+                        var key = td ? td.id : '';
+                        if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                            rows[i].parentNode.removeChild(rows[i]);
+                        }
+                    }
+                return tempDiv.innerHTML;
+            }
+
+            var highlightLayer;
+            function highlightFeature(e) {
+                highlightLayer = e.target;
+
+                if (e.target.feature.geometry.type === 'LineString' || e.target.feature.geometry.type === 'MultiLineString') {
+                highlightLayer.setStyle({
+                    color: '#ffff00',
+                });
+                } else {
+                highlightLayer.setStyle({
+                    fillColor: '#ffff00',
+                    fillOpacity: 1
+                });
+                }
+            }
+
+
+
+
+            // add class to format popup if it contains media
+            function addClassToPopupIfMedia(content, popup) {
+                var tempDiv = document.createElement('div');
+                tempDiv.innerHTML = content;
+                if (tempDiv.querySelector('td img')) {
+                    popup._contentNode.classList.add('media');
+                        // Delay to force the redraw
+                        setTimeout(function() {
+                            popup.update();
+                        }, 10);
+                } else {
+                    popup._contentNode.classList.remove('media');
+                }
+            }
+            var zoomControl = L.control.zoom({
+                position: 'topleft'
+            }).addTo(map);
+            L.control.locate({locateOptions: {maxZoom: 19}}).addTo(map);
+            var bounds_group = new L.featureGroup([]);
+            function setBounds() {
+            }
+            map.createPane('pane_OSMStandard_0');
+            map.getPane('pane_OSMStandard_0').style.zIndex = 400;
+            var layer_OSMStandard_0 = L.tileLayer('http://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                pane: 'pane_OSMStandard_0',
+                opacity: 1.0,
+                attribution: '<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors, CC-BY-SA</a>',
+                minZoom: 1,
+                maxZoom: 28,
+                minNativeZoom: 0,
+                maxNativeZoom: 19
+            });
+            layer_OSMStandard_0;
+            map.addLayer(layer_OSMStandard_0);
+            function pop_Chiapas_1(feature, layer) {
+                layer.on('click', function(e) {
+                    document.getElementById('IN-sidebar').innerHTML = 'this is chiapas';
+                });
+
+                layer.on('popupopen', function(e) {
+                });
+            }
+
+            function style_Chiapas_1_0() {
+                return {
+                    pane: 'pane_Chiapas_1',
+                    opacity: 1,
+                    color: 'rgba(35,35,35,1.0)',
+                    dashArray: '',
+                    lineCap: 'square',
+                    lineJoin: 'bevel',
+                    weight: 3.0,
+                    fillOpacity: 0,
+                    interactive: true,
+                }
+            }
+            map.createPane('pane_Chiapas_1');
+            map.getPane('pane_Chiapas_1').style.zIndex = 401;
+            map.getPane('pane_Chiapas_1').style['mix-blend-mode'] = 'normal';
+            var layer_Chiapas_1 = new L.geoJson(json_Chiapas_1, {
+                attribution: '',
+                interactive: true,
+                dataVar: 'json_Chiapas_1',
+                layerName: 'layer_Chiapas_1',
+                pane: 'pane_Chiapas_1',
+                onEachFeature: pop_Chiapas_1,
+                style: style_Chiapas_1_0,
+            });
+            bounds_group.addLayer(layer_Chiapas_1);
+            map.addLayer(layer_Chiapas_1);
+
+
+            
+
+
+            function pop_Tabasco_2(feature, layer) {
+                layer.on({
+                    mouseout: function(e) {
+                        for (var i in e.target._eventParents) {
+                            if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                                e.target._eventParents[i].resetStyle(e.target);
+                            }
+                        }
+                    },
+                    mouseover: highlightFeature,
+                    click: function(e) {
+                        // Actualiza el panel derecho con el nombre del municipio
+                        const nombreMunicipio = feature.properties['name'];
+                        //document.getElementById('nombre-municipio').textContent = nombreMunicipio;
+                        
+                        // Filtra las filas de la tabla en función del nombre del municipio
+                        const rows = document.querySelectorAll('.estado-row');
+                        rows.forEach(row => {
+                            const estadoNombre = row.getAttribute('data-nombre');
+                            if (estadoNombre !== nombreMunicipio) {
+                                row.style.display = 'none';  // Ocultar las filas que no coinciden
+                            } else {
+                                row.style.display = '';  // Mostrar las filas que coinciden
+                            }
+                        });
+                    }
+                });
+
+                layer.on('popupopen', function(e) {
+                });
+            }
+
+
+
+
+            function style_Tabasco_2_0() {
+                return {
+                    pane: 'pane_Tabasco_2',
+                    opacity: 1,
+                    color: 'rgba(13,13,13,1.0)',
+                    dashArray: '',
+                    lineCap: 'square',
+                    lineJoin: 'bevel',
+                    weight: 3.0,
+                    fillOpacity: 0,
+                    interactive: true,
+                }
+            }
+            map.createPane('pane_Tabasco_2');
+            map.getPane('pane_Tabasco_2').style.zIndex = 402;
+            map.getPane('pane_Tabasco_2').style['mix-blend-mode'] = 'normal';
+            var layer_Tabasco_2 = new L.geoJson(json_Tabasco_2, {
+                attribution: '',
+                interactive: true,
+                dataVar: 'json_Tabasco_2',
+                layerName: 'layer_Tabasco_2',
+                pane: 'pane_Tabasco_2',
+                onEachFeature: pop_Tabasco_2,
+                style: style_Tabasco_2_0,
+            });
+            bounds_group.addLayer(layer_Tabasco_2);
+            map.addLayer(layer_Tabasco_2);
+            var osmGeocoder = new L.Control.Geocoder({
+                collapsed: true,
+                position: 'topleft',
+                text: 'Search',
+                title: 'Testing'
+            }).addTo(map);
+            document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+            .className += ' fa fa-search';
+            document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+            .title += 'Search for a place';
+            setBounds();
+            var i = 0;
+            layer_Chiapas_1.eachLayer(function(layer) {
+                var context = {
+                    feature: layer.feature,
+                    variables: {}
+                };
+                layer.bindTooltip((layer.feature.properties['name'] !== null?String('<div style="color: #323232; font-size: 15pt; font-weight: bold; font-family: \'Open Sans\', sans-serif;">' + layer.feature.properties['name']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_Chiapas_1'});
+                labels.push(layer);
+                totalMarkers += 1;
+                layer.added = true;
+                addLabel(layer, i);
+                i++;
+            });
+            var i = 0;
+            layer_Tabasco_2.eachLayer(function(layer) {
+                var context = {
+                    feature: layer.feature,
+                    variables: {}
+                };
+                layer.bindTooltip((layer.feature.properties['name'] !== null?String('<div style="color: #323232; font-size: 15pt; font-weight: bold; font-family: \'Open Sans\', sans-serif;">' + layer.feature.properties['name']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_Tabasco_2'});
+                labels.push(layer);
+                totalMarkers += 1;
+                layer.added = true;
+                addLabel(layer, i);
+                i++;
+            });
+            resetLabels([layer_Chiapas_1,layer_Tabasco_2]);
+            map.on("zoomend", function(){
+                resetLabels([layer_Chiapas_1,layer_Tabasco_2]);
+            });
+            map.on("layeradd", function(){
+                resetLabels([layer_Chiapas_1,layer_Tabasco_2]);
+            });
+            map.on("layerremove", function(){
+                resetLabels([layer_Chiapas_1,layer_Tabasco_2]);
+            });
+            </script>
+            
+        </body>
+    </html>
+
+

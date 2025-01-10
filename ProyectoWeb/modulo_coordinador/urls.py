@@ -29,5 +29,7 @@ urlpatterns = [
     path('calendario/eventos/', views.calendario_view, name='calendario_view'),
     path('api/eventos/', views.eventos_calendario, name='eventos_calendario'),
     path('calendario-eventos/', views.calendario_eventos, name='calendario_eventos'), 
+    path('gestion_RMR/dashboard/ct', views.dashboard_gestion_RMR, name='gestion_RMR_dashboard_ct'),
+    path('gestion_estado/dashboard/ct', views.dashboard_gestion_estado, name='estado_estado'),
 ]
       

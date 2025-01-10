@@ -12,7 +12,7 @@ from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
 from modulo_dot.views import dashboard_vacantes as original_dashboard_vacantes
-from modulo_apec.models import ServicioEducativo
+from modulo_apec.models import ServicioEducativo,Estado, Municipio
 from modulo_apec.forms import ObservacionForm
 from modulo_dpe.models import Reporte
 from .models import ActividadCalendario
@@ -512,3 +512,19 @@ def calendario_view(request):
 def calendario_eventos(request):
     eventos = CalendarEvent.objects.all().order_by('date')  # Consulta los eventos
     return render(request, 'home_coordinador/calendario_eventos.html', {'eventos': eventos})
+
+# GIS
+
+#def dashboard_gestion_RMR(request):
+#    servicios = ServicioEducativo.objects.all()
+#    return render(request, 'home_dot/dashboard_vacantes.html', {'servicios': servicios})
+
+
+def dashboard_gestion_RMR(request):
+    estados = Estado.objects.all()
+    #return render(request, 'gis/index.html', {'estados': estados})
+    return render(request, 'gis/index.html', {'estados': estados})
+
+def dashboard_gestion_estado(request):
+    municipios = Municipio.objects.all()
+    return render(request, 'gis/municipio.html', {'municipios': municipios})
