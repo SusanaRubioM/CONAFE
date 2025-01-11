@@ -401,22 +401,18 @@ def ajax_aspirante_status(request, aspirante_id):
             data = json.loads(request.body)
             status_seleccion = data.get("status_seleccion")
 
-            print("Estado recibido:", status_seleccion)  # Debug para verificar el valor recibido
-
-            # Verificamos si el estado recibido es uno de los válidos
+            # Verificar que el estado recibido sea válido
             if status_seleccion not in ['aceptado', 'rechazado']:
                 return JsonResponse({"success": False, "message": "Estado no válido."})
 
             # Buscar al aspirante por ID
             aspirante = Aspirante.objects.get(id=aspirante_id)
 
-            # Actualizar el estado solo si es válido
-            aspirante.status_seleccion = status_seleccion  # Cambiar solo el estado
-            
-            # No modificar el campo folio ni otros campos, solo actualizamos status_seleccion
+            # Actualizar el estado del aspirante
+            aspirante.status_seleccion = status_seleccion
             aspirante.save()
 
-            return JsonResponse({"success": True, "message": f"Estado actualizado a {aspirante.status_seleccion} correctamente."})
+            return JsonResponse({"success": True, "message": f"Estado actualizado a {status_seleccion} correctamente."})
 
         except ObjectDoesNotExist:
             return JsonResponse({"success": False, "message": "Aspirante no encontrado."})
@@ -427,6 +423,7 @@ def ajax_aspirante_status(request, aspirante_id):
 
     return JsonResponse({"success": False, "message": "Método no permitido."})
 
+from form_app.models import Participacion
 
 def crear_usuario_ajax(request):
     if request.method == "POST":
@@ -434,35 +431,41 @@ def crear_usuario_ajax(request):
             # Recuperar los datos enviados por la solicitud AJAX
             data = json.loads(request.body)
             aspirante_id = data.get('aspirante_id')
-            usuario = data.get('usuario')
-            rol = data.get('rol')
-            contrasenia = data.get('contrasenia')
-
-            # Validación de rol
-            valid_roles = [role[0] for role in Usuario._meta.get_field('rol').choices]
-            if rol not in valid_roles:
-                return JsonResponse({"success": False, "message": "Rol no válido."})
 
             # Buscar el aspirante relacionado
             aspirante = get_object_or_404(Aspirante, id=aspirante_id)
+            # Asignación fija del rol
+            rol = aspirante.participacion.programa_participacion # Rol fijo para todos los usuarios
 
-            if aspirante.usuario and aspirante.usuario.rol == "ASPIRANTE":
-                # Actualizar usuario existente
+            # Usamos el folio del aspirante como el nombre de usuario
+            usuario = aspirante.folio
+            contrasenia = aspirante.datos_personales.curp  # CURP como contraseña
+
+            # Validar que el CURP no esté vacío
+            if not contrasenia:
+                return JsonResponse({"success": False, "message": "CURP del aspirante no disponible."})
+
+            # Verificar si el aspirante ya tiene un usuario asociado
+            if aspirante.usuario:
+                # Si el aspirante ya tiene un usuario asociado, actualizamos ese usuario
                 user = aspirante.usuario
                 user.usuario = usuario
                 user.contrasenia = contrasenia  # Aunque será encriptada
                 user.rol = rol
+                
+                # Actualizar el usuario_rol relacionado
                 user.usuario_rol.username = usuario
-                user.usuario_rol.password = make_password(contrasenia)
+                user.usuario_rol.password = make_password(contrasenia)  # Encriptamos la contraseña
                 user.usuario_rol.role = rol
+                user.usuario_rol.is_active = True
                 user.usuario_rol.save()
                 user.save()
             else:
-                # Crear un nuevo usuario
+                # Si el aspirante no tiene un usuario, creamos uno nuevo
                 usuario_rol = UsuarioRol.objects.create(
                     username=usuario,
                     role=rol,
-                    password=make_password(contrasenia)  # Encriptar contraseña
+                    password=make_password(contrasenia)  # Encriptamos la contraseña
                 )
                 user = Usuario.objects.create(
                     usuario_rol=usuario_rol,
@@ -476,8 +479,7 @@ def crear_usuario_ajax(request):
                 aspirante.usuario = user
                 aspirante.save()
 
-            # Retornar éxito
-            return JsonResponse({"success": True, "message": "Usuario actualizado o creado exitosamente!"})
+            return JsonResponse({"success": True, "message": "Usuario creado exitosamente!"})
 
         except Aspirante.DoesNotExist:
             return JsonResponse({"success": False, "message": "Aspirante no encontrado."})
