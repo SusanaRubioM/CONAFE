@@ -21,15 +21,18 @@ COPY . .
 RUN pip install --no-cache-dir \
     asgiref==3.7.2 \
     Django==4.2.4 \
+    django-widget-tweaks==1.5.0 \
+    djangorestframework==3.15.2 \
     et-xmlfile==1.1.0 \
     mysqlclient==2.2.6 \
     numpy==1.26.1 \
     openpyxl==3.1.2 \
     pandas==2.1.1 \
     Pillow==10.0.1 \
+    PyPDF2==3.0.1 \
     python-dateutil==2.8.2 \
     pytz==2023.3.post1 \
+    reportlab==4.2.5 \
     six==1.16.0 \
     sqlparse==0.4.4 \
-    tzdata==2023.3 \
-    django-widget-tweaks
+    tzdata==2023.3

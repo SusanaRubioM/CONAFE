@@ -325,20 +325,119 @@ def dashboard_convenios(request):
         convenio = ConveniosFiguras.objects.get(id=convenio_id)
 
         # Procesamos la firma digital
-        form = FirmaDigitalForm(request.POST, request.FILES)
-        if form.is_valid():
-            convenio.firma_digital = form.cleaned_data['firma_digital']
+        if request.FILES.get('firma_digital'):
+            convenio.firma_digital = request.FILES['firma_digital']
             convenio.save()
             return redirect('dot_home:dashboard_convenios')
-    else:
-        form = FirmaDigitalForm()
 
     return render(request, 'home_dot/dashboard_convenios.html', {
         'convenios': convenios,
-        'form': form
     })
 
 
+from PyPDF2 import PdfReader, PdfWriter
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from io import BytesIO
+from PIL import Image, ImageEnhance
+import base64
+import os  
+from django.core.files.base import ContentFile
+@csrf_exempt  # Solo si no estás usando protección CSRF en la solicitud
+def save_signature(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            signature_data = data.get('signature')
+            convenio_id = data.get('convenio_id')
 
+            if not convenio_id:
+                return JsonResponse({'status': 'error', 'message': 'ID del convenio no proporcionado'}, status=400)
 
+            convenio = ConveniosFiguras.objects.get(id=convenio_id)
 
+            # Convertir base64 a imagen
+            img_data = base64.b64decode(signature_data.split(',')[1])
+            image = Image.open(BytesIO(img_data))
+            
+            # Convertir a RGBA si no lo está ya
+            if image.mode != 'RGBA':
+                image = image.convert('RGBA')
+            
+            # Mejorar el contraste
+            enhancer = ImageEnhance.Contrast(image)
+            image = enhancer.enhance(2.0)  # Aumentar contraste (ajusta el valor según necesites)
+            
+            # Mejorar la nitidez
+            enhancer = ImageEnhance.Sharpness(image)
+            image = enhancer.enhance(1.5)  # Aumentar nitidez
+            
+            # Ajustar el brillo si es necesario
+            enhancer = ImageEnhance.Brightness(image)
+            image = enhancer.enhance(0.9)  # Reducir un poco el brillo para hacer la firma más oscura
+            
+            # Crear máscara de transparencia mejorada
+            r, g, b, a = image.split()
+            # Hacer los trazos más oscuros
+            a = ImageEnhance.Contrast(a).enhance(1.5)
+            
+            # Recombinar los canales
+            image = Image.merge('RGBA', (r, g, b, a))
+            
+            firma_temp_path = f"media/firmas/temp_firma_{convenio.usuario.usuario}.png"
+            # Guardar con mejor calidad
+            image.save(firma_temp_path, 'PNG', quality=95)
+
+            # Procesar PDF con la firma mejorada
+            pdf_path = convenio.convenio_pdf.path
+            output_pdf_path = f"media/firmas/convenio_firmado_{convenio.usuario.usuario}.pdf"
+            
+            agregar_firma(pdf_path, firma_temp_path, output_pdf_path)
+
+            with open(output_pdf_path, 'rb') as pdf_file:
+                convenio.firma_digital.save(
+                    f"convenio_firmado_{convenio.usuario.usuario}.pdf",
+                    ContentFile(pdf_file.read()),
+                    save=True
+                )
+
+            os.remove(firma_temp_path)
+            
+            return JsonResponse({'status': 'success', 'firma_pdf_path': convenio.firma_digital.url})
+            
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+def agregar_firma(pdf_path, firma_path, output_path, page_number=4):
+    reader = PdfReader(pdf_path)
+    writer = PdfWriter()
+
+    packet = BytesIO()
+    c = canvas.Canvas(packet, pagesize=letter)
+    
+    # Calcular dimensiones
+    img = Image.open(firma_path)
+    width = 150.43504 - 54.0
+    aspect = img.height / img.width
+    height = width * aspect
+    
+    # Dibujar las firmas con mayor opacidad
+    # Primera firma
+    c.drawImage(firma_path, x=54.0, y=350.59, width=width, height=height, mask='auto', preserveAspectRatio=True)
+    # Segunda firma
+    c.drawImage(firma_path, x=54.0, y=250.17, width=width, height=height, mask='auto', preserveAspectRatio=True)
+    # Tercera firma
+    c.drawImage(firma_path, x=54.0, y=150.37, width=width, height=height, mask='auto', preserveAspectRatio=True)
+    
+    c.save()
+
+    packet.seek(0)
+    firma_pdf = PdfReader(packet)
+
+    for i, page in enumerate(reader.pages):
+        if i == 4:
+            page.merge_page(firma_pdf.pages[0])
+        writer.add_page(page)
+
+    with open(output_path, "wb") as output_file:
+        writer.write(output_file)
