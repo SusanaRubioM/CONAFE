@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capacitación Inicial</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        tr.finalizado {
+            background-color: lightgreen;
+        }
+        tr.no-finalizado {
+            background-color: white;
+        }
+        tr.horas-insuficientes {
+            background-color: lightcoral;
+        }
+        button {
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Capacitaciones Iniciales</h1>
+
+    {% for cap in capacitaciones %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Región</th>
+                    <th>Microrregión</th>
+                    <th>Comunidad</th>
+                    <th>Nombre ECAR</th>
+                    <th>Nombre ECA</th>
+                    <th>CCT</th>
+                    <th>Folio EC</th>
+                    <th>Nombre EC</th>
+                    <th>Ciclo Asignado</th>
+                    <th>Contexto</th>
+                    <th>Tipo de Servicio</th>
+                    <th>Actividad</th>
+                    <th>Fecha</th>
+                    <th>Horas Cubiertas</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="{% if cap.finalizada %}finalizado{% elif cap.horas_cubiertas < 240 %}horas-insuficientes{% else %}no-finalizado{% endif %}">
+                    <td>{{ cap.cv_region }}</td>
+                    <td>{{ cap.cv_microrregion }}</td>
+                    <td>{{ cap.cv_comunidad }}</td>
+                    <td>{{ cap.nombre_ecar }}</td>
+                    <td>{{ cap.nombre_eca }}</td>
+                    <td>{{ cap.cct }}</td>
+                    <td>{{ cap.id_ec }}</td>
+                    <td>{{ cap.nombre_ec }}</td>
+                    <td>{{ cap.ciclo_asignado }}</td>
+                    <td>{{ cap.contexto }}</td>
+                    <td>{{ cap.tipo_servicio }}</td>
+                    <td>{{ cap.actividad }}</td>
+                    <td>{{ cap.fecha|date:"M. d, Y" }}</td>
+                    <td>{{ cap.horas_cubiertas }}</td>
+                    <td>
+                        {% if cap.finalizada %}
+                            <span>Finalizado</span>
+                        {% elif cap.horas_cubiertas >= 240 %}
+                            <form method="POST" action="{% url 'coordinador_home:finalizar_capacitacion' cap.id %}">
+                                {% csrf_token %}
+                                <button type="submit">Finalizar Capacitación</button>
+                            </form>
+                        {% else %}
+                            <span>Horas insuficientes</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    {% endfor %}
+
+</body>
+</html>

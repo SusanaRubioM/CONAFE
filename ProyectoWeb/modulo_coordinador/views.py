@@ -18,6 +18,14 @@ from modulo_dpe.models import Reporte
 from .models import ActividadCalendario
 from modulo_DECB.models import CalendarEvent  # Importar el modelo de eventos del módulo DECB
 
+#cambios
+from modulo_capacitacion.models import CapacitacionInicial
+from django.db.models import Sum
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from modulo_apec.models import Region, Microrregion, Comunidad
+#
 @login_required
 @role_required('CT')
 def empleado_view(request):
@@ -528,3 +536,36 @@ def dashboard_gestion_RMR(request):
 def dashboard_gestion_estado(request):
     municipios = Municipio.objects.all()
     return render(request, 'gis/municipio.html', {'municipios': municipios})
+##cambio
+@login_required
+def capacitacion_inicial_view(request):
+    # Obtenemos todas las capacitaciones iniciales
+    capacitaciones = CapacitacionInicial.objects.all()
+
+    # Mapear claves con los nombres de las regiones, microrregiones y comunidades
+    for cap in capacitaciones:
+        cap.region = Region.objects.filter(cv_region=cap.cv_region).first()
+        cap.microrregion = Microrregion.objects.filter(cv_microrregion=cap.cv_microrregion).first()
+        cap.comunidad = Comunidad.objects.filter(cv_comunidad=cap.cv_comunidad).first()
+
+    context = {'capacitaciones': capacitaciones}
+    return render(request, 'home_coordinador/capacitacion_inicial.html', context)
+
+def finalizar_capacitacion(request, capacitacion_id):
+    if request.method == 'POST':
+        # Obtener la capacitación por ID
+        capacitacion = get_object_or_404(CapacitacionInicial, id=capacitacion_id)
+
+        # Verificar si cumple con las horas mínimas
+        if capacitacion.horas_cubiertas >= 240:
+            capacitacion.finalizada = True
+            capacitacion.save()
+
+            # Redirigir a la página principal después de finalizar
+            return redirect('coordinador_home:capacitacion_inicial')
+
+        # Si no cumple, podrías mostrar un mensaje o manejar el caso aquí
+        return HttpResponse("La capacitación no cumple con las horas requeridas.", status=400)
+
+    # Manejar métodos GET u otros (opcional)
+    return HttpResponse("Método no permitido.", status=405)

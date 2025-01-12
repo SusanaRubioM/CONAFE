@@ -15,6 +15,8 @@ class CapacitacionInicial(models.Model):
     actividad = models.CharField(max_length=100)
     fecha = models.DateField()
     horas_cubiertas = models.PositiveIntegerField(default=0)
+    cct = models.CharField(max_length=50, unique=True)
+    finalizada = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = "Capacitación Inicial"

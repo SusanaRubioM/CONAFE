@@ -31,5 +31,8 @@ urlpatterns = [
     path('calendario-eventos/', views.calendario_eventos, name='calendario_eventos'), 
     path('gestion_RMR/dashboard/ct', views.dashboard_gestion_RMR, name='gestion_RMR_dashboard_ct'),
     path('gestion_estado/dashboard/ct', views.dashboard_gestion_estado, name='estado_estado'),
+    #cambio
+    path('capacitacion-inicial/', views.capacitacion_inicial_view, name='capacitacion_inicial'),
+    path('finalizar-capacitacion/<int:capacitacion_id>/', views.finalizar_capacitacion, name='finalizar_capacitacion'),
 ]
       
