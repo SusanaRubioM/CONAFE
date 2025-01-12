@@ -1,15 +1,36 @@
 from django.db import models
 import os
+import datetime
 from django.apps import apps
 from django.core.exceptions import ValidationError
+from datetime import datetime
 
 class ConveniosFiguras(models.Model):
+    control_numero = models.CharField(max_length=150, unique=True, blank=True, null=True)
     usuario = models.OneToOneField('modulo_dot.Usuario', on_delete=models.CASCADE, null=True, blank=True)
     convenio_pdf = models.FileField(upload_to='documentos/', null=True, blank=True)
     firma_digital = models.FileField(upload_to='firmas/', null=True, blank=True)
 
     class Meta:
         db_table = "convenio_digital"
+
+    def numero_control(self):
+        year = datetime.now().year
+        year_short = str(year)[2:]  # Obtiene los dos últimos dígitos del año, como '21' para 2021
+        identifier = 'EB'  # Este podría ser un identificador, si lo deseas cambiar
+        last_folio = (
+            ConveniosFiguras.objects.filter(control_numero__startswith=f"{year_short}{identifier}")
+            .order_by("-control_numero")
+            .first()
+        )
+        if last_folio:
+            last_number = int(last_folio.control_numero[-6:])  # Obtiene los últimos 6 dígitos
+            new_number = last_number + 1
+        else:
+            new_number = 1  # Iniciar la secuencia si no existen registros previos
+        
+        new_number_str = str(new_number).zfill(6)  # Asegura que el número tenga 6 dígitos
+        self.control_numero = f"{year_short}{identifier}{new_number_str}"
 
     def __str__(self):
         return f"Convenio de {self.usuario.usuario} ({self.pk})"
@@ -18,6 +39,11 @@ class ConveniosFiguras(models.Model):
         # Asigna el archivo predeterminado si no se ha asignado
         if not self.convenio_pdf:
             self.convenio_pdf = os.path.join('documentos', 'Convenio_figuras.pdf')
+        
+        # Llama al método de generar el número de control antes de guardar
+        if not self.control_numero:
+            self.numero_control()
+        
         super().save(*args, **kwargs)
 
 class ActividadCalendario(models.Model):

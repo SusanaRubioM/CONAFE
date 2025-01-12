@@ -392,7 +392,8 @@ def save_signature(request):
             pdf_path = convenio.convenio_pdf.path
             output_pdf_path = f"media/firmas/convenio_firmado_{convenio.usuario.usuario}.pdf"
             
-            agregar_firma(pdf_path, firma_temp_path, output_pdf_path)
+            # Ahora pasamos el convenio_id a agregar_firma
+            agregar_firma(pdf_path, firma_temp_path, output_pdf_path, convenio_id=convenio.id)
 
             with open(output_pdf_path, 'rb') as pdf_file:
                 convenio.firma_digital.save(
@@ -407,37 +408,60 @@ def save_signature(request):
             
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+        
 
-def agregar_firma(pdf_path, firma_path, output_path, page_number=4):
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+
+def agregar_firma(pdf_path, firma_path, output_path, convenio_id):
+     # Obtener el convenio usando el convenio_id
+    convenio = ConveniosFiguras.objects.get(id=convenio_id)  # Filtrar por ID del convenio
+    control_numero = convenio.control_numero  # Número de control
+
     reader = PdfReader(pdf_path)
     writer = PdfWriter()
 
+    # Crear un PDF temporal para el número de control y las firmas
     packet = BytesIO()
     c = canvas.Canvas(packet, pagesize=letter)
     
-    # Calcular dimensiones
-    img = Image.open(firma_path)
-    width = 150.43504 - 54.0
-    aspect = img.height / img.width
-    height = width * aspect
-    
-    # Dibujar las firmas con mayor opacidad
-    # Primera firma
-    c.drawImage(firma_path, x=54.0, y=350.59, width=width, height=height, mask='auto', preserveAspectRatio=True)
-    # Segunda firma
-    c.drawImage(firma_path, x=54.0, y=250.17, width=width, height=height, mask='auto', preserveAspectRatio=True)
-    # Tercera firma
-    c.drawImage(firma_path, x=54.0, y=150.37, width=width, height=height, mask='auto', preserveAspectRatio=True)
-    
+    # Dibujar el número de control en todas las páginas
+    c.setFont("Helvetica", 10)  # Establecer la fuente y tamaño
+    c.setFillColor(colors.black)  # Establecer el color del texto
+
+    # Recorrer todas las páginas para añadir el número de control
+    for i in range(len(reader.pages)):  
+        # Dibujar el número de control en todas las páginas
+        c.drawString(450.63, 758.64, f"{control_numero}")  # Ajustar la posición en la esquina superior derecha
+
+        # Si es la página 4 (índice 4 es la quinta página, ajusta según sea necesario)
+        if i == 4:
+            img = Image.open(firma_path)
+            width = 150.43504 - 54.0
+            aspect = img.height / img.width
+            height = width * aspect
+
+            # Dibujar las firmas con mayor opacidad
+            c.drawImage(firma_path, x=54.0, y=350.59, width=width, height=height, mask='auto', preserveAspectRatio=True)
+            c.drawImage(firma_path, x=54.0, y=250.17, width=width, height=height, mask='auto', preserveAspectRatio=True)
+            c.drawImage(firma_path, x=54.0, y=150.37, width=width, height=height, mask='auto', preserveAspectRatio=True)
+        
+        c.showPage()  # Añadir una nueva página al canvas para seguir con la siguiente página
+
     c.save()
 
     packet.seek(0)
-    firma_pdf = PdfReader(packet)
+    control_y_firma_pdf = PdfReader(packet)
 
+    # Añadir las páginas del archivo de control y firmas al PDF de salida
     for i, page in enumerate(reader.pages):
-        if i == 4:
-            page.merge_page(firma_pdf.pages[0])
+        # Combinamos el contenido de la página original con el control y las firmas (si es la página correspondiente)
+        page.merge_page(control_y_firma_pdf.pages[i])  # Añadir el texto (número de control) y las firmas al PDF
+
+        # Añadir la página modificada al PDF de salida
         writer.add_page(page)
 
     with open(output_path, "wb") as output_file:
         writer.write(output_file)
+
+
