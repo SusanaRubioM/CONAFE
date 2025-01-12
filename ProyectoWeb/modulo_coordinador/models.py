@@ -10,6 +10,11 @@ class ConveniosFiguras(models.Model):
     usuario = models.OneToOneField('modulo_dot.Usuario', on_delete=models.CASCADE, null=True, blank=True)
     convenio_pdf = models.FileField(upload_to='documentos/', null=True, blank=True)
     firma_digital = models.FileField(upload_to='firmas/', null=True, blank=True)
+    estado_convenio = models.CharField(max_length=50,
+                                      choices=[('Pendiente','Pendiente'),
+                                               ('Aprobado','Aprobado'),
+                                               ('Rechazado','Rechazado')],
+                                      default='Pendiente')
 
     class Meta:
         db_table = "convenio_digital"

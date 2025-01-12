@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from web_conafe.const import ESTADOS_MEXICO, BANCO_CHOICES, LINGUA_CHOICES, formacion_academica_CHOICES
 from modulo_dot.models import DocumentosPersonales
-
+from modulo_coordinador.models import ConveniosFiguras
 class RegistroAspiranteForm(forms.ModelForm):
     class Meta:
         model = Aspirante

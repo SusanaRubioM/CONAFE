@@ -341,7 +341,7 @@ def dashborard_equipamiento(request):
 
 @login_required
 @role_required('CT')
-def dashborard_equipamiento(request):
+def dashboard_equipamiento(request):
     # Filtrar reportes según la categoría seleccionada (si es que se ha seleccionado alguna)
     categoria = request.GET.get('categoria', '')  # Obtiene la categoría desde el query string
     if categoria:
@@ -504,6 +504,7 @@ def eventos_calendario(request):
         return JsonResponse(eventos, safe=False)
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+    
 
 @login_required
 @role_required('CT')
@@ -514,6 +515,71 @@ def calendario_view(request):
 def calendario_eventos(request):
     eventos = CalendarEvent.objects.all().order_by('date')  # Consulta los eventos
     return render(request, 'home_coordinador/calendario_eventos.html', {'eventos': eventos})
+
+
+
+
+from modulo_coordinador.models import ConveniosFiguras
+
+@login_required
+@role_required('CT')
+def dashboard_convenio_view(request):
+    # Obtener el estado del filtro
+    estado = request.GET.get('estado', '')
+    
+    # Consultar convenios con información relacionada
+    convenios = ConveniosFiguras.objects.select_related(
+        'usuario',
+        'usuario__aspirante',
+        'usuario__aspirante__datos_personales'
+    )
+    
+    if estado:
+        convenios = convenios.filter(estado_convenio=estado)
+    
+    # Crear lista de datos completos
+    convenios_data = []
+    for convenio in convenios:
+        aspirante = getattr(convenio.usuario, 'aspirante', None)
+        datos_personales = getattr(aspirante, 'datos_personales', None) if aspirante else None
+        
+        convenio_info = {
+            'convenio': convenio,
+            'folio_aspirante': aspirante.folio if aspirante else 'No disponible',
+            'nombre_completo': str(aspirante) if aspirante else 'No disponible',
+            'datos_personales': datos_personales
+        }
+        convenios_data.append(convenio_info)
+        
+    context = {
+        'convenios_data': convenios_data,
+    }
+    
+    return render(request, 'dashboards/dashboards_convenios.html', context)
+
+@login_required
+@role_required('CT')
+def actualizar_estado_convenio(request, convenio_id):
+    if request.method == "POST":
+        convenio = get_object_or_404(ConveniosFiguras, id=convenio_id)
+        accion = request.POST.get('accion')
+        
+        if accion == 'aprobar':
+            convenio.estado_convenio = 'Aprobado'
+            messages.success(request, 'Convenio aprobado exitosamente.')
+        elif accion == 'rechazar':
+            convenio.estado_convenio = 'Rechazado'
+            messages.success(request, 'Convenio rechazado.')
+            
+        convenio.save()
+        
+    return redirect('coordinador_home:dashboard_convenios')
+
+
+
+
+
+
 
 # GIS
 

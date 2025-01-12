@@ -63,19 +63,29 @@ class Usuario(models.Model):
 
     def _handle_convenio(self):
         """Gestiona la creación del objeto ConveniosFiguras para el rol 'EC', 'ECA', y 'ECAR'."""
-        if self.rol in ["EC", "ECA", "ECAR"]:
+        if self.rol in ["ASPIRANTE", "EC", "ECA", "ECAR"]:
+            # Comprobamos el estado del usuario
+            status = Statuses.objects.filter(usuario=self).order_by('-id').first()  # Ordena por id para obtener el último estado
+            if status and status.status == 'activa':
+                estado_convenio = 'Aprobado'  # Si el usuario está activo, el convenio se marca como "Aprobado"
+            else:
+                estado_convenio = 'Rechazado'  # Si el usuario no está activo o no tiene estado, lo marcamos como "Rechazado"
+            
             # Comprobamos si ya existe un convenio para el usuario con rol "EC", "ECA" o "ECAR"
             convenio, created = ConveniosFiguras.objects.update_or_create(
                 usuario=self,
                 defaults={
                     'convenio_pdf': os.path.join('documentos', 'Convenio_figuras.pdf'),
                     'firma_digital': None,  # Puedes asignar la firma digital más tarde
-                }
+                    'estado_convenio': estado_convenio,  # Asignamos el estado basado en la verificación
+                },
             )
+
             if created:
-                print(f"Convenio creado para el usuario {self.usuario}")
+                print(f"Convenio creado para el usuario {self.usuario} con estado {estado_convenio}")
             else:
-                print(f"Convenio actualizado para el usuario {self.usuario}")
+                print(f"Convenio actualizado para el usuario {self.usuario} con estado {estado_convenio}")
+
 
     def _handle_statuses(self):
         """Gestiona la creación o actualización de Statuses según el rol del usuario."""
