@@ -14,27 +14,31 @@
         <link rel="stylesheet" href="{% static 'css/fontawesome-all.min.css' %}">
         <link rel="stylesheet" href="{% static 'css/leaflet-control-geocoder.Geocoder.css' %}">
         <style>
+                        /* General */
             html, body {
                 width: 100%;
                 height: 100%;
                 margin: 0;
                 padding: 0;
             }
+
             #container {
                 display: flex;
                 flex-direction: row-reverse;
                 width: 100%;
                 height: 100%;
             }
+
             #sidebar {
                 width: 15%;
                 background-color: #f8f9fa;
                 padding: 10px;
-                box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1); 
+                box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
             }
+
             #sidebar button {
                 background-color: #007bff;
                 color: white;
@@ -42,15 +46,179 @@
                 padding: 10px;
                 cursor: pointer;
                 border-radius: 5px;
+                transition: background-color 0.3s ease;
             }
+
             #sidebar button:hover {
                 background-color: #0056b3;
             }
+
             #map {
                 flex-grow: 1;
                 height: 100%;
             }
+
+            /* Contenedor principal de la tabla */
+            #tabla-container {
+                margin: 0 auto; /* Eliminamos márgenes */
+                width: 95%;
+                max-width: 1200px;
+                text-align: center;
+                background-color: #ffffff;
+                border-radius: 8px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                padding: 0; /* Reducimos padding por defecto */
+                transition: all 0.3s ease; /* Suaviza cambios de altura y padding */
+            }
+
+            /* Cuando la tabla está oculta */
+            #tabla-container.collapsed {
+                padding: 0; /* Elimina el padding para reducir espacio */
+                height: auto; /* Ajusta automáticamente según el contenido */
+                overflow: hidden; /* Oculta cualquier contenido adicional */
+                background-color: transparent; /* Opcional: elimina fondo si está vacío */
+            }
+
+            /* Contenido de la tabla */
+            #tabla-content {
+                display: block; /* Por defecto, visible */
+                margin: 20px 0;
+            }
+
+            /* Ocultar el contenido de la tabla */
+            #tabla-content.hidden {
+                display: none; /* Oculta el contenido */
+            }
+
+            /* Botón de Mostrar/Ocultar */
+            #toggle-table-btn {
+                display: block;
+                margin: 20px auto;
+                background-color: #007bff;
+                color: white;
+                border: none;
+                padding: 10px 15px;
+                font-size: 1em;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+            }
+
+            #toggle-table-btn:hover {
+                background-color: #0056b3;
+            }
+
+            /* Tabla */
+            table.display {
+                width: 100%;
+                border-collapse: collapse;
+                border-spacing: 0;
+                font-size: 0.9em;
+                color: #333;
+            }
+
+            /* Encabezados */
+            table.display thead th {
+                background-color: #007bff;
+                color: white;
+                text-align: left;
+                padding: 12px 15px;
+                font-size: 1em;
+                text-transform: uppercase;
+            }
+
+            /* Celdas del cuerpo */
+            table.display tbody td {
+                padding: 10px 15px;
+                border: 1px solid #ddd;
+            }
+
+            /* Filas alternadas */
+            table.display tbody tr:nth-child(even) {
+                background-color: #f9f9f9;
+            }
+
+            table.display tbody tr:nth-child(odd) {
+                background-color: #ffffff;
+            }
+
+            /* Hover para filas */
+            table.display tbody tr:hover {
+                background-color: #f1f1f1;
+            }
+
+            /* Botón de Mostrar/Ocultar */
+            #toggle-table-btn {
+                background-color: #007bff;
+                color: white;
+                border: none;
+                padding: 10px 15px;
+                font-size: 1em;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+                z-index: 1000;
+            }
+
+            #toggle-table-btn:hover {
+                background-color: #0056b3;
+            }
+
+            /* Tabla flotante */
+            #tabla-overlay {
+                position: absolute;
+                top: 60px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 80%;
+                max-height: 70%;
+                background-color: #ffffff;
+                border-radius: 8px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                padding: 20px;
+                overflow-y: auto; /* Agrega un scroll si la tabla es demasiado alta */
+                z-index: 999;
+                display: none; /* Oculta la tabla por defecto */
+            }
+
+            /* Tabla */
+            table.display {
+                width: 100%;
+                border-collapse: collapse;
+                border-spacing: 0;
+                font-size: 0.9em;
+                color: #333;
+            }
+
+            table.display thead th {
+                background-color: #007bff;
+                color: white;
+                text-align: left;
+                padding: 12px 15px;
+                font-size: 1em;
+                text-transform: uppercase;
+            }
+
+            table.display tbody td {
+                padding: 10px 15px;
+                border: 1px solid #ddd;
+            }
+
+            table.display tbody tr:nth-child(even) {
+                background-color: #f9f9f9;
+            }
+
+            table.display tbody tr:nth-child(odd) {
+                background-color: #ffffff;
+            }
+
+            table.display tbody tr:hover {
+                background-color: #f1f1f1;
+            }
+
+
         </style>
+        
         
         <title>Gestion de Regiones y Microregiones</title>
     </head>
@@ -84,6 +252,64 @@
             </div>
 
             <div id="map"></div>
+
+            <!-- Botón de Mostrar/Ocultar -->
+            <button id="toggle-table-btn" style="position: absolute; top: 20px; left: 20px; z-index: 1000;">
+                Mostrar/Ocultar Tabla
+            </button>
+
+            <!-- Tabla flotante -->
+            <div id="tabla-overlay" class="hidden">
+                <div id="tabla-content">
+                    <h2>Regiones y Microrregiones</h2>
+                    <table id="tabla-detallada" class="display">
+                        <thead>
+                            <tr>
+                                <th>Clave Estado</th>
+                                <th>Estado</th>
+                                <th>Clave Región</th>
+                                <th>Región</th>
+                                <th>Clave Microrregión</th>
+                                <th>Microrregión</th>
+                                <th>Clave Comunidad</th>
+                                <th>Comunidad</th>
+                                <th>Contexto</th>
+                                <th>Tipo de Servicio</th>
+                                <th>Estatus</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for estado in estados %}
+                                {% for region in estado.regiones.all %}
+                                    {% for microrregion in region.microrregiones.all %}
+                                        {% for comunidad in microrregion.comunidades.all %}
+                                            <tr>
+                                                <td>{{ estado.cv_estado }}</td>
+                                                <td>{{ estado.nombre_estado }}</td>
+                                                <td>{{ region.cv_region }}</td>
+                                                <td>{{ region.nombre_region }}</td>
+                                                <td>{{ microrregion.cv_microrregion }}</td>
+                                                <td>{{ microrregion.nombre_microrregion }}</td>
+                                                <td>{{ comunidad.cv_comunidad }}</td>
+                                                <td>{{ comunidad.nombre_comunidad }}</td>
+                                                <td>{{ comunidad.contexto_comunidad }}</td>
+                                                <td>{{ comunidad.tipo_servicio }}</td>
+                                                <td>{{ comunidad.estatus }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% endfor %}
+                                {% endfor %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+
+            
+            
+
+    
             <script src="{% static 'js/qgis2web_expressions.js' %}"></script>
             <script src="{% static 'js/leaflet.js' %}"></script>
             <script src="{% static 'js/L.Control.Layers.Tree.min.js' %}"></script>
@@ -325,6 +551,33 @@
             });
             </script>
             
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+            <script>
+                $(document).ready(function() {
+                    // Inicializa DataTables
+                    $('#tabla-detallada').DataTable();
+            
+                    // Alternar visibilidad del overlay
+                    $('#toggle-table-btn').on('click', function() {
+                        const overlay = $('#tabla-overlay');
+                        if (overlay.is(':visible')) {
+                            overlay.hide(); // Ocultar la tabla flotante
+                        } else {
+                            overlay.show(); // Mostrar la tabla flotante
+                        }
+                    });
+                });
+            </script>
+            
+            
+            
+            
+            
+
+            
+
+
         </body>
     </html>
 

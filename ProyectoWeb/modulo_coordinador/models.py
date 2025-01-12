@@ -2,6 +2,8 @@ from django.db import models
 import os
 from django.apps import apps
 from django.core.exceptions import ValidationError
+from modulo_apec.models import Estado, Region, Microrregion
+from django.core.validators import MinValueValidator, RegexValidator
 
 class ConveniosFiguras(models.Model):
     usuario = models.OneToOneField('modulo_dot.Usuario', on_delete=models.CASCADE, null=True, blank=True)
@@ -39,3 +41,16 @@ class ActividadCalendario(models.Model):
 
     def __str__(self):
         return self.titulo
+
+
+#class Municipio(models.Model):
+#    clave = models.CharField(max_length=3)
+ #   nombre = models.CharField(max_length=100)
+  #  estado = models.ForeignKey(Estado, on_delete=models.CASCADE)
+
+
+
+
+
+
+
