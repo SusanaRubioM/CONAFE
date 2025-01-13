@@ -92,18 +92,24 @@ class Usuario(models.Model):
                 print(f"Convenio actualizado para el usuario {self.usuario} con estado {estado_convenio}")
 
     def _handle_statuses(self):
-        """Gestiona la creación o actualización del estado del usuario."""
+        """Gestiona la creación o actualización del estado del usuario según su rol."""
         if self.rol != "ASPIRANTE":
-            # Usuarios con roles distintos de 'ASPIRANTE' se marcan como activos
+            # Si el rol es distinto a 'ASPIRANTE', se marca como 'activado'
+            Statuses.objects.update_or_create(
+                usuario=self,
+                defaults={'status': 'activado'}
+            )
+        elif self.rol == "EC":
+            # Si el rol es 'EC', se marca como 'capacitacion'
             Statuses.objects.update_or_create(
                 usuario=self,
                 defaults={'status': 'capacitacion'}
             )
         else:
-            # Usuarios con rol 'ASPIRANTE' se marcan como suspendidos
+            # Si el rol es 'ASPIRANTE' (o cualquier otro no mencionado antes), se marca como 'suspendido'
             Statuses.objects.update_or_create(
                 usuario=self,
-                defaults={'status': 'suspendida'}
+                defaults={'status': 'suspendido'}
             )
 
         # Asegurar que los convenios se actualicen acorde al estado

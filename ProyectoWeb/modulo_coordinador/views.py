@@ -17,6 +17,7 @@ from modulo_apec.forms import ObservacionForm
 from modulo_dpe.models import Reporte
 from .models import ActividadCalendario
 from modulo_DECB.models import CalendarEvent  # Importar el modelo de eventos del módulo DECB
+from login_app.models import Statuses
 
 @login_required
 @role_required('CT')
@@ -460,6 +461,11 @@ def crear_usuario_ajax(request):
                 user.usuario_rol.is_active = True
                 user.usuario_rol.save()
                 user.save()
+
+                # Aquí actualizamos o asignamos el estado de 'Capacitación' al usuario
+                status, created = Statuses.objects.get_or_create(usuario=user)
+                status.status = 'capacitacion'  # Asignamos el nuevo estado
+                status.save()
             else:
                 # Si el aspirante no tiene un usuario, creamos uno nuevo
                 usuario_rol = UsuarioRol.objects.create(
