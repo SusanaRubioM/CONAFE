@@ -1,90 +1,37 @@
 from django import forms
 from .models import CapacitacionInicial
-import datetime
+from modulo_dot.models import Usuario
+from datetime import datetime
 
-class CapacitacionForm(forms.ModelForm):
+class CapacitacionInicialForm(forms.ModelForm):
     class Meta:
         model = CapacitacionInicial
-        fields = '__all__'
+        fields = ['ecar', 'ec', 'ciclo_asignado', 'fecha', 'contexto', 'actividad', 'horas_cubiertas']
         widgets = {
-            'fecha': forms.DateInput(attrs={'type': 'date'}),
-            'contexto': forms.Textarea(attrs={'rows': 4, 'cols': 50}),
+            'ecar': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Seleccione el ECAR'}),
+            'ec': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Seleccione el EC'}),
+            'ciclo_asignado': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 2024-2025'}),
+            'fecha': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'contexto': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Describa el contexto de la capacitación'}),
+            'actividad': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Describa la actividad realizada'}),
+            'horas_cubiertas': forms.NumberInput(attrs={'class': 'form-control', 'min': '0', 'max': '240'})
         }
 
-    # Campos del formulario
-    cv_region = forms.CharField(
-        max_length=50,
-        label="Región",
-        widget=forms.TextInput(attrs={'placeholder': 'Ingrese la región'})
-    )
-    nombre_ecar = forms.CharField(
-        max_length=100,
-        label="Nombre del ECAR",
-        widget=forms.TextInput(attrs={'placeholder': 'Nombre del ECAR'})
-    )
-    cv_microrregion = forms.CharField(
-        max_length=50,
-        label="Microrregión",
-        widget=forms.TextInput(attrs={'placeholder': 'Microrregión'})
-    )
-    nombre_eca = forms.CharField(
-        max_length=100,
-        label="Nombre del ECA",
-        widget=forms.TextInput(attrs={'placeholder': 'Nombre del ECA'})
-    )
-    cv_comunidad = forms.CharField(
-        max_length=50,
-        label="Comunidad",
-        widget=forms.TextInput(attrs={'placeholder': 'Comunidad'})
-    )
-    id_ec = forms.CharField(
-        max_length=20,
-        label="ID del EC",
-        widget=forms.TextInput(attrs={'placeholder': 'ID del EC'})
-    )
-    nombre_ec = forms.CharField(
-        max_length=100,
-        label="Nombre del EC",
-        widget=forms.TextInput(attrs={'placeholder': 'Nombre del EC'})
-    )
-    ciclo_asignado = forms.CharField(
-        max_length=50,
-        label="Ciclo Asignado",
-        widget=forms.TextInput(attrs={'placeholder': 'Ciclo Asignado'})
-    )
-    contexto = forms.CharField(
-        label="Contexto",
-        widget=forms.Textarea(attrs={'placeholder': 'Describa el contexto de la capacitación', 'rows': 4, 'cols': 50})
-    )
-    tipo_servicio = forms.CharField(
-        max_length=50,
-        label="Tipo de Servicio",
-        widget=forms.TextInput(attrs={'placeholder': 'Tipo de Servicio'})
-    )
-    actividad = forms.CharField(
-        max_length=100,
-        label="Actividad",
-        widget=forms.TextInput(attrs={'placeholder': 'Actividad realizada'})
-    )
-    fecha = forms.DateField(
-        label="Fecha",
-        widget=forms.DateInput(attrs={'type': 'date'}),
-    )
-    horas_cubiertas = forms.IntegerField(
-        label="Horas Cubiertas",
-        initial=0,
-        widget=forms.NumberInput(attrs={'placeholder': 'Horas cubiertas'})
-    )
-
-    # Validaciones
-    def clean_horas_cubiertas(self):
-        horas = self.cleaned_data['horas_cubiertas']
-        if horas < 0:
-            raise forms.ValidationError("Las horas cubiertas no pueden ser negativas.")
-        return horas
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['ecar'].queryset = Usuario.objects.filter(rol='ECAR').select_related('datospersonales')
+        self.fields['ec'].queryset = Usuario.objects.filter(rol='EC').select_related('datospersonales')
+        self.fields['ecar'].label = 'Educador Comunitario de Acompañamiento Regional'
+        self.fields['ec'].label = 'Educador Comunitario'
+        self.fields['ciclo_asignado'].label = 'Ciclo Escolar Asignado'
+        self.fields['horas_cubiertas'].label = 'Horas de Capacitación Cubiertas'
 
     def clean_fecha(self):
-        fecha = self.cleaned_data['fecha']
-        if fecha > datetime.date.today():
-            raise forms.ValidationError("La fecha no puede ser en el futuro.")
+        fecha = self.cleaned_data.get('fecha')
         return fecha
+
+    def clean_horas_cubiertas(self):
+        horas = self.cleaned_data.get('horas_cubiertas')
+        if horas and horas > 240:
+            raise forms.ValidationError("Las horas cubiertas no pueden exceder 240")
+        return horas

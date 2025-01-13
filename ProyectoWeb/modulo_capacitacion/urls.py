@@ -8,4 +8,6 @@ urlpatterns = [
     path('crear/', views.crear_capacitacion, name='crear_capacitacion'),
     path('editar/<int:capacitacion_id>/', views.editar_capacitacion, name='editar_capacitacion'),
     path('finalizar/<int:capacitacion_id>/', views.finalizar_capacitacion, name='finalizar_capacitacion'),
+    path('api/usuarios/<int:usuario_id>/', views.obtener_datos_usuario, name='get_usuario_data'),
 ]
+

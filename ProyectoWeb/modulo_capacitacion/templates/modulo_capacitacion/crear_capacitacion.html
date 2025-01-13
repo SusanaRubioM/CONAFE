@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Crear Capacitación{% endblock %}
+{% block title %}Registro de Capacitación ECAR{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-    <h2 class="text-center mb-4">Crear Nueva Capacitación</h2>
+    <h2 class="text-center mb-4">Registro de Capacitación ECAR</h2>
+
     <div class="card shadow">
         <div class="card-body">
             {% if messages %}
@@ -14,19 +15,200 @@
                     {% endfor %}
                 </div>
             {% endif %}
-            <form method="post">
+
+            <form method="post" id="formCapacitacion">
                 {% csrf_token %}
-                {{ form.as_p }}
+
+                <!-- Sección ECAR -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_ecar">{{ form.ecar.label }}</label>
+                            {{ form.ecar }}
+                            {% if form.ecar.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.ecar.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_nombre_ecar">Nombre del ECAR</label>
+                            <input type="text" id="id_nombre_ecar" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección EC -->
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="id_ec">{{ form.ec.label }}</label>
+                            {{ form.ec }}
+                            {% if form.ec.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.ec.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="id_id_ec">ID del EC</label>
+                            <input type="text" id="id_id_ec" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="id_nombre_ec">Nombre del EC</label>
+                            <input type="text" id="id_nombre_ec" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información de la capacitación -->
+                <div class="row mb-3">
+                    <div class="form-group col-md-4">
+                        <label for="id_ciclo_asignado">{{ form.ciclo_asignado.label }}</label>
+                        <select class="form-control" id="id_ciclo_asignado" name="ciclo_asignado">
+                            <option value="2024-2025">2024-2025</option>
+                            <option value="2025-2026">2025-2026</option>
+                        </select>
+                        {% if form.ciclo_asignado.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.ciclo_asignado.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="id_fecha">{{ form.fecha.label }}</label>
+                            {{ form.fecha }}
+                            {% if form.fecha.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.fecha.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="id_horas_cubiertas">{{ form.horas_cubiertas.label }}</label>
+                            {{ form.horas_cubiertas }}
+                            {% if form.horas_cubiertas.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.horas_cubiertas.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="id_contexto">{{ form.contexto.label }}</label>
+                    {{ form.contexto }}
+                    {% if form.contexto.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.contexto.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="id_actividad">{{ form.actividad.label }}</label>
+                    {{ form.actividad }}
+                    {% if form.actividad.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.actividad.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Botones -->
                 <div class="d-flex justify-content-between mt-4">
-                    <button type="submit" class="btn btn-primary w-48">
-                        <i class="fas fa-save"></i> Guardar
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar Registro
                     </button>
-                    <a href="{% url 'modulo_capacitacion:lista_capacitaciones' %}" class="btn btn-secondary w-48">
-                        <i class="fas fa-arrow-left"></i> Regresar
+                    <a href="{% url 'modulo_capacitacion:lista_capacitaciones' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver
                     </a>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ecarSelect = document.getElementById('id_ecar');
+        const ecSelect = document.getElementById('id_ec');
+        const nombreEcarInput = document.getElementById('id_nombre_ecar');
+        const idEcInput = document.getElementById('id_id_ec');
+        const nombreEcInput = document.getElementById('id_nombre_ec');
+
+        function actualizarCamposUsuario(selectElement, nombreInput, idInput = null) {
+            const usuarioId = selectElement.value;
+            
+            // Limpiar campos si no hay selección
+            if (!usuarioId) {
+                nombreInput.value = '';
+                if (idInput) idInput.value = '';
+                return;
+            }
+
+            // Mostrar estado de carga
+            nombreInput.value = 'Cargando...';
+            if (idInput) idInput.value = 'Cargando...';
+
+            // Corrección en la URL
+            fetch(`/capacitacion/api/usuarios/${usuarioId}/`)  // Asegúrate de tener la barra antes de ${usuarioId}
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    nombreInput.value = data.nombre_completo;
+                    if (idInput) {
+                        idInput.value = data.rol;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    nombreInput.value = 'Error al cargar datos';
+                    if (idInput) {
+                        idInput.value = 'Error al cargar datos';
+                    }
+                });
+        }
+
+        // Event listeners
+        if (ecarSelect) {
+            ecarSelect.addEventListener('change', () => {
+                actualizarCamposUsuario(ecarSelect, nombreEcarInput);
+            });
+            
+            // Cargar datos iniciales si hay un valor preseleccionado
+            if (ecarSelect.value) {
+                actualizarCamposUsuario(ecarSelect, nombreEcarInput);
+            }
+        }
+
+        if (ecSelect) {
+            ecSelect.addEventListener('change', () => {
+                actualizarCamposUsuario(ecSelect, nombreEcInput, idEcInput);
+            });
+            
+            // Cargar datos iniciales si hay un valor preseleccionado
+            if (ecSelect.value) {
+                actualizarCamposUsuario(ecSelect, nombreEcInput, idEcInput);
+            }
+        }
+    });
+</script>
+{% endblock %}
 {% endblock %}

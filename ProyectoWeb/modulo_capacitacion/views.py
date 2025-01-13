@@ -1,60 +1,80 @@
-from django.shortcuts import render, get_object_or_404, redirect
+# views.py
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.http import JsonResponse
 from .models import CapacitacionInicial
-from .forms import CapacitacionForm
+from .forms import CapacitacionInicialForm
+from modulo_dot.models import Usuario, DatosPersonales
+import logging
 
-@login_required
+logger = logging.getLogger(__name__)
+
 def lista_capacitaciones(request):
-    """Vista para listar todas las capacitaciones iniciales"""
-    capacitaciones = CapacitacionInicial.objects.all()
-    return render(request, 'modulo_capacitacion/lista_capacitaciones.html', {'capacitaciones': capacitaciones})
+    capacitaciones = CapacitacionInicial.objects.select_related(
+        'ecar__datospersonales',
+        'ec__datospersonales'
+    ).all()
+    return render(request, 'modulo_capacitacion/lista_capacitaciones.html', {
+        'capacitaciones': capacitaciones
+    })
 
-@login_required
 def crear_capacitacion(request):
-    """Vista para crear una nueva capacitación"""
     if request.method == 'POST':
-        form = CapacitacionForm(request.POST)
+        form = CapacitacionInicialForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'La capacitación se ha creado exitosamente.')
+            capacitacion = form.save()
+            messages.success(request, 'Capacitación registrada exitosamente.')
             return redirect('modulo_capacitacion:lista_capacitaciones')
         else:
-            messages.error(request, 'Hubo un error al crear la capacitación. Por favor, revisa los datos.')
+            messages.error(request, 'Por favor corrija los errores en el formulario.')
     else:
-        form = CapacitacionForm()
+        form = CapacitacionInicialForm()
     
     return render(request, 'modulo_capacitacion/crear_capacitacion.html', {'form': form})
 
-@login_required
 def editar_capacitacion(request, capacitacion_id):
-    """Vista para editar una capacitación existente"""
     capacitacion = get_object_or_404(CapacitacionInicial, id=capacitacion_id)
     
     if request.method == 'POST':
-        form = CapacitacionForm(request.POST, instance=capacitacion)
+        form = CapacitacionInicialForm(request.POST, instance=capacitacion)
         if form.is_valid():
             form.save()
-            messages.success(request, 'La capacitación se ha actualizado exitosamente.')
+            messages.success(request, 'Capacitación actualizada exitosamente.')
             return redirect('modulo_capacitacion:lista_capacitaciones')
-        else:
-            messages.error(request, 'Hubo un error al actualizar la capacitación. Por favor, revisa los datos.')
     else:
-        form = CapacitacionForm(instance=capacitacion)
+        form = CapacitacionInicialForm(instance=capacitacion)
     
-    return render(request, 'modulo_capacitacion/editar_capacitacion.html', {'form': form, 'capacitacion': capacitacion})
+    return render(request, 'modulo_capacitacion/editar_capacitacion.html', {
+        'form': form,
+        'capacitacion': capacitacion
+    })
 
-@login_required
+def obtener_datos_usuario(request, usuario_id):
+    try:
+        usuario = Usuario.objects.get(id=usuario_id)
+        response_data = {'id': usuario.id, 'rol': usuario.id, 'nombre_completo': 'Sin datos personales'}
+        
+        try:
+            datos_personales = DatosPersonales.objects.get(usuario=usuario)
+            response_data['nombre_completo'] = f"{datos_personales.nombre} {datos_personales.apellidopa} {datos_personales.apellidoma}".strip()
+        except DatosPersonales.DoesNotExist:
+            logger.warning(f"No se encontraron datos personales para el usuario {usuario_id}")
+        
+        return JsonResponse(response_data)
+    except Usuario.DoesNotExist:
+        logger.error(f"Usuario no encontrado: {usuario_id}")
+        return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
+    except Exception as e:
+        logger.error(f"Error inesperado: {str(e)}")
+        return JsonResponse({'error': 'Error interno del servidor'}, status=500)
+
 def finalizar_capacitacion(request, capacitacion_id):
-    """Vista para finalizar una capacitación si las horas cubiertas son >= 240"""
     capacitacion = get_object_or_404(CapacitacionInicial, id=capacitacion_id)
-    
-    if capacitacion.horas_cubiertas >= 240:
-        # Agregar un campo 'finalizado' en el modelo para marcar la capacitación como finalizada
-        capacitacion.finalizado = True
+    if capacitacion.estado != 'completada':
+        capacitacion.estado = 'completada'
         capacitacion.save()
-        messages.success(request, 'La capacitación ha sido finalizada correctamente.')
-        return redirect('modulo_capacitacion:lista_capacitaciones')
+        messages.success(request, 'Capacitación finalizada exitosamente.')
     else:
-        messages.error(request, 'No es posible finalizar la capacitación porque las horas cubiertas son menores a 240.')
-        return render(request, 'modulo_capacitacion/error_finalizacion.html', {'capacitacion': capacitacion})
+        messages.warning(request, 'La capacitación ya estaba marcada como completada.')
+    return redirect('modulo_capacitacion:lista_capacitaciones')
