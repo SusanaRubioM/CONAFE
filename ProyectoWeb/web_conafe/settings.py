@@ -176,6 +176,7 @@ AUTH_USER_MODEL = "login_app.UsuarioRol"
 
 LOGIN_URL = "/login/"
 
+LANGUAGE_CODE = 'es'
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"

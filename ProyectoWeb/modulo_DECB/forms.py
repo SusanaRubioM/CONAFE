@@ -1,9 +1,5 @@
 from django import forms
 from .models import PaymentSchedule
-
-
-from django import forms
-from .models import PaymentSchedule
 from login_app.models import UsuarioRol
 from .models import CalendarEvent
 
@@ -12,10 +8,10 @@ class CalendarEventForm(forms.ModelForm):
         model = CalendarEvent
         fields = ['event_type', 'date', 'description']
         widgets = {
-            'date': forms.DateInput(attrs={'type': 'date'}),
+            'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
         }
 
-        
+
 class PaymentAssignmentForm(forms.ModelForm):
     class Meta:
         model = PaymentSchedule
@@ -29,9 +25,10 @@ class PaymentAssignmentForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Filtramos los usuarios según roles específicos
         self.fields['assigned_to'].queryset = UsuarioRol.objects.filter(role__in=['APEC', 'EC', 'ECA', 'ECAR'])
 
-        
+
 class PaymentScheduleForm(forms.ModelForm):
     class Meta:
         model = PaymentSchedule
@@ -43,12 +40,19 @@ class PaymentScheduleForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['payment_date'].widget.attrs.update({'class': 'form-control', 'placeholder': 'DD/MM/AAAA'})
-        self.fields['payment_type'].widget.attrs.update({'class': 'form-select'})
+        # Añadimos atributos de clase y placeholder para los campos
+        self.fields['payment_date'].widget.attrs.update({
+            'class': 'form-control', 
+            'placeholder': 'DD/MM/AAAA'
+        })
+        self.fields['payment_type'].widget.attrs.update({
+            'class': 'form-select'
+        })
 
     def clean_payment_date(self):
         from datetime import datetime
         payment_date = self.cleaned_data['payment_date']
+        # Validamos que la fecha esté en el formato correcto
         try:
             datetime.strptime(payment_date.strftime('%d/%m/%Y'), '%d/%m/%Y')
         except ValueError:

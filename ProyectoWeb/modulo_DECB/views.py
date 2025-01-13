@@ -32,7 +32,7 @@ def agregar_evento(request):
         form = CalendarEventForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('modulo_DECB:visualizar_calendario')
+            return redirect('modulo_DECB:calendario_eventos')
     else:
         form = CalendarEventForm()
     return render(request, 'modulo_DECB/agregar_evento.html', {'form': form})
