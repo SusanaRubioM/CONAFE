@@ -318,7 +318,8 @@ def dashboard_vacantes(request):
 @login_required
 @role_required("DOT")
 def dashboard_convenios(request):
-    convenios = ConveniosFiguras.objects.all()
+    # Filtrar convenios con usuario asignado y que no tengan el rol 'ASPIRANTE'
+    convenios = ConveniosFiguras.objects.filter(usuario__isnull=False).exclude(usuario__rol='ASPIRANTE')
 
     if request.method == 'POST' and 'agregar_firma' in request.POST:
         convenio_id = request.POST.get('convenio_id')
