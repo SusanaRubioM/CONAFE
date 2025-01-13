@@ -15,6 +15,11 @@ class ConveniosFiguras(models.Model):
                                                ('Aprobado','Aprobado'),
                                                ('Rechazado','Rechazado')],
                                       default='Pendiente')
+    tipo_convenio = models.CharField(max_length=50,
+                                      choices=[('CUD','CUD'),
+                                               ('Inicial','Inicial'),
+                                               ('Otro','Rechazado')],
+                                      default='Pendiente')
 
     class Meta:
         db_table = "convenio_digital"
