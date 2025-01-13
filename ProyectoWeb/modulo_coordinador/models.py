@@ -19,7 +19,7 @@ class ConveniosFiguras(models.Model):
                                       choices=[('CUD','CUD'),
                                                ('Inicial','Inicial'),
                                                ('Otro','Rechazado')],
-                                      default='Pendiente')
+                                      default='Inicial')
 
     class Meta:
         db_table = "convenio_digital"
@@ -53,7 +53,16 @@ class ConveniosFiguras(models.Model):
         # Llama al método de generar el número de control antes de guardar
         if not self.control_numero:
             self.numero_control()
-        
+
+        # Lógica de actualización del estado basado en la firma digital
+        if self.firma_digital and self.firma_digital.name.strip():  # Si hay firma digital válida
+            if self.estado_convenio != 'Aprobado':
+                self.estado_convenio = 'Aprobado'
+        else:
+            if self.estado_convenio != 'Pendiente':
+                self.estado_convenio = 'Pendiente'
+
+        # Guarda el objeto
         super().save(*args, **kwargs)
 
 class ActividadCalendario(models.Model):

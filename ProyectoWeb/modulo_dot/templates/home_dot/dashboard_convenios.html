@@ -47,7 +47,7 @@
             <div class="modal-body">
                 <form id="firma-form" method="POST">
                     {% csrf_token %}
-                    <canvas id="canvas" width="500" height="300" style="border: 1px solid #000;"></canvas><br>
+                    <canvas id="canvas" width="470" height="300" style="border: 1px solid #000;"></canvas><br>
                     <button type="button" id="btnLimpiar">Limpiar</button>
                     <button type="button" id="btnDescargar">Descargar</button>
                     <button type="button" id="btnGuardarFirma">Guardar Firma</button>
@@ -129,9 +129,8 @@
     .then(data => {
         if (data.status === 'success') {
             alert("Firma guardada correctamente");
-            // Cerrar el modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('firmaModal'));
-            modal.hide();
+
+            location.reload();
         } else {
             alert(`Hubo un error: ${data.message}`);
         }

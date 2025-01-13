@@ -71,7 +71,7 @@ class Usuario(models.Model):
             if status:
                 if status.status == 'suspendida':
                     estado_convenio = 'Pendiente'
-                elif status.status == 'activa':
+                elif status.status == 'capacitacion':
                     estado_convenio = 'Aprobado'
                 else:
                     estado_convenio = 'Rechazado'
