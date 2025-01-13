@@ -46,10 +46,20 @@
           <td>{{ reporte.categoria }}</td>
           <td><a href="{{ reporte.reporte.url }}" target="_blank">Ver Reporte</a></td>
           <td>
-            <form method="POST" action="{% url 'coordinador_home:validar_rechazar_reporte' reporte.id %}">
+            <form method="POST" action="{% url 'coordinador_home:validar_rechazar_reporte' reporte.id %}" id="form_{{ reporte.id }}">
               {% csrf_token %}
-              <button type="submit" name="accion" value="validar" class="btn btn-success btn-sm">Validar</button>
-              <button type="submit" name="accion" value="rechazar" class="btn btn-danger btn-sm">Rechazar</button>
+              
+              {% if reporte.estado == 'validado' %}
+                <!-- Solo muestra el botón "Validado" si ya fue validado -->
+                <button type="button" class="btn btn-success btn-sm" disabled>Validado</button>
+              {% elif reporte.estado == 'rechazado' %}
+                <!-- Solo muestra el botón "Rechazado" si ya fue rechazado -->
+                <button type="button" class="btn btn-danger btn-sm" disabled>Rechazado</button>
+              {% else %}
+                <!-- Los botones de acción están habilitados solo si el reporte está en pendiente -->
+                <button type="submit" name="accion" value="validar" class="btn btn-success btn-sm" id="validar_{{ reporte.id }}" onclick="disableButtons('{{ reporte.id }}'); return false;">Validar</button>
+                <button type="submit" name="accion" value="rechazar" class="btn btn-danger btn-sm" id="rechazar_{{ reporte.id }}" onclick="disableButtons('{{ reporte.id }}'); return false;">Rechazar</button>
+              {% endif %}
             </form>
           </td>
         </tr>
@@ -62,4 +72,5 @@
     </table>
   </div>
 </div>
+
 {% endblock %}

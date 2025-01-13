@@ -317,11 +317,7 @@ def exito_view_ct(request):
 
 # aqui termina
 
-# menu reportes 
-@login_required
-@role_required('CT')
-def menu_reportes_ct(request):
-    return render(request, 'home_coordinador/dashboard_equipo_pdf.html')
+
 
 """
 @login_required
@@ -339,6 +335,11 @@ def dashborard_equipamiento(request):
     return render(request, 'home_coordinador/dashboard_equipo_pdf.html', {'reportes': reportes})
 
 """
+# menu reportes 
+@login_required
+@role_required('CT')
+def menu_reportes_ct(request):
+    return render(request, 'home_coordinador/dashboard_equipo_pdf.html')
 
 @login_required
 @role_required('CT')
@@ -392,9 +393,15 @@ def validar_rechazar_reporte(request, reporte_id):
         # Guardamos el reporte con el nuevo estado
         reporte.save()
 
-    # Redirigir al dashboard de equipamiento después de la acción
-    return redirect('coordinador_home:dashboard_equipamiento')
+    # Filtrar nuevamente los reportes para cargar los actualizados
+    categoria = request.GET.get('categoria', '')  # Reemplazar por el filtro actual si existe
+    if categoria:
+        reportes = Reporte.objects.filter(categoria=categoria)  # Filtra reportes por categoría
+    else:
+        reportes = Reporte.objects.all()  # Si no se filtra, muestra todos los reportes
 
+    # Redirigir con los reportes actualizados
+    return render(request, 'home_coordinador/dashboard_equipo_pdf.html', {'reportes': reportes})
 def ajax_aspirante_status(request, aspirante_id):
     if request.method == "POST":
         try:
