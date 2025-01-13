@@ -77,7 +77,8 @@ class Statuses(models.Model):
                  ('baja', 'Baja'),
                  ('reincorporacion', 'Reincorporación'),
                  ('reingreso', 'Reingreso'),
-                 ('suspendida', 'Suspendida')],
+                 ('suspendida', 'Suspendida'),
+                 ('capacitacion', 'Capacitacion')],
         default='suspendida'  
     )
     class Meta:

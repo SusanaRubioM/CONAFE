@@ -97,7 +97,7 @@ class Usuario(models.Model):
             # Usuarios con roles distintos de 'ASPIRANTE' se marcan como activos
             Statuses.objects.update_or_create(
                 usuario=self,
-                defaults={'status': 'activa'}
+                defaults={'status': 'capacitacion'}
             )
         else:
             # Usuarios con rol 'ASPIRANTE' se marcan como suspendidos
