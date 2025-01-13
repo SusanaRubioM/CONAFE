@@ -8,7 +8,7 @@
         <a href="{% url 'dot_home:home_dot' %}" class="btn btn-warning" style="background-color: #620b0b; color:white">Menú</a>
     </div>
 
-    <h2>Modificar Información del Empleado</h2>
+    <h2>Modificar Información Figuras Educativas</h2>
 
     <!-- Mostrar Mensajes de Confirmación -->
     {% if messages %}
@@ -23,25 +23,6 @@
         {% csrf_token %}
         
         <!-- Formulario de Datos Personales -->
-        <div class="form-group">
-            <label for="nombre">Nombre</label>
-            {{ datos_personales_form.nombre }}
-        </div>
-
-        <div class="form-group">
-            <label for="apellidopa">Apellido Paterno</label>
-            {{ datos_personales_form.apellidopa }}
-        </div>
-
-        <div class="form-group">
-            <label for="apellidoma">Apellido Materno</label>
-            {{ datos_personales_form.apellidoma }}
-        </div>
-
-        <div class="form-group">
-            <label for="edad">Edad</label>
-            {{ datos_personales_form.edad }}
-        </div>
 
         <div class="form-group hidden">
             <label for="sexo">Sexo</label>

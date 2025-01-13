@@ -217,6 +217,9 @@ class ServicioEducativo(models.Model):
         ], default='sin asignar',
         null=True, blank=True  # Hacerlo opcional
     )
+    # Nuevos campos
+    cantidad_educadores_activos = models.IntegerField(default=0)  # Número de educadores activos
+    cantidad_solicitudes = models.IntegerField(default=0)  # Número de solicitudes realizadas
 
     def save(self, *args, **kwargs):
         is_new = self.pk is None
@@ -235,6 +238,7 @@ class ServicioEducativo(models.Model):
 
     def __str__(self):
         return f"{self.nombre_comunidad} - {self.nombre_region} ({self.clave_centro_trabajo})"
+
 
 
 class Observacion(models.Model):
