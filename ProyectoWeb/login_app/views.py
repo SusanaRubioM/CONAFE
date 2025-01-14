@@ -1,7 +1,9 @@
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_protect
 
+from django.http import HttpResponse
+@csrf_protect
 def login_view(request):
     if request.method == 'POST':
         # Recibe los datos de login
