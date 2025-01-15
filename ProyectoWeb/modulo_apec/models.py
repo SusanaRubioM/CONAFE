@@ -154,6 +154,7 @@ class ApoyoGestion(models.Model):
         return f"{self.nombre_servicio_educativo} - EC: {self.numero_ec_asignado}"
 
 
+
 class ServicioEducativo(models.Model):
     apoyo_gestion = models.ForeignKey(ApoyoGestion, on_delete=models.CASCADE, null=True, blank=True)
     comunidad_servicio = models.ForeignKey(Comunidad, on_delete=models.CASCADE, null=True, blank=True)
@@ -249,3 +250,25 @@ class Observacion(models.Model):
 
     def __str__(self):
         return f"Observación del servicio educativo: {self.servicio_educativo.clave_centro_trabajo}"
+    
+
+class DatosComplementarios(models.Model):
+    id_SituacionEducativa = models.AutoField(primary_key=True)
+    id_Usuario = models.ForeignKey('modulo_dot.Usuario', on_delete=models.SET_NULL, null=True, blank=True, related_name='datos_complementarios')
+    situacionEducativa = models.CharField(max_length=100, null=True, blank=True)
+    
+    # Relación con Región, Microrregión, y otros detalles geográficos
+    Region = models.ForeignKey('modulo_apec.Region', on_delete=models.SET_NULL, null=True, blank=True, related_name='datos_complementarios')
+    Microregion = models.ForeignKey('modulo_apec.Microrregion', on_delete=models.SET_NULL, null=True, blank=True, related_name='datos_complementarios')
+    
+    CCT = models.CharField(max_length=45, null=True, blank=True)
+    contexto = models.CharField(max_length=80, null=True, blank=True)
+    nivel = models.CharField(max_length=45, null=True, blank=True)
+
+    class Meta:
+        db_table = 'datos_complementarios'
+        verbose_name = 'Dato Complementario'
+        verbose_name_plural = 'Datos Complementarios'
+
+    def __str__(self):
+        return f"Datos complementarios de {self.id_Usuario} - {self.situacionEducativa}"
