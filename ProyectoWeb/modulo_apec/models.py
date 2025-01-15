@@ -165,48 +165,27 @@ class ServicioEducativo(models.Model):
     nombre_microregion = models.CharField(max_length=255)
     clave_comunidad = models.CharField(max_length=255)
     nombre_comunidad = models.CharField(max_length=255, default="Nombre genérico")
-    rol_vacante = models.CharField(
-        max_length=10,
-        choices=[  
-            ("EC", "Educador Comunitario"),
-            ("ECA", "Educador Comunitario de Acompañamiento Microrregional"),
-            ("ECAR", "Educador Comunitario de Acompañamiento Regional"),
-        ],
-        default="EC",
-        null=True, blank=True  # Hacerlo opcional
-    )
+    clave_centro_trabajo = models.CharField(max_length=100, null=True, blank=True)
+    nombre_escuela = models.CharField(max_length=255, null=True, blank=True)
+    tipo_sede = models.CharField(max_length=255, null=True, blank=True)
     tipo_servicio = models.CharField(
         max_length=255,
-        choices=[ 
-            ('Sin asignar', 'Sin asignar'),
-            ('Inicial', 'Inicial'),
-            ('Preescolar', 'Preescolar'),
-            ('Primaria', 'Primaria'),
-            ('Secundaria', 'Secundaria'),
-            ('Postsecundaria', 'Postsecundaria')
-        ], default='Sin asignar',
-        null=True, blank=True  # Hacerlo opcional
+        choices=[
+            ("preescolar", "Preescolar"),
+            ("primaria", "Primaria"),
+            ("secundaria", "Secundaria")
+        ], null=True, blank=True
     )
-    clave_centro_trabajo = models.CharField(max_length=100, null=True, blank=True)
-    contexto = models.CharField(
+    nivel_escolar = models.CharField(
         max_length=255,
-        choices=[ 
-            ('Sin asignar', 'Sin asignar'),
-            ('Rural', 'Rural'),
-            ('Urbano', 'Urbano'),
-            ('Indígena', 'Indígena'),
-            ('Mestizo', 'Mestizo'),
-            ('Migrante', 'Migrante'),
-            ('Circense', 'Circense'),
-            ('Grupos Vulnerables', 'Grupos Vulnerables'),
-            ('Excluidos del Sistema Regular', 'Excluidos del Sistema Regular'),
-        ], default='Sin asignar',
-        null=True, blank=True  # Hacerlo opcional
-    )
-    nivel_educativo = models.CharField(
-        max_length=255,
-        choices=[('APEC', 'APEC'), ('APEC-INI', 'APEC-INI')],
-        null=True, blank=True  # Hacerlo opcional
+        choices=[
+            ("primaria I", "Primaria I"),
+            ("primaria II", "Primaria II"),
+            ("primaria III", "Primaria III"),
+            ("secundaria", "Secundaria"),
+            ("inicial", "Inicial")
+        ],
+        null=True, blank=True
     )
     periodo_servicio = models.CharField(
         max_length=255,
@@ -217,9 +196,20 @@ class ServicioEducativo(models.Model):
         ], default='sin asignar',
         null=True, blank=True  # Hacerlo opcional
     )
+    rol_vacante = models.CharField(
+        max_length=10,
+        choices=[  
+            ("EC", "Educador Comunitario"),
+            ("ECA", "Educador Comunitario de Acompañamiento Microrregional"),
+            ("ECAR", "Educador Comunitario de Acompañamiento Regional"),
+        ],
+        null=True, blank=True  # Hacerlo opcional
+    )
+
     # Nuevos campos
     cantidad_educadores_activos = models.IntegerField(default=0)  # Número de educadores activos
     cantidad_solicitudes = models.IntegerField(default=0)  # Número de solicitudes realizadas
+    
 
     def save(self, *args, **kwargs):
         is_new = self.pk is None
