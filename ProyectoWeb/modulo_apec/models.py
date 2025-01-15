@@ -46,7 +46,6 @@ class Region(models.Model):
     )
     nombre_region = models.CharField(max_length=100, verbose_name="Nombre completo de la región")
     estado = models.ForeignKey(Estado, on_delete=models.CASCADE, related_name="regiones", verbose_name="Estado al que pertenece", null=True, blank=True)
-    usuario = models.OneToOneField('modulo_dot.Usuario', on_delete=models.CASCADE, null=True, blank=True)
     municipios_region = models.CharField(max_length=255, verbose_name="Municipios que pertenecen a la región", null=True, blank=True)
 
     class Meta:
@@ -72,8 +71,6 @@ class Microrregion(models.Model):
         verbose_name="Región a la que pertenece",
         null=True, blank=True
     )
-    usuario = models.OneToOneField('modulo_dot.Usuario', on_delete=models.CASCADE, null=True, blank=True)
-
     class Meta:
         db_table = "microrregion"
 
