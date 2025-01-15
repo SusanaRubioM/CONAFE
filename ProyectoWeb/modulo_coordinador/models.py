@@ -64,23 +64,3 @@ class ConveniosFiguras(models.Model):
 
         # Guarda el objeto
         super().save(*args, **kwargs)
-
-class ActividadCalendario(models.Model):
-    titulo = models.CharField(max_length=200)
-    descripcion = models.TextField(blank=True, null=True)
-    fecha_inicio = models.DateTimeField()
-    fecha_fin = models.DateTimeField()
-
-    def clean(self):
-        if self.fecha_inicio >= self.fecha_fin:
-            raise ValidationError("La fecha de inicio debe ser menor que la fecha de fin.")
-
-    def save(self, *args, **kwargs):
-        self.clean()
-        super().save(*args, **kwargs)
-
-    class Meta:
-        db_table = "actividad_calendario"
-
-    def __str__(self):
-        return self.titulo

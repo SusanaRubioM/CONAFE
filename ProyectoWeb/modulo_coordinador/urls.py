@@ -26,9 +26,6 @@ urlpatterns = [
     path('dashboard/capacitacion/', views.dashboard_capacitacion_pdf, name='dashboard_capacitacion_pdf'),
     path('dashboard/seguimiento/', views.dashboard_seguim_pdf, name='dashboard_seguim_pdf'),
     path('reporte/<int:reporte_id>/validar-rechazar', views.validar_rechazar_reporte, name='validar_rechazar_reporte'),
-    path('calendario/eventos/', views.calendario_view, name='calendario_view'),
-    path('api/eventos/', views.eventos_calendario, name='eventos_calendario'),
-    path('calendario-eventos/', views.calendario_eventos, name='calendario_eventos'), 
     #GIS
     path('gestion_RMR/dashboard/ct', views.dashboard_gestion_RMR, name='gestion_RMR_dashboard_ct'),
     path('gestion_estado/dashboard/ct', views.dashboard_gestion_estado, name='estado_estado'),

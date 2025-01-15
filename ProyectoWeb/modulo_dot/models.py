@@ -212,43 +212,4 @@ class DocumentosPersonales(models.Model):
     def __str__(self):
         return f"Documentos de {self.datos_personales.nombre} {self.datos_personales.apellidopa}"
 
-class DatosUsuario(models.Model):
-    id_Datos = models.CharField(
-        max_length=10,
-        primary_key=True,
-        verbose_name="Clave única del municipio",
-    )
-    nombreCompleto = models.CharField(max_length=255, unique=True, null=True, blank=True)
-    id_comunidad = models.ForeignKey(
-        'modulo_apec.Comunidad', on_delete=models.CASCADE, null=True, blank=True
-    )
-    situacion_Educativa = models.CharField(max_length=255, null=True, blank=True)
-    tipoServicio = models.CharField(max_length=255, null=True, blank=True)
-    contexto = models.CharField(max_length=255, null=True, blank=True)
-    Estado = models.CharField(max_length=255, null=True, blank=True)
-    class Meta:
-        db_table = "datos_usuario"
 
-    def __str__(self):
-        return self.nombreCompleto or "DatosUsuario sin nombre"
-
-
-
-
-class UsuariosApi(models.Model):
-    id_Usuario = models.CharField(
-        max_length=10,
-        primary_key=True,
-        verbose_name="Clave única del usuario",
-    )
-    usuario_api = models.CharField(max_length=255, unique=True, null=True, blank=True)
-    password = models.CharField(max_length=255, null=True, blank=True)  # Considera usar make_password
-    rol = models.CharField(max_length=255, null=True, blank=True)
-    id_Datos = models.ForeignKey(
-        DatosUsuario, on_delete=models.CASCADE, null=True, blank=True
-    )
-    class Meta:
-        db_table = "usuario_api"
-
-    def __str__(self):
-        return self.usuario_api or "Usuario sin nombre"

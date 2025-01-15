@@ -21,7 +21,7 @@ class ReporteFiguraEducativa:
 
     
 
-"Modelo movil"
+""""Modelo movil"
 
 class AlumnosMovil(models.Model):
     id_Alumno = models.AutoField(primary_key=True)
@@ -321,3 +321,4 @@ class PagosFechasMovil(models.Model):
 
     def __str__(self):
         return f"{self.tipoPago} - {self.monto}"
+"""
