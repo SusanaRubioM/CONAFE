@@ -105,12 +105,6 @@
             </div>
             <div class="col-md-3">
                 <div class="card stats-card">
-                    <div class="stats-number">{{ estadisticas.promedio_solicitudes.cantidad_solicitudes__avg|floatformat:1 }}</div>
-                    <div class="stats-label">Promedio de Solicitudes</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card stats-card">
                     <div class="stats-number">{{ estadisticas.vacantes_por_estado|length }}</div>
                     <div class="stats-label">Estados con Vacantes</div>
                 </div>
@@ -178,13 +172,12 @@
                         <h5 class="card-title mb-0">Alumnos por Comunidad</h5>
                     </div>
                     <div class="card-body">
-                        <div class="chart-container">
+                        <div class="chart-container" style="height: 500px; width: 100%; max-width: 600px; margin: auto;">
                             <canvas id="alumnosComunidadChart"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
         <div class="col-md-6">
             <div class="card">
@@ -283,6 +276,7 @@
                     },
                     options: {
                         responsive: true,
+                        maintainAspectRatio: false, // Forzar que se ajuste al tamaño del contenedor
                         plugins: { legend: { position: 'bottom' } }
                     }
                 });
