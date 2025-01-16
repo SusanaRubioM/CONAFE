@@ -415,9 +415,16 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 
 def agregar_firma(pdf_path, firma_path, output_path, convenio_id):
-     # Obtener el convenio usando el convenio_id
+    # Obtener el convenio usando el convenio_id
     convenio = ConveniosFiguras.objects.get(id=convenio_id)  # Filtrar por ID del convenio
     control_numero = convenio.control_numero  # Número de control
+    
+    # Obtener el usuario relacionado con el convenio y sus datos personales
+    usuario = convenio.usuario
+    datos_personales = DatosPersonales.objects.get(usuario=usuario)
+    nombre = datos_personales.nombre
+    apellidopa = datos_personales.apellidopa
+    apellidoma = datos_personales.apellidoma
 
     reader = PdfReader(pdf_path)
     writer = PdfWriter()
@@ -429,6 +436,13 @@ def agregar_firma(pdf_path, firma_path, output_path, convenio_id):
     # Dibujar el número de control en todas las páginas
     c.setFont("Helvetica", 10)  # Establecer la fuente y tamaño
     c.setFillColor(colors.black)  # Establecer el color del texto
+     # Dibujar el nombre completo en la primera página en las coordenadas especificadas
+    c.setFont("Helvetica-Bold", 10)
+    c.setFillColor(colors.black)
+    c.drawString(225.04, 608.7, f"{nombre} {apellidopa} {apellidoma}")
+
+    # Dibujar el número de control en todas las páginas
+    c.setFont("Helvetica-Bold", 10)  # Restablecer la fuente y tamaño
 
     # Recorrer todas las páginas para añadir el número de control
     for i in range(len(reader.pages)):  
@@ -437,6 +451,8 @@ def agregar_firma(pdf_path, firma_path, output_path, convenio_id):
 
         # Si es la página 4 (índice 4 es la quinta página, ajusta según sea necesario)
         if i == 4:
+            
+            # Dibujar la firma digital
             img = Image.open(firma_path)
             width = 150.43504 - 54.0
             aspect = img.height / img.width
@@ -464,5 +480,3 @@ def agregar_firma(pdf_path, firma_path, output_path, convenio_id):
 
     with open(output_path, "wb") as output_file:
         writer.write(output_file)
-
-

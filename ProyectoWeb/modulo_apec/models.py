@@ -207,7 +207,16 @@ class ServicioEducativo(models.Model):
     # Nuevos campos
     cantidad_educadores_activos = models.IntegerField(default=0)  # Número de educadores activos
     cantidad_solicitudes = models.IntegerField(default=0)  # Número de solicitudes realizadas
-    
+    status = models.CharField(
+        max_length=10,
+        choices=[
+            ("aprobado", "Aprobado"),
+            ("rechazado", "Rechazado"),
+            ("pendiente", "Pendiente")
+        ],
+        default="Pendiente",
+        null=True, blank=True
+    )
 
     def save(self, *args, **kwargs):
         is_new = self.pk is None

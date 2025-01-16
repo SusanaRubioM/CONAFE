@@ -45,6 +45,24 @@ class ReportesAcomp(models.Model):
     class Meta:
         db_table = "reportes_acomp"
 
+class Grupo(models.Model):
+    id_Grupo = models.AutoField(primary_key=True)
+    id_CCT = models.ForeignKey("modulo_apec.Comunidad", on_delete=models.CASCADE)
+    Grado = models.DateField()
+
+    class Meta:
+        db_table = "grupos"
+
+
+class PromocionesAlumnos(models.Model):
+    id_Alumno = models.AutoField(primary_key=True)
+    id_Alumno = models.ForeignKey("modulo_apec.Comunidad", on_delete=models.CASCADE)
+    calfFinal = models.IntegerField(null=True, blank=True)
+    tipoPromocion = models.CharField(max_length=50)
+    Grado = models.CharField(max_length=50)
+    Nivel = models.CharField(max_length=50)
+    class Meta:
+        db_table = "PromocionesAlumnos"
 
 class Alumno(models.Model):
     actaNacimiento = models.CharField(max_length=255)
