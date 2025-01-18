@@ -20,24 +20,9 @@ class Reporte(models.Model):
         db_table = "reportes"
 
 
-class ActividadAcomp(models.Model):
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    fecha = models.DateField()
-    hora = models.TimeField()
-    nombreEC = models.CharField(max_length=255)
-    descripcion = models.TextField()
-    estado = models.CharField(max_length=50)
-
-    def __str__(self):
-        return self.nombreEC
-
-    class Meta:
-        db_table = "actividades_acomp"
-
 
 class ReportesAcomp(models.Model):
     reporte = models.FileField(upload_to='reporte_acomp_pdfs/')
-    ActividadAcomp = models.ForeignKey(ActividadAcomp, on_delete=models.CASCADE)
     fecha = models.DateField()
     figuraEducativa = models.CharField(max_length=120)
     Usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
@@ -89,22 +74,9 @@ class Alumno(models.Model):
         db_table = "alumnos"
 
 
-class ActividadAlumno(models.Model):
-    titulo = models.CharField(max_length=255)
-    descripcion = models.TextField()
-    periodo = models.CharField(max_length=50)
-    materia = models.CharField(max_length=100)
-    estado = models.CharField(max_length=50)
-
-    def __str__(self):
-        return self.titulo
-
-    class Meta:
-        db_table = "actividades_alumno"
 
 
 class Calificacion(models.Model):
-    actividad_alumno = models.ForeignKey(ActividadAlumno, on_delete=models.CASCADE)
     alumno = models.ForeignKey(Alumno, on_delete=models.CASCADE)
     calificacion = models.DecimalField(max_digits=5, decimal_places=2)
     observacion = models.TextField(null=True, blank=True)
@@ -128,20 +100,6 @@ class Dependencias(models.Model):
         db_table = "dependencias"
 
 
-class Asistencia(models.Model):
-    fecha = models.DateField()
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    horaEntrada = models.TimeField()
-    horaSalida = models.TimeField()
-    Asistencia = models.BooleanField()
-
-    def __str__(self):
-        return f"Asistencia {self.id_asistencia} - Usuario {self.usuario}"
-
-    class Meta:
-        db_table = "asistencias"
-
-
 class Recibo(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     recibo = models.CharField(max_length=100)
@@ -152,23 +110,6 @@ class Recibo(models.Model):
 
     class Meta:
         db_table = "recibos"
-
-
-class ActCAP(models.Model):
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    numCapacitacion = models.IntegerField()
-    tema = models.CharField(max_length=255)
-    clave_region = models.CharField(max_length=100)
-    nombre_region = models.CharField(max_length=255)
-    fecha_programada = models.DateField()
-    estado = models.CharField(max_length=50)
-    reporte = models.TextField()
-
-    def __str__(self):
-        return f"ActCAP {self.numCapacitacion} - Tema {self.tema}"
-
-    class Meta:
-        db_table = "actcap"
 
 
 class PagosFechas(models.Model):
