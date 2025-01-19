@@ -1,17 +1,16 @@
-# views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
-from .models import CapacitacionInicial
+from .models import VacanteAsignada
 from .forms import CapacitacionInicialForm
 from modulo_dot.models import Usuario, DatosPersonales
 import logging
 
 logger = logging.getLogger(__name__)
 
-def lista_capacitaciones(request):
-    capacitaciones = CapacitacionInicial.objects.select_related(
+def lista_vacantes_asignadas(request):
+    capacitaciones = VacanteAsignada.objects.select_related(
         'ecar__datospersonales',
         'ec__datospersonales'
     ).all()
@@ -19,7 +18,7 @@ def lista_capacitaciones(request):
         'capacitaciones': capacitaciones
     })
 
-def crear_capacitacion(request):
+def crear_asigancion(request):
     if request.method == 'POST':
         form = CapacitacionInicialForm(request.POST)
         if form.is_valid():
@@ -33,8 +32,8 @@ def crear_capacitacion(request):
     
     return render(request, 'modulo_capacitacion/crear_capacitacion.html', {'form': form})
 
-def editar_capacitacion(request, capacitacion_id):
-    capacitacion = get_object_or_404(CapacitacionInicial, id=capacitacion_id)
+def editar_asignacion(request, capacitacion_id):
+    capacitacion = get_object_or_404(VacanteAsignada, id=capacitacion_id)
     
     if request.method == 'POST':
         form = CapacitacionInicialForm(request.POST, instance=capacitacion)
@@ -69,8 +68,8 @@ def obtener_datos_usuario(request, usuario_id):
         logger.error(f"Error inesperado: {str(e)}")
         return JsonResponse({'error': 'Error interno del servidor'}, status=500)
 
-def finalizar_capacitacion(request, capacitacion_id):
-    capacitacion = get_object_or_404(CapacitacionInicial, id=capacitacion_id)
+def finalizar_asigancion(request, capacitacion_id):
+    capacitacion = get_object_or_404(VacanteAsignada, id=capacitacion_id)
     if capacitacion.estado != 'completada':
         capacitacion.estado = 'completada'
         capacitacion.save()
