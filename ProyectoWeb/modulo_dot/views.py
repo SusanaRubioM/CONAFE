@@ -357,6 +357,16 @@ def save_signature(request):
 
             convenio = ConveniosFiguras.objects.get(id=convenio_id)
 
+            # Obtener el usuario autenticado (UsuarioRol)
+            usuario_rol = request.user  # Este es el objeto UsuarioRol
+            if not usuario_rol:  # Si no hay un usuario autenticado
+                return JsonResponse({'status': 'error', 'message': 'Usuario no autenticado'}, status=400)
+            
+            usuario_autenticado = usuario_rol.usuario
+             # Asignar al firmante
+            if not convenio.firmado_por:
+                convenio.firmado_por = usuario_autenticado
+                
             # Convertir base64 a imagen
             img_data = base64.b64decode(signature_data.split(',')[1])
             image = Image.open(BytesIO(img_data))

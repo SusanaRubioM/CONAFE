@@ -25,8 +25,20 @@
                 <td>{{ pago.payment_date }}</td>
                 <td>{{ pago.get_payment_type_display }}</td>
                 <td>${{ pago.amount }}</td>
-                <td>{{ pago.assigned_to.username }}</td>
-                <td>{{ pago.assigned_by.username }}</td>
+                <td>
+                    {% if pago.assigned_to %}
+                        {{ pago.assigned_to.username }}
+                    {% else %}
+                        No asignado
+                    {% endif %}
+                </td>
+                <td>
+                    {% if pago.assigned_by %}
+                        {{ pago.assigned_by.username }}
+                    {% else %}
+                        No asignado
+                    {% endif %}
+                </td>
                 <td>
                     {% if pago.signature %}
                         <a href="{{ pago.signature.url }}" target="_blank">Ver Firma</a>

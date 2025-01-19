@@ -26,7 +26,8 @@ class PaymentAssignmentForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Filtramos los usuarios según roles específicos
-        self.fields['assigned_to'].queryset = UsuarioRol.objects.filter(role__in=['APEC', 'EC', 'ECA', 'ECAR'])
+        # Usamos 'usuario' en lugar de 'user' ya que ese es el campo que existe en UsuarioRol
+        self.fields['assigned_to'].queryset = UsuarioRol.objects.filter(role__in=['APEC', 'EC', 'ECA', 'ECAR']).values_list('usuario', flat=True)
 
 
 class PaymentScheduleForm(forms.ModelForm):

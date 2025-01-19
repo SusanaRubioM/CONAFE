@@ -83,6 +83,7 @@ class Usuario(models.Model):
                     'convenio_pdf': os.path.join('documentos', 'Convenio_figuras.pdf'),
                     'firma_digital': None,  # Firma digital puede ser añadida posteriormente
                     'estado_convenio': estado_convenio,
+                    'firmado_por': None,
                 },
             )
 

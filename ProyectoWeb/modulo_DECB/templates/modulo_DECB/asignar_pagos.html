@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Agregar Evento{% endblock %}
+{% block title %}Agregar Pago{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
@@ -17,6 +17,7 @@
                 <div class="card-body">
                     <form method="POST" novalidate>
                         {% csrf_token %}
+                        
                         <!-- Campo de la fecha de pago -->
                         <div class="mb-3">
                             <label for="id_payment_date" class="form-label">Fecha de Pago (DD/MM/AAAA)</label>
