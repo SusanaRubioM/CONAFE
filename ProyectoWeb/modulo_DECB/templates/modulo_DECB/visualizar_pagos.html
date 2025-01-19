@@ -5,11 +5,12 @@
 {% block content %}
 <div class="container mt-5">
     <div class="row mb-4">
-        <div class="col">
+        <div class="col d-flex justify-content-between align-items-center">
             <a href="{% url 'modulo_DECB:home' %}" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Regresar
             </a>
-            <h1 class="text-center">Registro de Pagos</h1>
+            <h1 class="text-center flex-grow-1">Registro de Pagos</h1>
+            <div></div>
         </div>
     </div>
 
@@ -27,26 +28,27 @@
     <div class="card shadow">
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead class="table-dark">
+                <table class="table table-striped table-hover align-middle">
+                    <thead class="table-dark text-center">
                         <tr>
+                            <th>Fecha de Facturación</th>
                             <th>Fecha de Pago</th>
                             <th>Tipo de Pago</th>
                             <th>Monto</th>
                             <th>Estado</th>
                             <th>Asignado a</th>
                             <th>Asignado por</th>
-                            <th>Firma</th>
-                            <th>Acciones</th>
+                            <th>Sin acciones por el momento</th> <!-- Nueva columna -->
                         </tr>
                     </thead>
                     <tbody>
                         {% for pago in pagos %}
                         <tr>
-                            <td>{{ pago.payment_date|date:"d/m/Y" }}</td>
+                            <td class="text-center">{{ pago.payment_date|date:"d/m/Y" }}</td>
+                            <td class="text-center">{{ pago.payment_date_pay|date:"d/m/Y" }}</td>
                             <td>{{ pago.get_payment_type_display }}</td>
-                            <td>${{ pago.amount|floatformat:2 }}</td>
-                            <td>
+                            <td class="text-end">${{ pago.amount|floatformat:2 }}</td>
+                            <td class="text-center">
                                 <span class="badge {% if pago.status == 'completado' %}bg-success
                                     {% elif pago.status == 'pendiente' %}bg-warning
                                     {% elif pago.status == 'rechazado' %}bg-danger
@@ -62,66 +64,12 @@
                             </td>
                             <td>{{ pago.assigned_to.get_full_name|default:pago.assigned_to.username }}</td>
                             <td>{{ pago.assigned_by.get_full_name|default:pago.assigned_by.username }}</td>
-                            <td>
-                                {% if pago.signature %}
-                                    <a href="{{ pago.signature.url }}" class="btn btn-sm btn-primary" target="_blank">
-                                        <i class="fas fa-signature"></i> Ver Firma
-                                    </a>
-                                {% else %}
-                                    <span class="text-muted">Sin firma</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if not pago.payment_status.is_completed and pago.status != 'completado' %}
-                                    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" 
-                                            data-bs-target="#completePaymentModal{{ pago.id }}">
-                                        <i class="fas fa-check"></i> Marcar Completado
-                                    </button>
-                                {% endif %}
-                                
-                                {% if pago.payment_status.evidence %}
-                                    <a href="{{ pago.payment_status.evidence.url }}" class="btn btn-info btn-sm" target="_blank">
-                                        <i class="fas fa-file"></i> Ver Evidencia
-                                    </a>
-                                {% endif %}
-                            </td>
+                            <td class="text-center">Sin acciones por el momento</td> <!-- Nueva columna con texto estático -->
                         </tr>
 
-                        <!-- Modal para marcar como completado -->
-                        <div class="modal fade" id="completePaymentModal{{ pago.id }}" tabindex="-1">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Marcar Pago como Completado</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                    </div>
-                                    <form action="{% url 'modulo_DECB:mark_payment_completed' pago.id %}" 
-                                          method="POST" enctype="multipart/form-data">
-                                        {% csrf_token %}
-                                        <div class="modal-body">
-                                            <div class="mb-3">
-                                                <label class="form-label">Detalles del Pago:</label>
-                                                <ul class="list-unstyled">
-                                                    <li><strong>Tipo:</strong> {{ pago.get_payment_type_display }}</li>
-                                                    <li><strong>Monto:</strong> ${{ pago.amount|floatformat:2 }}</li>
-                                                    <li><strong>Asignado a:</strong> {{ ago.assigned_to.get_full_name|default:pago.assigned_to.username }}</li>
-                                                </ul>
-                                            </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                                Cancelar
-                                            </button>
-                                            <button type="submit" class="btn btn-success">
-                                                <i class="fas fa-check"></i> Confirmar Completado
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
                         {% empty %}
                         <tr>
-                            <td colspan="8" class="text-center">No hay pagos registrados</td>
+                            <td colspan="8" class="text-center">No hay pagos registrados</td> <!-- Ajusta el colspan a 8 -->
                         </tr>
                         {% endfor %}
                     </tbody>

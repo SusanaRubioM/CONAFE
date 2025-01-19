@@ -7,7 +7,7 @@ from django.utils import timezone
 
 @receiver(post_save, sender=ConveniosFiguras)
 def create_payment_schedule(sender, instance, created, **kwargs):
-    """Crea un registro de pago después de que el convenio haya sido firmado."""
+    """Crea un registro de pago después de que el convenio haya sido firmado y actualiza su estado."""
     try:
         if instance.firma_digital and instance.estado_convenio == 'Aprobado':
             # Diccionario que mapea el rol a un tipo de pago y monto
@@ -35,7 +35,7 @@ def create_payment_schedule(sender, instance, created, **kwargs):
                 amount = 6000.00
 
             # Crear o actualizar el registro de PaymentSchedule
-            PaymentSchedule.objects.update_or_create(
+            payment_schedule, created = PaymentSchedule.objects.update_or_create(
                 payment_date=timezone.now(),  # Usar timezone.now() en lugar de datetime.now()
                 assigned_to=instance.usuario.usuario_rol,  # El usuario relacionado con el convenio
                 defaults={
@@ -44,6 +44,10 @@ def create_payment_schedule(sender, instance, created, **kwargs):
                     'assigned_by': firmante.usuario_rol,  # Asignar al firmante (el que firmó el convenio)
                 }
             )
+            
+            # Después de crear o actualizar el PaymentSchedule, actualizamos su estado
+            payment_schedule.update_payment_status()
+
     except Exception as e:
         # Manejo de errores
         print(f"Error al crear el PaymentSchedule para el convenio {instance.id}: {str(e)}")
