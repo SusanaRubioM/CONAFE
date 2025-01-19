@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'modulo_DECB',
     'modulo_educadores',
     'modulo_capacitacion',
+    'modulo_calendario'
 ]
 
 MIDDLEWARE = [
