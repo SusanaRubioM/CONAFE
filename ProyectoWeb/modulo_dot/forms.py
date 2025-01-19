@@ -85,7 +85,7 @@ class DatosPersonalesForm(forms.ModelForm):
 
     nombre = forms.CharField(
         max_length=255,
-        required=True,
+        required=False,
         label="Nombre",
         widget=forms.TextInput(
             attrs={"class": "form-control", "placeholder": "Nombre del Usuario"}
@@ -93,7 +93,7 @@ class DatosPersonalesForm(forms.ModelForm):
     )
     apellidopa = forms.CharField(
         max_length=255,
-        required=True,
+        required=False,
         label="Apellido Paterno",
         widget=forms.TextInput(
             attrs={"class": "form-control", "placeholder": "Apellido Paterno"}
@@ -101,7 +101,7 @@ class DatosPersonalesForm(forms.ModelForm):
     )
     apellidoma = forms.CharField(
         max_length=255,
-        required=True,
+        required=False,
         label="Apellido Materno",
         widget=forms.TextInput(
             attrs={"class": "form-control", "placeholder": "Apellido Materno"}
