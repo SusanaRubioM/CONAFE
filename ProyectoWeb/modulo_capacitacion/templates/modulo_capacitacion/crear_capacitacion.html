@@ -19,23 +19,44 @@
             <form method="post" id="formCapacitacion">
                 {% csrf_token %}
 
-                <!-- Sección ECAR -->
+               <!-- Sección ECAR -->
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="id_ecar">{{ form.ecar.label }}</label>
-                            {{ form.ecar }}
-                            {% if form.ecar.errors %}
+                            <label for="id_usuario_responsable">{{ form.usuario_responsable.label }}</label>
+                            {{ form.usuario_responsable }}
+                            {% if form.usuario_responsable.errors %}
                                 <div class="invalid-feedback d-block">
-                                    {{ form.ecar.errors }}
+                                    {{ form.usuario_responsable.errors }}
                                 </div>
                             {% endif %}
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="id_nombre_ecar">Nombre del ECAR</label>
-                            <input type="text" id="id_nombre_ecar" class="form-control" readonly>
+                            <label for="id_nombre_usuario_responsable">Nombre del ECAR</label>
+                            <input type="text" id="id_nombre_usuario_responsable" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección ECA -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_usuario_eca">{{ form.usuario_eca.label }}</label>
+                            {{ form.usuario_eca }}
+                            {% if form.usuario_eca.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.usuario_eca.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_nombre_usuario_eca">Nombre del ECA</label>
+                            <input type="text" id="id_nombre_usuario_eca" class="form-control" readonly>
                         </div>
                     </div>
                 </div>
@@ -44,25 +65,25 @@
                 <div class="row mb-3">
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="id_ec">{{ form.ec.label }}</label>
-                            {{ form.ec }}
-                            {% if form.ec.errors %}
+                            <label for="id_usuario_ec">{{ form.usuario_ec.label }}</label>
+                            {{ form.usuario_ec }}
+                            {% if form.usuario_ec.errors %}
                                 <div class="invalid-feedback d-block">
-                                    {{ form.ec.errors }}
+                                    {{ form.usuario_ec.errors }}
                                 </div>
                             {% endif %}
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="id_id_ec">ID del EC</label>
-                            <input type="text" id="id_id_ec" class="form-control" readonly>
+                            <label for="id_id_usuario_ec">ID del EC</label>
+                            <input type="text" id="id_id_usuario_ec" class="form-control" readonly>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="id_nombre_ec">Nombre del EC</label>
-                            <input type="text" id="id_nombre_ec" class="form-control" readonly>
+                            <label for="id_nombre_usuario_ec">Nombre del EC</label>
+                            <input type="text" id="id_nombre_usuario_ec" class="form-control" readonly>
                         </div>
                     </div>
                 </div>
@@ -135,6 +156,56 @@
                         <i class="fas fa-arrow-left"></i> Volver
                     </a>
                 </div>
+
+                <!-- Botón flotante para mostrar/ocultar la tabla de servicios educativos -->
+                <button class="btn btn-info mt-4" id="showServiciosBtn" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
+                    Mostrar Servicios Educativos
+                </button>
+
+                <!-- Tabla de servicios educativos flotante -->
+                <div id="serviciosTable" class="mt-3" style="display:none; position: fixed; bottom: 80px; right: 20px; background-color: white; border: 1px solid #ccc; padding: 10px; max-height: 400px; overflow-y: auto; z-index: 999;">
+                    <h3>Servicios Educativos</h3>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Estado</th>
+                                <th>Región</th>
+                                <th>Microrregión</th>
+                                <th>Comunidad</th>
+                                <th>CCT</th>
+                                <th>Nombre de la Escuela</th>
+                                <th>Tipo de Sede</th>
+                                <th>Servicio</th>
+                                <th>Nivel</th>
+                                <th>Periodo</th>
+                                <th>Rol Educativo</th>
+                                <th>Educadores</th>
+                                <th>Solicitudes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for servicio in servicios %}
+                            <tr>
+                                <td>{{ servicio.nombre_estado }}</td>
+                                <td>{{ servicio.nombre_region }}</td>
+                                <td>{{ servicio.nombre_microregion }}</td>
+                                <td>{{ servicio.nombre_comunidad }}</td>
+                                <td>{{ servicio.clave_centro_trabajo }}</td>
+                                <td>{{ servicio.nombre_escuela }}</td>
+                                <td>{{ servicio.tipo_sede }}</td>
+                                <td>{{ servicio.tipo_servicio }}</td>
+                                <td>{{ servicio.nivel_escolar }}</td>
+                                <td>{{ servicio.periodo_servicio }}</td>
+                                <td>{{ servicio.rol_vacante }}</td>
+                                <td>{{ servicio.cantidad_educadores_activos }}</td>
+                                <td>{{ servicio.cantidad_solicitudes }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                
             </form>
         </div>
     </div>
@@ -143,16 +214,29 @@
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const ecarSelect = document.getElementById('id_ecar');
-        const ecSelect = document.getElementById('id_ec');
-        const nombreEcarInput = document.getElementById('id_nombre_ecar');
-        const idEcInput = document.getElementById('id_id_ec');
-        const nombreEcInput = document.getElementById('id_nombre_ec');
+        // Selectores de campos
+        const ecarSelect = document.getElementById('id_usuario_responsable');
+        const ecaSelect = document.getElementById('id_usuario_eca');
+        const ecSelect = document.getElementById('id_usuario_ec');
+        const nombreEcarInput = document.getElementById('id_nombre_usuario_responsable');
+        const nombreEcaInput = document.getElementById('id_nombre_usuario_eca');
+        const nombreEcInput = document.getElementById('id_nombre_usuario_ec');
+        const idEcInput = document.getElementById('id_id_usuario_ec');
 
+        const showServiciosBtn = document.getElementById('showServiciosBtn');
+        const serviciosTable = document.getElementById('serviciosTable');
+        
+        // Mostrar/ocultar tabla de servicios educativos
+        showServiciosBtn.addEventListener('click', function(event) {
+            event.preventDefault();
+            serviciosTable.style.display = (serviciosTable.style.display === 'none') ? 'block' : 'none';
+        });
+
+        // Función para actualizar campos en base a la selección
         function actualizarCamposUsuario(selectElement, nombreInput, idInput = null) {
             const usuarioId = selectElement.value;
-            
-            // Limpiar campos si no hay selección
+
+            // Si no hay selección, limpiar campos
             if (!usuarioId) {
                 nombreInput.value = '';
                 if (idInput) idInput.value = '';
@@ -163,8 +247,8 @@
             nombreInput.value = 'Cargando...';
             if (idInput) idInput.value = 'Cargando...';
 
-            // Corrección en la URL
-            fetch(`/capacitacion/api/usuarios/${usuarioId}/`)  // Asegúrate de tener la barra antes de ${usuarioId}
+            // Fetch para obtener datos del usuario
+            fetch(`/capacitacion/api/usuarios/${usuarioId}/`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
@@ -173,42 +257,34 @@
                 })
                 .then(data => {
                     nombreInput.value = data.nombre_completo;
-                    if (idInput) {
-                        idInput.value = data.rol;
-                    }
+                    if (idInput) idInput.value = data.rol;
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     nombreInput.value = 'Error al cargar datos';
-                    if (idInput) {
-                        idInput.value = 'Error al cargar datos';
-                    }
+                    if (idInput) idInput.value = 'Error al cargar datos';
                 });
         }
 
-        // Event listeners
-        if (ecarSelect) {
-            ecarSelect.addEventListener('change', () => {
-                actualizarCamposUsuario(ecarSelect, nombreEcarInput);
-            });
-            
-            // Cargar datos iniciales si hay un valor preseleccionado
-            if (ecarSelect.value) {
-                actualizarCamposUsuario(ecarSelect, nombreEcarInput);
+        // Función para agregar listeners a los selectores
+        function agregarListener(selectElement, nombreInput, idInput = null) {
+            if (selectElement) {
+                selectElement.addEventListener('change', () => {
+                    actualizarCamposUsuario(selectElement, nombreInput, idInput);
+                });
+
+                // Cargar datos iniciales si hay un valor preseleccionado
+                if (selectElement.value) {
+                    actualizarCamposUsuario(selectElement, nombreInput, idInput);
+                }
             }
         }
 
-        if (ecSelect) {
-            ecSelect.addEventListener('change', () => {
-                actualizarCamposUsuario(ecSelect, nombreEcInput, idEcInput);
-            });
-            
-            // Cargar datos iniciales si hay un valor preseleccionado
-            if (ecSelect.value) {
-                actualizarCamposUsuario(ecSelect, nombreEcInput, idEcInput);
-            }
-        }
+        // Agregar listeners para ECAR, ECA y EC
+        agregarListener(ecarSelect, nombreEcarInput);
+        agregarListener(ecaSelect, nombreEcaInput);
+        agregarListener(ecSelect, nombreEcInput, idEcInput);
     });
-</script>
+</script>>
 {% endblock %}
 {% endblock %}
