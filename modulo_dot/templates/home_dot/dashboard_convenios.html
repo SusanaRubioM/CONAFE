@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>Dashboard de Convenios</h1>
+        <p class="text-muted">Gestiona y firma digitalmente los convenios pendientes.</p>
+    </div>
+
+    <div class="row">
+        {% for convenio in convenios %}
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Usuario: {{ convenio.usuario.usuario }}</h5>
+                    <p><strong>Número de Control:</strong> {{ convenio.control_numero }}</p>
+                    <p class="card-text">
+                        <strong>Firma Digital:</strong>
+                        {% if convenio.firma_digital %}
+                            <a href="{{ convenio.firma_digital.url }}" target="_blank" class="text-success">Ver Firma</a>
+                        {% else %}
+                            <span class="text-danger">No firmada</span>
+                        {% endif %}
+                    </p>
+
+                    {% if not convenio.firma_digital %}
+                    <!-- Botón para abrir el modal de firma -->
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#firmaModal" data-convenio-id="{{ convenio.id }}">
+                        Firmar Convenio
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Modal de firma -->
+<div class="modal fade" id="firmaModal" tabindex="-1" aria-labelledby="firmaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="firmaModalLabel">Firma Digital</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="firma-form" method="POST">
+                    {% csrf_token %}
+                    <canvas id="canvas" width="470" height="300" style="border: 1px solid #000;"></canvas><br>
+                    <button type="button" id="btnLimpiar">Limpiar</button>
+                    <button type="button" id="btnDescargar">Descargar</button>
+                    <button type="button" id="btnGuardarFirma">Guardar Firma</button>
+                    <input type="hidden" id="convenio_id" name="convenio_id" value="">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Script para manejar la firma en el canvas
+    const canvas = document.getElementById("canvas");
+    const context = canvas.getContext("2d");
+    const btnLimpiar = document.getElementById("btnLimpiar");
+    const btnDescargar = document.getElementById("btnDescargar");
+    const btnGuardarFirma = document.getElementById("btnGuardarFirma");
+    let drawing = false;
+    let x, y;
+
+    // Detectar cuando el modal es abierto
+    const modal = document.getElementById('firmaModal');
+    modal.addEventListener('show.bs.modal', (event) => {
+        const button = event.relatedTarget; // Botón que abrió el modal
+        const convenioId = button.getAttribute('data-convenio-id');
+        document.getElementById('convenio_id').value = convenioId;
+        context.clearRect(0, 0, canvas.width, canvas.height); // Limpiar el canvas cada vez que se abra el modal
+    });
+
+    // Lógica para dibujar en el canvas
+    canvas.addEventListener("mousedown", (e) => {
+        drawing = true;
+        x = e.offsetX;
+        y = e.offsetY;
+    });
+
+    canvas.addEventListener("mousemove", (e) => {
+        if (drawing) {
+            const newX = e.offsetX;
+            const newY = e.offsetY;
+            context.beginPath();
+            context.moveTo(x, y);
+            context.lineTo(newX, newY);
+            context.stroke();
+            x = newX;
+            y = newY;
+        }
+    });
+
+    canvas.addEventListener("mouseup", () => drawing = false);
+    canvas.addEventListener("mouseout", () => drawing = false);
+
+    btnLimpiar.addEventListener("click", () => context.clearRect(0, 0, canvas.width, canvas.height));
+
+    btnDescargar.addEventListener("click", () => {
+        const dataUrl = canvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = dataUrl;
+        link.download = "firma.png";
+        link.click();
+    });
+
+    btnGuardarFirma.addEventListener("click", () => {
+    const dataUrl = canvas.toDataURL("image/png");
+    const convenioId = document.getElementById("convenio_id").value;
+
+    fetch("{% url 'dot_home:save_signature' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value,
+        },
+        body: JSON.stringify({
+            signature: dataUrl,  // Firma en formato base64
+            convenio_id: convenioId,  // ID del convenio
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            alert("Firma guardada correctamente");
+
+            location.reload();
+        } else {
+            alert(`Hubo un error: ${data.message}`);
+        }
+    })
+    .catch(error => console.error("Error al guardar la firma:", error));
+});
+
+</script>
+{% endblock %}

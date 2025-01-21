@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Home Director{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4 text-center">Home Director</h2>
+  <p class="text-center">Bienvenido Director!</p>
+  <div class="row text-center">
+    <!-- Botón Agregar -->
+    <div class="col-md-4 mb-4">
+      <a href="{% url 'dot_home:home_agregar' %}" class="btn btn-primary btn-block">
+        <i class="fas fa-plus"></i> Agregar
+      </a>
+    </div>
+
+    <!-- Botón Visualizar -->
+    <div class="col-md-4 mb-4">
+      <a href="{% url 'dot_home:dashboard_visualizar' %}" class="btn btn-primary btn-block">
+        <i class="fas fa-eye"></i> Visualizar
+      </a>
+    </div>
+
+    <!-- Botón Modificar -->
+    <div class="col-md-4 mb-4">
+      <a href="{% url 'dot_home:dashboard_modificar' %}" class="btn btn-warning btn-block">
+        <i class="fas fa-edit"></i> Modificar
+      </a>
+    </div>
+
+    <!-- Botón Status (nuevo formulario) -->
+    <div class="col-md-4 mb-4">
+      <a href="{% url 'dot_home:dasboard_status' %}" class="btn btn-success btn-block">
+          <i class="fas fa-users"></i> Actualizar Status
+      </a>
+    </div>
+
+    <!-- Botón Eliminar -->
+    <div class="col-md-4 mb-4">
+      <a href="{% url 'dot_home:dashboard_eleminar' %}" class="btn btn-danger btn-block">
+        <i class="fas fa-trash"></i> Eliminar
+      </a>
+    </div>
+
+    <!-- Botón Vacantes -->
+    <div class="col-md-4 mb-4">
+      <a href="{% url 'dot_home:dashboard_vacantes' %}" class="btn btn-info btn-block">
+        <i class="fas fa-briefcase"></i> Vacantes
+      </a>
+    </div>
+  </div>
+
+  <!-- Fila para los botones Documentación y Convenios -->
+  <div class="row justify-content-center">
+    <!-- Botón Documentación -->
+    <div class="col-md-4 mb-4">
+      <a href="{% url 'dot_home:visualizacion_docs' %}" class="btn btn-secondary btn-block">
+        <i class="fas fa-file-alt"></i> Documentación
+      </a>
+    </div>
+
+    <!-- Botón Convenios -->
+    <div class="col-md-4 mb-4">
+      <a href="{% url 'dot_home:dashboard_convenios' %}" class="btn btn-secondary btn-block">
+        <i class="fas fa-file-alt"></i> Convenios
+      </a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

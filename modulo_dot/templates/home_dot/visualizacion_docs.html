@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Visualización de Documentos{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Botón para volver al menú -->
+    <div class="d-flex justify-content-start mb-3">
+        <a href="{% url 'dot_home:home_dot' %}" class="btn btn-warning" style="background-color: #620b0b; color:white">Menú</a>
+    </div>
+
+    <h2>Documentos Disponibles</h2>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Nombre del Documento</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for documento in documentos %}
+            <tr>
+                <td>{{ documento }}</td>
+                <td><a href="{{ MEDIA_URL }}documentos/{{ documento }}" target="_blank" class="btn btn-primary">Ver</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+
+

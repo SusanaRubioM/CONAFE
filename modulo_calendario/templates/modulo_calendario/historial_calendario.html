@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Historial del Calendario{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Historial de Fechas de Pago</h1>
+    <div class="card shadow">
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Categoría</th>
+                        <th>Monto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fecha in fechas %}
+                        <tr>
+                            <td>{{ fecha.fecha }}</td>
+                            <td>{{ fecha.categoria }}</td>
+                            <td>${{ fecha.monto }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center">No hay fechas registradas</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="text-center mt-4">
+        <a href="{% url 'modulo_DECB:home' %}" class="btn btn-secondary">
+            <i class="fas fa-home"></i> Regresar a Inicio
+        </a>
+    </div>
+</div>
+{% endblock %}

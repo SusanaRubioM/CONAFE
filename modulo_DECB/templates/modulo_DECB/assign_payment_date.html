@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Asignar Fecha de Pago{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Encabezado -->
+    <h1 class="text-center mb-4 text-success">Asignar Nueva Fecha de Pago</h1>
+
+    <!-- Formulario en una tarjeta -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="POST" novalidate>
+                {% csrf_token %}
+                
+                <!-- Campo de fecha -->
+                <div class="mb-3">
+                    <label for="id_payment_date" class="form-label">{{ form.payment_date.label }}</label>
+                    {{ form.payment_date|add_class:"form-control" }}
+                </div>
+                
+                <!-- Campo de tipo de pago -->
+                <div class="mb-3">
+                    <label for="id_payment_type" class="form-label">{{ form.payment_type.label }}</label>
+                    {{ form.payment_type|add_class:"form-control" }}
+                </div>
+                
+                <!-- Botón guardar -->
+                <button type="submit" class="btn btn-success mt-3 w-100">
+                    <i class="fas fa-save"></i> Guardar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Botón regresar -->
+    <div class="text-center mt-4">
+        <a href="{% url 'modulo_DECB:home' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Regresar a la Página Principal
+        </a>
+    </div>
+</div>
+{% endblock %}

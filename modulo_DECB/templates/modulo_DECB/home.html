@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Home DECB{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Bienvenido, Usuario DECB</h1>
+    <div class="d-flex justify-content-center">
+        <div class="card text-center mx-2" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">Calendario</h5>
+                <p class="card-text">Consulta las fechas asignadas para los pagos.</p>
+                <a href="{% url 'modulo_DECB:calendario_pagos' %}" class="btn btn-primary">Ver Calendario</a>
+            </div>
+        </div>
+        <div class="card text-center mx-2" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">Asignar Fecha</h5>
+                <p class="card-text">Asigna nuevas fechas de pagos para los beneficiarios.</p>
+                <a href="{% url 'modulo_DECB:asignar_fecha_pago' %}" class="btn btn-success">Asignar Fecha</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Calendario DECB{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <!-- Encabezado -->
+            <h1 class="text-center mb-4">Calendario DECB</h1>
+
+            <!-- Tabla -->
+            <div class="card shadow">
+                <div class="card-body">
+                    <table class="table table-bordered table-striped">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Tipo de Evento</th>
+                                <th>Fecha</th>
+                                <th>Descripción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for evento in eventos %}
+                                <tr>
+                                    <td>{{ evento.get_event_type_display }}</td>
+                                    <td>{{ evento.date }}</td>
+                                    <td>{{ evento.description }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center">No hay eventos programados.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <!-- Botones -->
+                    <div class="text-center mt-4">
+                        <a href="{% url 'modulo_DECB:agregar_evento' %}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Agregar Evento
+                        </a>
+                        <a href="{% url 'modulo_DECB:home' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Regresar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

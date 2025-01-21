@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Home Dirección
+de Planeación y
+Evaluación{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4 text-center">Home Dirección
+    de Planeación y
+    Evaluación</h2>
+  <p class="text-center">Bienvenido Dirección
+    de Planeación y
+    Evaluación!</p>
+  <div class="row text-center">
+    <!-- Botón Agregar -->
+    <div class="col-md-4 mb-4">
+      <a href="{% url 'modulo_dpe:vacantes_dashboard' %}" class="btn btn-primary btn-block">
+        <i class="fas fa-plus"></i> Vacantes Establecidas
+      </a>
+    </div>
+</div>
+<div class="col-md-4 mb-4">
+  <a href="{% url 'modulo_dpe:estadisticas_dashboard' %}" class="btn btn-success btn-block">
+    <i class="fas fa-chart-bar"></i> Estadísticas
+  </a>
+</div>
+
+
+{% endblock %}

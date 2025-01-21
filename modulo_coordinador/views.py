@@ -1,0 +1,639 @@
+from django.shortcuts import render, get_object_or_404, redirect
+from login_app.decorators import role_required
+from django.contrib.auth.decorators import login_required
+from form_app.models import Aspirante, Usuario
+from django.contrib.auth.hashers import make_password
+from login_app.models import UsuarioRol
+from modulo_dot.models import DatosPersonales 
+from django.db.models import Prefetch
+from django.http import JsonResponse, HttpResponse
+import json
+from django.utils import timezone
+from django.core.exceptions import ObjectDoesNotExist
+from django.contrib import messages
+from modulo_dot.views import dashboard_vacantes as original_dashboard_vacantes
+from modulo_apec.models import ServicioEducativo,Estado, Municipio
+from modulo_apec.forms import ObservacionForm
+from modulo_dpe.models import Reporte
+from .models import ActividadCalendario
+from modulo_DECB.models import CalendarEvent  # Importar el modelo de eventos del módulo DECB
+
+@login_required
+@role_required('CT')
+def empleado_view(request):
+    # Lógica específica para el coordinador territorial
+    return render(request, 'home_coordinador/home_coordinador.html')
+
+@login_required
+@role_required('CT')
+def dashboard_aspirantes_rechazados(request):
+    aspirantes = (
+        Aspirante.objects
+        .select_related(
+            "datos_personales",
+            "datos_personales__documentos",  # Relación de DocumentosPersonales
+            "residencia",
+            "participacion",
+            "gestion",
+            "usuario",
+        )
+        .all()
+    )
+    return render(
+        request,
+        "home_coordinador/dashboard_aspirante_rechazados.html",
+        {"aspirantes": aspirantes},
+    )
+@login_required
+@role_required('CT')
+def dashboard_aspirantes_ec(request):
+    aspirantes = (
+        Aspirante.objects
+        .select_related(
+            "datos_personales",
+            "datos_personales__documentos",  # Relación de DocumentosPersonales
+            "residencia",
+            "participacion",
+            "gestion",
+            "usuario",
+        )
+        .all()
+    )
+    return render(
+        request,
+        "home_coordinador/dashboard_aspirante.html",
+        {"aspirantes": aspirantes},
+    )
+
+@login_required
+@role_required('CT')
+def dashboard_aspirantes_aceptados(request):
+    aspirantes = (
+        Aspirante.objects
+        .select_related(
+            "datos_personales",
+            "datos_personales__documentos",  # Relación de DocumentosPersonales
+            "residencia",
+            "participacion",
+            "gestion",
+            "usuario",
+        )
+        .all()
+    )
+    return render(
+        request,
+        "home_coordinador/dashboard_aspirante_aceptados.html",
+        {"aspirantes": aspirantes},
+    )
+@login_required
+@role_required('CT')
+def dashboard_aspirantes_aceptados_eca_ecar(request):
+    aspirantes = (
+        Aspirante.objects
+        .select_related(
+            "datos_personales",
+            "datos_personales__documentos",  # Relación de DocumentosPersonales
+            "residencia",
+            "participacion",
+            "gestion",
+            "usuario",
+        )
+        .filter(participacion__programa_participacion__in=["ECA", "ECAR"])
+    )
+    return render(
+        request,
+        "home_coordinador/dashboard_eca_aceptados.html",
+        {"aspirantes": aspirantes},
+    )
+@login_required
+@role_required('CT')
+def dashboard_aspirantes_rechazados_eca_ecar(request):
+    aspirantes = (
+        Aspirante.objects
+        .select_related(
+            "datos_personales",
+            "datos_personales__documentos",  # Relación de DocumentosPersonales
+            "residencia",
+            "participacion",
+            "gestion",
+            "usuario",
+        )
+        .filter(participacion__programa_participacion__in=["ECA", "ECAR"])
+    )
+    return render(
+        request,
+        "home_coordinador/dashboard_eca_rechazados.html",
+        {"aspirantes": aspirantes},
+    )
+
+@login_required
+@role_required('CT')
+def dashboard_aspirantes_eca_ecar(request):
+    aspirantes = (
+        Aspirante.objects
+        .select_related(
+            "datos_personales",
+            "datos_personales__documentos",  # Relación de DocumentosPersonales
+            "residencia",
+            "participacion",
+            "gestion",
+            "usuario",
+        )
+        .filter(participacion__programa_participacion__in=["ECA", "ECAR"])
+    )
+    return render(
+        request,
+        "home_coordinador/dashboard_aspirante_ecar.html",
+        {"aspirantes": aspirantes},
+    )
+
+@login_required
+@role_required('CT')
+def dashboard_figura_educativa(request):
+    """
+    Vista para mostrar el dashboard con todos los educadores filtrados por roles específicos.
+    """
+    # Filtrar los educadores según los roles permitidos
+    empleados = (
+        Aspirante.objects
+        .select_related(
+            "datos_personales",
+            "datos_personales__documentos",  # Relación de DocumentosPersonales
+            "residencia",
+            "participacion",
+            "gestion",
+            "usuario",
+            "usuario__statuses",
+        )
+        .filter(usuario__rol__in=["EC", "ECA", "ECAR"])  # Filtrar por roles específicos
+    )
+
+    # Renderizar el template con los datos filtrados
+    return render(
+        request, 
+        "home_coordinador/dashboard_figuras.html", 
+        {"empleados": empleados}  # Cambié el nombre a empleados para que coincida con el template
+    )
+
+
+@login_required
+@role_required("CT")
+def detalles_educador(request, empleado_id):
+    """
+    Vista para ver los detalles de un empleado en específico.
+    """
+    # Obtener el objeto DatosPersonales asociado al usuario con el id proporcionado
+    empleado = get_object_or_404(DatosPersonales.objects.select_related("documentos"), usuario__id=empleado_id)
+    
+    # Pasar el objeto empleado a la plantilla
+    return render(request, "home_coordinador/detalles_educador.html", {"empleado": empleado})
+
+
+@login_required
+@role_required('CT')
+def detalles_aspirante(request, aspirante_id):
+    aspirante = get_object_or_404(Aspirante.objects.prefetch_related(
+        'datos_personales',
+        'datos_personales__documentos',
+        'datos_personales__residencia',  # Accediendo a residencia directamente
+        'gestion', 
+        'banco', 
+        'participacion',
+    ), id=aspirante_id)
+
+    return render(request, 'home_coordinador/detalles_aspirante.html', {'aspirante': aspirante})
+
+
+#Modulo observaciones
+
+@login_required
+@role_required('CT')
+def observaciones_view(request):
+    servicios = ServicioEducativo.objects.all()
+
+    if request.method == 'POST':
+        servicio_id = request.POST.get('servicio_id')
+        try:
+            servicio = ServicioEducativo.objects.get(id=servicio_id)
+        except ServicioEducativo.DoesNotExist:
+            return HttpResponse("Servicio no encontrado", status=404)
+
+        form = ObservacionForm(request.POST)
+        if form.is_valid():
+            observacion = form.save(commit=False)
+            observacion.servicio_educativo = servicio
+            observacion.fecha_creacion = timezone.now()
+            observacion.save()
+
+            # Redirigir a la página de asignación de vacantes
+            return redirect('home_coordinador:asignacion_vacantes', servicio_id=servicio.id)
+        else:
+            return HttpResponse("Formulario no válido", status=400)
+
+    return render(request, 'home_coordinador/dashboard_vacantes_ct.html', {'servicios': servicios})
+
+# Customizing the original function to add new behavior
+def dashboard_vacantes_ct(request):
+    # Example: Logging the request before processing
+    print("Request received for dashboard_vacantes")
+    return original_dashboard_vacantes(request)
+
+@login_required
+@role_required('CT')
+def dashboard_asignar(request):
+    servicios = ServicioEducativo.objects.all()
+
+    if request.method == 'POST':
+        servicio_id = request.POST.get('servicio_id')
+        try:
+            servicio = ServicioEducativo.objects.get(id=servicio_id)
+        except ServicioEducativo.DoesNotExist:
+            return HttpResponse("Servicio no encontrado", status=404)
+
+        form = ObservacionForm(request.POST)
+        if form.is_valid():
+            observacion = form.save(commit=False)
+            observacion.servicio_educativo = servicio
+            observacion.fecha_creacion = timezone.now()
+            observacion.save()
+
+            # Redirigir a la página de asignación de vacantes
+            return redirect('coordinador_home:vacante_asignacion_ct', servicio_id=servicio.id)
+        else:
+            return HttpResponse("Formulario no válido", status=400)
+
+    return render(request, 'home_coordinador/dashboard_vacantes_ct.html', {'servicios': servicios})
+
+from modulo_apec.models import Observacion
+
+@login_required
+@role_required('CT')
+def asignacion_vacantes_view_ct(request, servicio_id):
+    servicio = get_object_or_404(ServicioEducativo, id=servicio_id)
+
+    # Consulta optimizada con el nombre correcto del campo relacionado
+    usuarios = Usuario.objects.filter(rol__in=['EC', 'ECA', 'ECAR']).select_related('datospersonales', 'aspirante__residencia')
+
+    # Obtención de la observación asociada al servicio educativo
+    observacion = Observacion.objects.filter(servicio_educativo=servicio).first()
+
+    if request.method == 'POST':
+        candidatos_ids = request.POST.getlist('candidatos')
+        candidatos = Usuario.objects.filter(id__in=candidatos_ids).select_related('datospersonales', 'aspirante__residencia')
+
+        comentario = request.POST.get('comentario')
+        rol = request.POST.get('rol')
+        ciclo = request.POST.get('ciclo')
+
+        if observacion:
+            observacion.comentario = comentario if comentario else observacion.comentario
+            observacion.save()
+        else:
+            observacion = Observacion.objects.create(
+                servicio_educativo=servicio,
+                fecha_creacion=timezone.now(),
+                comentario=comentario,
+            )
+
+        servicio.rol_vacante = rol if rol else 'NP'
+        servicio.periodo_servicio = ciclo if ciclo else 'Sin asignar'
+        servicio.save()
+
+        if candidatos:
+            observacion.candidatos.set(candidatos)
+            observacion.save()
+
+        messages.success(request, "¡Operación Exitosa! Los cambios han sido guardados correctamente.")
+
+    return render(
+        request,
+        'home_coordinador/vacante_asignacion_ct.html',
+        {'servicio': servicio, 'usuarios': usuarios, 'observacion': observacion}
+    )
+
+def exito_view_ct(request):
+    return render(request, 'home_coordinador/mensaje_exito_ct.html')
+
+# aqui termina
+
+# menu reportes 
+@login_required
+@role_required('CT')
+def menu_reportes_ct(request):
+    return render(request, 'home_coordinador/dashboard_equipo_pdf.html')
+
+"""
+@login_required
+@role_required('CT')
+def dashborard_equipamiento(request):
+    # Filtrar reportes según la categoría seleccionada (si es que se ha seleccionado alguna)
+    categoria = request.GET.get('categoria', '')  # Obtiene la categoría desde el query string
+    if categoria:
+        # Filtra reportes por categoría y estado "pendiente"
+        reportes = Reporte.objects.filter(categoria=categoria, estado='pendiente')
+    else:
+        # Si no se filtra por categoría, solo muestra los reportes con estado "pendiente"
+        reportes = Reporte.objects.filter(estado='pendiente')  # Solo reportes pendientes
+
+    return render(request, 'home_coordinador/dashboard_equipo_pdf.html', {'reportes': reportes})
+
+"""
+
+@login_required
+@role_required('CT')
+def dashborard_equipamiento(request):
+    # Filtrar reportes según la categoría seleccionada (si es que se ha seleccionado alguna)
+    categoria = request.GET.get('categoria', '')  # Obtiene la categoría desde el query string
+    if categoria:
+        reportes = Reporte.objects.filter(categoria=categoria)  # Filtra reportes por categoría
+    else:
+        reportes = Reporte.objects.all()  # Si no se filtra, muestra todos los reportes
+
+    return render(request, 'home_coordinador/dashboard_equipo_pdf.html', {'reportes': reportes})
+
+@login_required
+@role_required('CT')
+def dashboard_capacitacion_pdf(request):
+    # Filtrar reportes según la categoría "capacitación"
+    categoria = 'capacitación'  # Definir directamente la categoría
+    reportes = Reporte.objects.filter(categoria=categoria)
+
+    return render(request, 'home_coordinador/dashboard_capacitacion_pdf.html', {'reportes': reportes})
+
+@login_required
+@role_required('CT')
+def dashboard_seguim_pdf(request):
+    # Filtrar reportes según la categoría "seguimiento"
+    categoria = 'seguimiento'  # Definir directamente la categoría
+    reportes = Reporte.objects.filter(categoria=categoria)
+
+    return render(request, 'home_coordinador/dashboard_seguim_pdf.html', {'reportes': reportes})
+
+
+@login_required
+@role_required('CT')
+def validar_rechazar_reporte(request, reporte_id):
+    # Obtener el reporte
+    try:
+        reporte = Reporte.objects.get(id=reporte_id)
+    except Reporte.DoesNotExist:
+        return redirect('coordinador_home:dashboard_equipamiento')  # Si no existe el reporte, redirige
+
+    # Obtener la acción (validar o rechazar) desde el formulario
+    if request.method == "POST":
+        accion = request.POST.get('accion')
+
+        if accion == 'validar':
+            reporte.estado = 'validado'
+        elif accion == 'rechazar':
+            reporte.estado = 'rechazado'
+
+        # Guardamos el reporte con el nuevo estado
+        reporte.save()
+
+    # Redirigir al dashboard de equipamiento después de la acción
+    return redirect('coordinador_home:dashboard_equipamiento')
+
+def ajax_aspirante_status(request, aspirante_id):
+    if request.method == "POST":
+        try:
+            # Obtener los datos del cuerpo de la solicitud en formato JSON
+            data = json.loads(request.body)
+            status_seleccion = data.get("status_seleccion")
+
+            print("Estado recibido:", status_seleccion)  # Debug para verificar el valor recibido
+
+            # Verificamos si el estado recibido es uno de los válidos
+            if status_seleccion not in ['aceptado', 'rechazado']:
+                return JsonResponse({"success": False, "message": "Estado no válido."})
+
+            # Buscar al aspirante por ID
+            aspirante = Aspirante.objects.get(id=aspirante_id)
+
+            # Actualizar el estado solo si es válido
+            aspirante.status_seleccion = status_seleccion  # Cambiar solo el estado
+            
+            # No modificar el campo folio ni otros campos, solo actualizamos status_seleccion
+            aspirante.save()
+
+            return JsonResponse({"success": True, "message": f"Estado actualizado a {aspirante.status_seleccion} correctamente."})
+
+        except ObjectDoesNotExist:
+            return JsonResponse({"success": False, "message": "Aspirante no encontrado."})
+        except json.JSONDecodeError:
+            return JsonResponse({"success": False, "message": "Error al procesar los datos."})
+        except Exception as e:
+            return JsonResponse({"success": False, "message": f"Error inesperado: {str(e)}"})
+
+    return JsonResponse({"success": False, "message": "Método no permitido."})
+
+
+def crear_usuario_ajax(request):
+    if request.method == "POST":
+        try:
+            # Recuperar los datos enviados por la solicitud AJAX
+            data = json.loads(request.body)
+            aspirante_id = data.get('aspirante_id')
+            usuario = data.get('usuario')
+            rol = data.get('rol')
+            contrasenia = data.get('contrasenia')
+
+            # Validación de rol
+            valid_roles = [role[0] for role in Usuario._meta.get_field('rol').choices]
+            if rol not in valid_roles:
+                return JsonResponse({"success": False, "message": "Rol no válido."})
+
+            # Buscar el aspirante relacionado
+            aspirante = get_object_or_404(Aspirante, id=aspirante_id)
+
+            if aspirante.usuario and aspirante.usuario.rol == "ASPIRANTE":
+                # Actualizar usuario existente
+                user = aspirante.usuario
+                user.usuario = usuario
+                user.contrasenia = contrasenia  # Aunque será encriptada
+                user.rol = rol
+                user.usuario_rol.username = usuario
+                user.usuario_rol.password = make_password(contrasenia)
+                user.usuario_rol.role = rol
+                user.usuario_rol.save()
+                user.save()
+            else:
+                # Crear un nuevo usuario
+                usuario_rol = UsuarioRol.objects.create(
+                    username=usuario,
+                    role=rol,
+                    password=make_password(contrasenia)  # Encriptar contraseña
+                )
+                user = Usuario.objects.create(
+                    usuario_rol=usuario_rol,
+                    usuario=usuario,
+                    contrasenia=contrasenia,  # Aunque será encriptada
+                    rol=rol
+                )
+                user.save()
+
+                # Asociar el nuevo usuario al aspirante
+                aspirante.usuario = user
+                aspirante.save()
+
+            # Retornar éxito
+            return JsonResponse({"success": True, "message": "Usuario actualizado o creado exitosamente!"})
+
+        except Aspirante.DoesNotExist:
+            return JsonResponse({"success": False, "message": "Aspirante no encontrado."})
+        except Exception as e:
+            return JsonResponse({"success": False, "message": str(e)})
+
+    return JsonResponse({"success": False, "message": "Método no permitido"})
+
+@login_required
+@role_required('CT')  # Decorador personalizado
+def eventos_calendario(request):
+    try:
+        actividades = ActividadCalendario.objects.all()
+        eventos = []
+        for actividad in actividades:
+            eventos.append({
+                "title": actividad.titulo,
+                "start": actividad.fecha_inicio.isoformat(),
+                "end": actividad.fecha_fin.isoformat(),
+                "description": actividad.descripcion or "Sin descripción",
+            })
+        return JsonResponse(eventos, safe=False)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+@login_required
+@role_required('CT')
+def calendario_view(request):
+    return render(request, 'home_coordinador/calendario.html')
+
+@login_required
+def calendario_eventos(request):
+    eventos = CalendarEvent.objects.all().order_by('date')  # Consulta los eventos
+    return render(request, 'home_coordinador/calendario_eventos.html', {'eventos': eventos})
+
+# GIS
+
+#def dashboard_gestion_RMR(request):
+#    servicios = ServicioEducativo.objects.all()
+#    return render(request, 'home_dot/dashboard_vacantes.html', {'servicios': servicios})
+
+
+def dashboard_gestion_RMR(request):
+    estados = Estado.objects.all()
+    #return render(request, 'gis/index.html', {'estados': estados})
+    return render(request, 'gis/index.html', {'estados': estados})
+
+def dashboard_gestion_estado(request):
+    municipios = Municipio.objects.all()
+    return render(request, 'gis/municipio.html', {'municipios': municipios})
+
+#================================================================================ PC010 =================================================================================
+from io import BytesIO
+from django.http import HttpResponse
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from django.shortcuts import render
+from login_app.decorators import role_required
+from django.contrib.auth.decorators import login_required
+from form_app.models import Aspirante
+
+@login_required
+@role_required("CT")
+def generar_lista_aspirantes_pdf(request):
+    # Obtener aspirantes aceptados y rechazados
+    aspirantes = Aspirante.objects.all()
+    aceptados = aspirantes.filter(status_seleccion="aceptado")
+    rechazados = aspirantes.filter(status_seleccion="rechazado")
+
+    # Crear el archivo PDF
+    buffer = BytesIO()
+    pdf = canvas.Canvas(buffer, pagesize=letter)
+    width, height = letter
+
+    # Encabezado
+    pdf.setFont("Helvetica-Bold", 14)
+    pdf.drawString(100, height - 50, "Lista de Aspirantes Aceptados y Rechazados")
+
+    # Instrucciones de inicio de sesión
+    pdf.setFont("Helvetica", 12)
+    pdf.drawString(30, height - 100, "Instrucciones de Inicio de Sesión para Aspirantes Aceptados:")
+    pdf.drawString(50, height - 120, "1. Descargue la aplicación móvil desde la tienda correspondiente (Android o iOS).")
+    pdf.drawString(50, height - 140, "2. Ingrese su folio como usuario y su CURP como contraseña.")
+
+    # Listar aceptados
+    y = height - 180
+    pdf.setFont("Helvetica-Bold", 12)
+    pdf.drawString(30, y, "Aspirantes Aceptados:")
+    pdf.setFont("Helvetica", 10)
+    y -= 20
+    for aspirante in aceptados:
+        pdf.drawString(50, y, f"Folio: {aspirante.folio} - Estado: Aceptado")
+        y -= 15
+
+    # Listar rechazados
+    pdf.setFont("Helvetica-Bold", 12)
+    pdf.drawString(30, y - 20, "Aspirantes Rechazados:")
+    pdf.setFont("Helvetica", 10)
+    y -= 40
+    for aspirante in rechazados:
+        pdf.drawString(50, y, f"Folio: {aspirante.folio} - Estado: Rechazado")
+        y -= 15
+
+    pdf.save()
+    buffer.seek(0)
+    return HttpResponse(buffer, content_type="application/pdf")
+
+
+
+import base64
+from django.http import HttpResponse
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from login_app.decorators import role_required
+from django.db import connection
+
+@login_required
+@role_required("CT")
+def subir_resultados(request):
+    if request.method == "POST":
+        archivo = request.FILES.get("pdf_file")
+        if archivo:
+            try:
+                with connection.cursor() as cursor:
+                    cursor.execute("""
+                        INSERT INTO resultados_convocatorias (archivo, fecha_subida, subido_por_id)
+                        VALUES (%s, NOW(), %s)
+                    """, [archivo.read(), request.user.id])
+                return render(request, "home_coordinador/subir_resultados.html", {"success": "El archivo se ha subido correctamente."})
+            except Exception as e:
+                return render(request, "home_coordinador/subir_resultados.html", {"error": f"Error al subir el archivo: {e}"})
+        else:
+            return render(request, "home_coordinador/subir_resultados.html", {"error": "No se seleccionó ningún archivo."})
+    return render(request, "home_coordinador/subir_resultados.html")
+
+
+
+
+@login_required
+@role_required("CT")
+def descargar_resultados(request):
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT archivo, fecha_subida
+                FROM resultados_convocatorias
+                ORDER BY fecha_subida DESC
+                LIMIT 1
+            """)
+            resultado = cursor.fetchone()
+            if resultado:
+                archivo, fecha_subida = resultado
+                response = HttpResponse(archivo, content_type="application/pdf")
+                response["Content-Disposition"] = f"attachment; filename=resultado_{fecha_subida.date()}.pdf"
+                return response
+            else:
+                return render(request, "home_coordinador/subir_resultados.html", {"error": "No hay resultados disponibles para descargar."})
+    except Exception as e:
+        return render(request, "home_coordinador/subir_resultados.html", {"error": f"Error al descargar el archivo: {e}"})

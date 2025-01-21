@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Capacitación{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Editar Capacitación</h2>
+    <div class="card shadow">
+        <div class="card-body">
+            {% if messages %}
+                <div class="alert alert-info">
+                    {% for message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="submit" class="btn btn-primary w-48">
+                        <i class="fas fa-save"></i> Actualizar
+                    </button>
+                    <a href="{% url 'modulo_capacitacion:lista_capacitaciones' %}" class="btn btn-secondary w-48">
+                        <i class="fas fa-arrow-left"></i> Regresar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

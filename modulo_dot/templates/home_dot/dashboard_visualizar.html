@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Lista de Empleados{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-start mb-3">
+        <a href="{% url 'dot_home:home_dot' %}" class="btn btn-warning" style="background-color: #620b0b; color:white;">Menu</a>
+    </div>
+
+    <h2 class="text-center mb-4">Lista de Lista de Figuras Educativas</h2>
+
+    {% if empleados %}
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellido Paterno</th>
+                    <th>Apellido Materno</th>
+                    <th>Email</th>
+                    <th>Rol</th>
+                    <th>Informacion</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for empleado in empleados %}
+                {% if empleado.usuario.rol != "ASPIRANTE" %}
+                <tr id="empleado_{{ empleado.id }}">
+                    <td>{{ empleado.nombre }}</td>
+                    <td>{{ empleado.apellidopa }}</td>
+                    <td>{{ empleado.apellidoma }}</td>
+                    <td>{{ empleado.correo }}</td>
+                    <td>{{ empleado.usuario.rol }}</td>
+                    <td>
+                        <a href="{% url 'dot_home:detalles_empleado' empleado.id %}" class="btn btn-info">Detalles</a>
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-center">No hay empleados registrados.</p>
+    {% endif %}
+</div>
+{% endblock %}
+

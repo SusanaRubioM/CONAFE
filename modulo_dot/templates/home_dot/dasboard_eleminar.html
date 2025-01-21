@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Dashboard Eliminar Empleados{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Botón para volver al menú -->
+    <div class="d-flex justify-content-start mb-3">
+        <a href="{% url 'dot_home:home_dot' %}" class="btn btn-warning" style="background-color: #620b0b; color:white">Menú</a>
+    </div>
+
+    <!-- Título principal -->
+    <h2 class="text-center mb-4">Eliminar  Figuras Educativas</h2>
+
+    <!-- Tabla para listar empleados -->
+    {% if empleados %}
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellido Paterno</th>
+                    <th>Apellido Materno</th>
+                    <th>Email</th>
+                    <th>Rol</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for empleado in empleados %}
+                {% if empleado.usuario.rol != "ASPIRANTE" %}
+                <tr id="empleado_{{ empleado.id }}">
+                    <td>{{ empleado.nombre }}</td>
+                    <td>{{ empleado.apellidopa }}</td>
+                    <td>{{ empleado.apellidoma }}</td>
+                    <td>{{ empleado.correo }}</td>
+                    <td>{{ empleado.usuario.rol }}</td>
+                    <td>
+                        <a href="{% url 'dot_home:empleado_eliminar' empleado.id %}" 
+                           class="btn btn-danger" 
+                           style="color:white" 
+                           onclick="return confirm('¿Estás seguro de que deseas eliminar este empleado?');">
+                           Eliminar
+                        </a>
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <!-- Mensaje si no hay empleados -->
+    <p class="text-center">No hay empleados registrados para eliminar.</p>
+    {% endif %}
+
+    <!-- Mensajes de éxito o error -->
+    {% if messages %}
+    <div class="alert alert-info mt-4">
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

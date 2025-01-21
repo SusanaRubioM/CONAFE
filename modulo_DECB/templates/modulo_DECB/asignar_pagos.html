@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Agregar Pago{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <a href="{% url 'modulo_DECB:home' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Regresar
+    </a>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Encabezado -->
+            <h1 class="text-center mb-4">Agregar Pago</h1>
+
+            <!-- Formulario -->
+            <div class="card shadow">
+                <div class="card-body">
+                    <form method="POST" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Campo de la fecha de pago -->
+                        <div class="mb-3">
+                            <label for="id_payment_date" class="form-label">Fecha de Pago (DD/MM/AAAA)</label>
+                            {{ form.payment_date }}
+                        </div>
+                        
+                        <!-- Campo tipo de pago -->
+                        <div class="mb-3">
+                            <label for="id_payment_type" class="form-label">Tipo de Pago</label>
+                            {{ form.payment_type }}
+                        </div>
+                        
+                        <!-- Campo monto -->
+                        <div class="mb-3">
+                            <label for="id_amount" class="form-label">Monto</label>
+                            {{ form.amount }}
+                        </div>
+                        
+                        <!-- Campo asignado a -->
+                        <div class="mb-3">
+                            <label for="id_assigned_to" class="form-label">Asignado a</label>
+                            {{ form.assigned_to }}
+                        </div>
+
+                        <!-- Botón Guardar -->
+                        <button type="submit" class="btn btn-success w-100 mb-3">
+                            <i class="fas fa-save"></i> Guardar
+                        </button>
+                        
+                        <!-- Botón Cancelar -->
+                        <a href="{% url 'modulo_DECB:visualizar_calendario' %}" class="btn btn-secondary w-100">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

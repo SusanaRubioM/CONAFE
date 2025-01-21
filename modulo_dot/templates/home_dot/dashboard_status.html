@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Estado de los Empleados{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-start mb-3">
+        <a href="{% url 'dot_home:home_dot' %}" class="btn btn-warning" style="background-color: #620b0b; color:white">
+            Menú
+        </a>
+    </div>
+
+    <h2 class="text-center mb-4">Estado de las Figuras Educativas</h2>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellido Paterno</th>
+                    <th>Apellido Materno</th>
+                    <th>Email</th>
+                    <th>Rol</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for empleado, form in empleados_forms %}
+                    <tr id="empleado-row-{{ empleado.id }}">
+                        <td>{{ empleado.nombre }}</td>
+                        <td>{{ empleado.apellidopa }}</td>
+                        <td>{{ empleado.apellidoma }}</td>
+                        <td>{{ empleado.correo }}</td>
+                        <td>{{ empleado.usuario.rol }}</td>
+                        <td>
+                            <select class="form-select estado-select" data-empleado-id="{{ empleado.id }}">
+                                {% for key, value in form.fields.status.choices %}
+                                    <option value="{{ key }}" {% if form.instance.status == key %}selected{% endif %}>
+                                        {{ value }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td>
+                            <button class="btn btn-primary actualizar-btn" data-empleado-id="{{ empleado.id }}">
+                                Actualizar
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const botonesActualizar = document.querySelectorAll(".actualizar-btn");
+
+        botonesActualizar.forEach((boton) => {
+            boton.addEventListener("click", function () {
+                const empleadoId = boton.getAttribute("data-empleado-id");
+                const selectEstado = document.querySelector(`.estado-select[data-empleado-id="${empleadoId}"]`);
+                const nuevoEstado = selectEstado.value;
+
+                // Enviar solicitud AJAX
+                fetch("{% url 'dot_home:actualizar_status_ajax' 0 %}".replace("0", empleadoId), {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": "{{ csrf_token }}",  // Asegúrate de incluir el token CSRF
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ status: nuevoEstado }),
+                })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.success) {
+                        alert(data.message);
+                    } else {
+                        alert("Error: " + data.message);
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                });
+            });
+        });
+    });
+</script>
+
+{% endblock %}

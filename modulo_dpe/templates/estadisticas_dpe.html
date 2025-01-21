@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadísticas DPE</title>
+</head>
+<body>
+    <h1>Estadísticas DPE</h1>
+
+    <section>
+        <h2>Distribución de alumnos por estado y nivel educativo</h2>
+        {% if graphic1 %}
+            <img src="data:image/png;base64,{{ graphic1 }}" alt="Gráfico 1">
+        {% else %}
+            <p>No hay datos disponibles para este gráfico.</p>
+        {% endif %}
+    </section>
+
+    <section>
+        <h2>Alumnos Totales vs Aprobados</h2>
+        <img src="data:image/png;base64,{{ graphic2 }}" alt="Gráfico 2">
+    </section>
+</body>
+</html>
+s
