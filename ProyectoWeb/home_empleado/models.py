@@ -166,19 +166,18 @@ class ModuloCoordinadorStatusHistory(models.Model):
 
 
 class ActCAP(models.Model):
-    id_usuario = models.ForeignKey('modulo_dot.Usuario', on_delete=models.CASCADE, db_column='id_usuario')
-    num_capacitacion = models.IntegerField(db_column='num_capacitacion')
-    tema = models.CharField(max_length=200, db_column='tema')
-    id_region = models.ForeignKey('modulo_apec.Region', on_delete=models.CASCADE, db_column='id_region')
-    id_microregion = models.ForeignKey('modulo_apec.Microrregion', on_delete=models.CASCADE, db_column='id_microregion')
-    id_cct = models.ForeignKey('modulo_apec.Comunidad', on_delete=models.CASCADE, db_column='id_cct')
-    fecha_programada = models.CharField(max_length=45, db_column='fecha_programada')
-    estado = models.CharField(max_length=45, db_column='estado')
-    reporte = models.BinaryField(db_column='reporte')
+    id_usuario = models.ForeignKey('modulo_dot.Usuario', on_delete=models.CASCADE, db_column='id_usuario', null=True, blank=True)
+    num_capacitacion = models.IntegerField(db_column='num_capacitacion', null=True, blank=True)
+    tema = models.CharField(max_length=200, db_column='tema', null=True, blank=True)
+    id_region = models.ForeignKey('modulo_apec.Region', on_delete=models.CASCADE, db_column='id_region', null=True, blank=True)
+    id_microregion = models.ForeignKey('modulo_apec.Microrregion', on_delete=models.CASCADE, db_column='id_microregion', null=True, blank=True)
+    id_cct = models.ForeignKey('modulo_apec.Comunidad', on_delete=models.CASCADE, db_column='id_cct', null=True, blank=True)
+    fecha_programada = models.CharField(max_length=45, db_column='fecha_programada', null=True, blank=True)
+    estado = models.CharField(max_length=45, db_column='estado', null=True, blank=True)
+    reporte = models.BinaryField(db_column='reporte', null=True, blank=True)
 
     class Meta:
         db_table = "ActCAP"
-
 
     def __str__(self):
         return f"Capacitacion {self.num_capacitacion} - {self.tema}"
