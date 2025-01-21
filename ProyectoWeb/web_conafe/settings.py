@@ -50,10 +50,13 @@ INSTALLED_APPS = [
     'modulo_DECB',
     'modulo_educadores',
     'modulo_capacitacion',
-    'modulo_calendario'
+    'modulo_calendario',
+    "corsheaders",    
+    'rest_framework'
 ]
-
+CORS_ALLOW_ALL_ORIGINS = True  # Permite solicitudes desde cualquier dominio
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",

@@ -27,6 +27,7 @@ urlpatterns = [
     ),  # Redirige a la página de login cuando acceden a la raíz
     path('formulario_aspirante/', include('form_app.urls')),
     path("login/", include("login_app.urls")),  # Redirige a las URLs de login
+    path('api/', include('modulo_dot.api_urls')),  # Rutas exclusivas de la API
     path(
         "dot_section/", include(("modulo_dot.urls", "dot_home"), namespace="dot_home")
     ),
