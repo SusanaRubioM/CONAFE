@@ -22,6 +22,7 @@ RUN pip install --no-cache-dir \
     asgiref==3.7.2 \
     Django==4.2.4 \
     django-widget-tweaks==1.5.0 \
+    django-cors-headers==4.6.0 \
     djangorestframework==3.15.2 \
     et-xmlfile==1.1.0 \
     mysqlclient==2.2.6 \
