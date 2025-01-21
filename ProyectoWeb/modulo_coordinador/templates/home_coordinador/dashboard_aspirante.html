@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Dashboard de Aspirantes a EC{% endblock %}
+
+{% block content %}
+<style>
+    .aceptar-btn {
+        color: black;
+        border-color: lightgray;
+        background-color: white;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .aceptar-btn:hover {
+        background-color: #d4edda; /* Verde suave */
+        color: #155724; /* Verde oscuro */
+    }
+
+    .rechazar-btn {
+        color: black;
+        border-color: lightgray;
+        background-color: white;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .rechazar-btn:hover {
+        background-color: #f8d7da; /* Rojo suave */
+        color: #721c24; /* Rojo oscuro */
+    }
+</style>
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-start mb-3">
+        <a href="{% url 'coordinador_home:home_coordinador' %}" class="btn btn-warning" style="background-color: #620b0b; color:white">
+            Menú
+        </a>
+    </div>
+
+
+    <div class="d-flex justify-content-between mb-3">
+        <a href="{% url 'coordinador_home:dashboard_aspirante_aceptado' %}" 
+           class="btn btn-danger" 
+           style="background-color: #620b0b; color: white;">
+            Ver Aspirantes Aceptados
+        </a>
+        <a href="{% url 'coordinador_home:dashboard_aspirante_rechazado' %}" 
+           class="btn btn-danger" 
+           style="background-color: #620b0b; color: white;">
+            Ver Aspirantes Rechazados
+        </a>
+    </div>
+
+    
+</div>
+    <h2 class="text-center mb-4 mt-4">Selección de Aspirantes a EC</h2>
+
+
+
+    {% if aspirantes %}
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered text-center align-middle">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Número de Teléfono</th>
+                    <th>Rol/Programa aplicando</th>
+                    <th>Estado de Procedencia</th>
+                    <th>Estado de Participación</th>
+                    <th>Ciclo Escolar</th>
+                    <th>Habla Lengua Indígena</th>
+                    <th>Lengua Indígena</th>
+                    <th>Formación Académica</th>
+                    <th>Certificado de Estudios</th>
+                    <th>Contexto</th>
+                    <th>Tipo de Servicio</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for aspirante in aspirantes %}
+                {% if aspirante.participacion.programa_participacion == "EC" and aspirante.status_seleccion == "pendiente" %}
+                <tr>
+                    <td>
+                        {{ aspirante.datos_personales.nombre }} 
+                        {{ aspirante.datos_personales.apellidopa }} 
+                        {{ aspirante.datos_personales.apellidoma }}
+                    </td>
+                    <td>{{ aspirante.datos_personales.correo }}</td>
+                    <td>{{ aspirante.datos_personales.telefono }}</td>
+                    <td>{{ aspirante.participacion.programa_participacion  }}</td>
+                    <td>{{ aspirante.residencia.estado }}</td>
+                    <td>{{ aspirante.participacion.estado_participacion }}</td>
+                    <td>{{ aspirante.participacion.ciclo_escolar }}</td>
+                    <td>{{ aspirante.gestion.habla_lengua_indigena|yesno:"Sí,No" }}</td>
+                    <td>{{ aspirante.gestion.lengua_indigena }}</td>
+                    <td>{{ aspirante.datos_personales.formacion_academica }}</td>
+                    <td>
+                        {% if aspirante.datos_personales.documentos.certificado_estudio %}
+                        <a href="{{ aspirante.datos_personales.documentos.certificado_estudio.url }}">Ver documento</a>
+                        {% else %}
+                        No disponible
+                        {% endif %}
+                    </td>
+                    <td>{{ aspirante.participacion.contexto }}</td>
+                    <td>{{ aspirante.participacion.tipo_servicio }}</td>
+                    <td>
+                        <button class="btn aceptar-btn" data-aspirante-id="{{ aspirante.id }}" data-status="aceptado">Aceptar</button>
+                        <button class="btn rechazar-btn" data-aspirante-id="{{ aspirante.id }}" data-status="rechazado">Rechazar</button>
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-center">No hay aspirantes disponibles.</p>
+    {% endif %}
+</div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+    const botonesAceptar = document.querySelectorAll(".aceptar-btn");
+    const botonesRechazar = document.querySelectorAll(".rechazar-btn");
+    let aspiranteId = null;
+
+    botonesAceptar.forEach((boton) => {
+        boton.addEventListener("click", function () {
+            aspiranteId = boton.getAttribute("data-aspirante-id");
+
+            // Actualizamos el estado a "aceptado" y creamos el usuario
+            actualizarEstado(aspiranteId, 'aceptado')
+                .then(() => {
+                    // Crear el usuario directamente
+                    crearUsuario(aspiranteId);
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                    alert("Error al cambiar el estado.");
+                });
+        });
+    });
+
+    botonesRechazar.forEach((boton) => {
+        boton.addEventListener("click", function () {
+            aspiranteId = boton.getAttribute("data-aspirante-id");
+
+            // Actualizamos el estado a "rechazado"
+            actualizarEstado(aspiranteId, 'rechazado')
+                .then(() => {
+                    alert("Estado cambiado a rechazado");
+                    location.reload(); // Refrescar la página
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                    alert("Error al cambiar el estado.");
+                });
+        });
+    });
+
+    function crearUsuario(aspiranteId) {
+        fetch("{% url 'coordinador_home:crear_usuario_ajax' %}", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                aspirante_id: aspiranteId
+            }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    alert("Usuario creado exitosamente!");
+                    location.reload(); // Refrescar la página
+                } else {
+                    alert("Error: " + data.message);
+                }
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+                alert("Error al crear el usuario.");
+            });
+    }
+
+    function actualizarEstado(aspiranteId, nuevoEstado) {
+        return fetch("{% url 'coordinador_home:actualizar_status_ajax' 0 %}".replace("0", aspiranteId), {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ status_seleccion: nuevoEstado }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (!data.success) {
+                    throw new Error(data.message);
+                }
+            });
+    }
+});
+</script>
+
+{% endblock %}
+
+

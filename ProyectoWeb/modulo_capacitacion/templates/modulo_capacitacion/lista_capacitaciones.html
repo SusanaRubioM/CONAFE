@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Lista de Capacitaciones{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-start mb-3">
+        <a href="{% url 'modulo_capacitacion:crear_capacitacion' %}" class="btn btn-primary" style="background-color: #620b0b; color:white;">
+            Crear Nueva Capacitación
+        </a>
+    </div>
+
+    <h2 class="text-center mb-4">Lista de Capacitaciones</h2>
+
+    {% if capacitaciones %}
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nombre del EC</th>
+                    <th>Ciclo Asignado</th>
+                    <th>Horas Cubiertas</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for capacitacion in capacitaciones %}
+                <tr id="capacitacion_{{ capacitacion.id }}">
+                    <td>{{ capacitacion.nombre_ec }}</td>
+                    <td>{{ capacitacion.ciclo_asignado }}</td>
+                    <td>{{ capacitacion.horas_cubiertas }}</td>
+                    <td>
+                        <a href="{% url 'modulo_capacitacion:editar_capacitacion' capacitacion.id %}" class="btn btn-warning btn-sm">
+                            Editar
+                        </a>
+                        {% if capacitacion.horas_cubiertas >= 240 %}
+                        <a href="{% url 'modulo_capacitacion:finalizar_capacitacion' capacitacion.id %}" class="btn btn-danger btn-sm">
+                            Finalizar
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-center">No hay capacitaciones registradas.</p>
+    {% endif %}
+</div>
+{% endblock %}

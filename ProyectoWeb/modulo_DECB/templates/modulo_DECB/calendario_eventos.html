@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Calendario de Eventos{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Título -->
+    <h1 class="text-center mb-4">Calendario de Eventos</h1>
+
+    <!-- Tabla de eventos -->
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped shadow-sm">
+            <thead class="table-dark text-center">
+                <tr>
+                    <th>Fecha</th>
+                    <th>Descripción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for evento in eventos %}
+                <tr>
+                    <td>{{ evento.date }}</td>
+                    <td>{{ evento.description }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="2" class="text-center">No hay eventos programados.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Botón de regreso -->
+    <div class="text-center mt-4">
+        <a href="{% url 'modulo_DECB:home' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Regresar a la Página Principal
+        </a>
+    </div>
+</div>
+{% endblock %}

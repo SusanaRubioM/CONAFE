@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Asignar Nueva Fecha de Pago{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Asignar Nueva Fecha de Pago</h2>
+    <form method="post" class="p-4 border rounded bg-light shadow-sm">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="id_payment_date" class="form-label">{{ form.payment_date.label }}</label>
+            {{ form.payment_date }}
+        </div>
+        <div class="mb-3">
+            <label for="id_payment_type" class="form-label">{{ form.payment_type.label }}</label>
+            {{ form.payment_type }}
+        </div>
+        <button type="submit" class="btn btn-success w-100">Guardar</button>
+    </form>
+    <div class="text-center mt-4">
+        <a href="{% url 'modulo_DECB:home' %}" class="btn btn-secondary">Regresar a la Página Principal</a>
+    </div>
+</div>
+{% endblock %}

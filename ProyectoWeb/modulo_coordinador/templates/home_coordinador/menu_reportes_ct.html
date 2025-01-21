@@ -1,0 +1,32 @@
+{% extends "base.html" %} <!-- Extiende una plantilla base para consistencia en el diseño -->
+
+{% block title %}Menu Reportes{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4 text-center">Menu Reportes</h2>
+
+  <div class="row text-center">
+    <!-- Botón Capacitación -->
+    <div class="col-md-4 mb-4">
+      <a href="{% url 'coordinador_home:dashboard_equipamiento' %}" class="btn btn-primary btn-block">
+        <i class="fas fa-chalkboard-teacher"></i> Capacitación
+      </a>
+    </div>
+
+    <!-- Botón Equipamiento -->
+    <div class="col-md-4 mb-4">
+      <a href="{% url 'coordinador_home:dashboard_equipamiento' %}" class="btn btn-info btn-block">
+        <i class="fas fa-tools"></i> Equipamiento
+      </a>
+    </div>
+
+    <!-- Botón Seguimiento -->
+    <div class="col-md-4 mb-4">
+      <a href="" class="btn btn-success btn-block">
+        <i class="fas fa-check-circle"></i> Seguimiento
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

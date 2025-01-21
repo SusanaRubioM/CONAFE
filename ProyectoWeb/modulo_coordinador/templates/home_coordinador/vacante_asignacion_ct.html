@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Asignación de candidatos a servicio educativo.">
+    <meta name="author" content="Tu Nombre">
+    <title>Asignación de Candidatos a Servicio Educativo</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        :root {
+            --primary-color: #620b0b;
+            --primary-color-hover: #631818e3;
+            --secondary-color: #f8faeb;
+            --text-color: #333;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--secondary-color);
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: var(--text-color);
+            margin: 0;
+        }
+        .btn-custom {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .btn-custom:hover {
+            background-color: var(--primary-color-hover);
+            color: white;
+        }
+        .form-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="header-container">
+            <h1>Asignación de Candidatos a Servicio Educativo: {{ servicio.nombre_comunidad }}</h1>
+            <a href="{% url 'coordinador_home:home_coordinador' %}" class="btn btn-custom">Menú Promoción</a>
+        </div>
+
+        <!-- Mensajes Flash -->
+        {% if messages %}
+            <div class="alert alert-success">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="form-container">
+            <h3>Formulario de Observación</h3>
+
+            <form method="POST">
+                {% csrf_token %}
+                
+                <!-- Visualización del comentario (no editable) -->
+                <div class="form-group">
+                    <label for="id_comentario">Comentario:</label>
+                    <textarea name="comentario" id="id_comentario" rows="4" class="form-control" readonly>{{ observacion.comentario }}</textarea>
+                </div>
+            
+                <!-- Campo de selección de candidatos -->
+                <div class="form-group">
+                    <label for="id_candidatos">Seleccionar Candidatos <span class="text-danger">*</span>:</label>
+                    <select name="candidatos" id="id_candidatos" class="form-control" multiple required>
+                        {% for usuario in usuarios %}
+                            <option value="{{ usuario.id }}">
+                                {{ usuario.usuario }} {{ usuario.rol }} 
+                                {{ usuario.datospersonales.nombre }}
+                                {{ usuario.datospersonales.apellidopa}}
+                                {{ usuario.datospersonales.apellidoma}}
+                                {{ usuario.aspirante.residencia.calle }}, 
+                                {{ usuario.aspirante.residencia.colonia }},
+                                {{ usuario.aspirante.residencia.municipio_alcaldia }},
+                                {{ usuario.aspirante.residencia.estado }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Rol Editable -->
+                <div class="form-group">
+                    <label for="id_rol">Rol Vacante:</label>
+                    <select name="rol" id="id_rol" class="form-control">
+                        <option value="EC" {% if servicio.rol_vacante == 'EC' %}selected{% endif %}>Educador Comunitario</option>
+                        <option value="ECA" {% if servicio.rol_vacante == 'ECA' %}selected{% endif %}>Educador Comunitario de Acompañamiento Microrregional</option>
+                        <option value="ECAR" {% if servicio.rol_vacante == 'ECAR' %}selected{% endif %}>Educador Comunitario de Acompañamiento Regional</option>
+                    </select>
+                </div>
+
+                <!-- Ciclo Escolar Editable -->
+                <div class="form-group">
+                    <label for="id_ciclo">Ciclo Escolar:</label>
+                    <select name="ciclo" id="id_ciclo" class="form-control">
+                        <option value="2024-2025" {% if servicio.periodo_servicio == '2024-2025' %}selected{% endif %}>2024-2025</option>
+                        <option value="2025-2026" {% if servicio.periodo_servicio == '2025-2026' %}selected{% endif %}>2025-2026</option>
+                    </select>
+                </div>
+
+                <!-- Botón para guardar y asignar candidatos -->
+                <button type="submit" class="btn btn-primary" style="background-color: #620b0b;">Guardar Observación y Asignar Candidatos</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

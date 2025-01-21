@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Panel de Control DECB{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Encabezado -->
+            <h1 class="text-center mb-4">Panel de Control DECB</h1>
+
+            <!-- Opciones del Panel -->
+            <div class="list-group">
+                <a href="{% url 'modulo_DECB:asignar_pagos' %}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-money-check-alt"></i> Asignar Pagos
+                </a>
+                <a href="{% url 'modulo_DECB:calendario_eventos' %}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-calendar-alt"></i> Ver Calendario
+                </a>
+                <a href="{% url 'modulo_DECB:agregar_evento' %}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-plus"></i> Agregar Evento
+                </a>
+                <a href="{% url 'modulo_DECB:visualizar_pagos' %}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-history"></i> Historial de Pagos
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

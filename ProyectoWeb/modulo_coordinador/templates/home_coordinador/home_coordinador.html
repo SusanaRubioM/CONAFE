@@ -1,0 +1,77 @@
+{% extends "base.html" %} <!-- Extiende una plantilla base para consistencia en el diseño -->
+
+{% block title %}Dashboard Coordinador{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4 text-center">Home Coordinador</h2>
+  <p class="text-center">Bienvenido Coordinador!</p>
+
+  <div class="row text-center">
+    <!-- Validación de Reportes -->
+    <div class="col-md-4 mb-4">
+      <a href="{% url 'coordinador_home:dashboard_equipamiento' %}" class="btn btn-primary btn-block">
+        <i class="fas fa-file-signature"></i> Validación de Reportes
+      </a>
+    </div>
+
+    <!-- Seleccionar Nuevos EC -->
+    <div class="col-md-4 mb-4">
+      <a href="{% url 'coordinador_home:dashboard_aspirante' %}" class="btn btn-info btn-block">
+        <i class="fas fa-file-import"></i> Seleccionar Nuevos EC
+      </a>
+    </div>
+
+    <!-- Seleccionar Nuevos ECA y ECAR -->
+    <div class="col-md-4 mb-4">
+      <a href="{% url 'coordinador_home:dashboard_aspirante_eca_ecar' %}" class="btn btn-success btn-block">
+        <i class="fas fa-user-check"></i> Seleccionar Nuevos ECA y ECAR
+      </a>
+    </div>
+
+    <!-- Registros de Figuras Educativas -->
+    <div class="col-md-4 mb-4">
+      <a href="{% url 'coordinador_home:dashboard_figura_educativa' %}" class="btn btn-secondary btn-block">
+        <i class="fas fa-database"></i> Registros de Figuras Educativas
+      </a>
+    </div>
+
+    <!-- Gestionar Microrregiones y Regiones -->
+    <div class="col-md-4 mb-4">
+      <a href="{% url 'coordinador_home:gestion_RMR_dashboard_ct' %}" class="btn btn-warning btn-block">
+        <i class="fas fa-map-marked-alt"></i> Gestionar Microrregiones y Regiones
+      </a>
+    </div>
+
+    <!-- Asignar EC, ECA y ECAR a Zonas -->
+    <div class="col-md-4 mb-4">
+      <a href="{% url 'coordinador_home:asignar_dashboard' %}" class="btn btn-danger btn-block">
+        <i class="fas fa-map-pin"></i> Asignar EC, ECA y ECAR a Zonas
+      </a>
+    </div>
+
+    <!-- Crear Capacitación -->
+    <div class="col-md-4 mb-4">
+      <a href="{% url 'modulo_capacitacion:crear_capacitacion' %}" class="btn btn-outline-primary btn-block">
+        <i class="fas fa-calendar-plus"></i> Crear Asignación
+      </a>
+    </div>
+
+    <!-- Ver Capacitaciones -->
+    <div class="col-md-4 mb-4">
+      <a href="{% url 'modulo_capacitacion:lista_capacitaciones' %}" class="btn btn-outline-info btn-block">
+        <i class="fas fa-calendar-alt"></i> Ver Asignaciónes
+      </a>
+    </div>
+
+      <!-- Ver Calendario de Eventos -->
+      <div class="col-md-4 mb-4">
+        <a href="{% url 'coordinador_home:dashboard_convenios' %}" class="btn btn-outline-warning btn-block">
+          <i class="fas fa-calendar-alt"></i> Ver Convenios de Educares
+        </a>
+      </div>
+    </div>
+
+</div>
+{% endblock %}
+

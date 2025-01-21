@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block title %}Agregar Nuevo Usuario{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="d-flex justify-content-start mb-3">
+    <a href="{% url 'dot_home:home_dot' %}" class="btn btn-warning" style="background-color: #620b0b; color:white">Menú</a>
+  </div>
+
+  <h2 class="text-center mb-4">Agregar Nuevo Usuario</h2>
+
+  <!-- Bloque para mostrar los mensajes -->
+  {% if messages %}
+    <div class="alert-container">
+        {% for message in messages %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+  {% endif %}
+
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="row">
+      <!-- Nombre del Usuario -->
+      <div class="col-md-6 mb-3">
+        <label for="id_nombre">Nombre</label>
+        {{ datos_personales_form.nombre }}
+        {% if datos_personales_form.nombre.errors %}
+          <div class="alert alert-danger">
+            {% for error in datos_personales_form.nombre.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Apellido Paterno -->
+      <div class="col-md-6 mb-3">
+        <label for="id_apellidopa">Apellido Paterno</label>
+        {{ datos_personales_form.apellidopa }}
+        {% if datos_personales_form.apellidopa.errors %}
+          <div class="alert alert-danger">
+            {% for error in datos_personales_form.apellidopa.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Apellido Materno -->
+      <div class="col-md-6 mb-3">
+        <label for="id_apellidoma">Apellido Materno</label>
+        {{ datos_personales_form.apellidoma }}
+        {% if datos_personales_form.apellidoma.errors %}
+          <div class="alert alert-danger">
+            {% for error in datos_personales_form.apellidoma.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Correo Electrónico -->
+      <div class="col-md-6 mb-3">
+        <label for="id_correo">Email</label>
+        {{ datos_personales_form.correo }}
+        {% if datos_personales_form.correo.errors %}
+          <div class="alert alert-danger">
+            {% for error in datos_personales_form.correo.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Teléfono -->
+      <div class="col-md-6 mb-3">
+        <label for="id_telefono">Teléfono</label>
+        {{ datos_personales_form.telefono }}
+        {% if datos_personales_form.telefono.errors %}
+          <div class="alert alert-danger">
+            {% for error in datos_personales_form.telefono.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Edad -->
+      <div class="col-md-6 mb-3">
+        <label for="id_edad">Edad</label>
+        {{ datos_personales_form.edad }}
+        {% if datos_personales_form.edad.errors %}
+          <div class="alert alert-danger">
+            {% for error in datos_personales_form.edad.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+  <!-- Género -->
+      <div class="col-md-6 mb-3">
+          <label for="id_sexo">Género</label>
+          <div class="form-check form-check-inline">
+              {{ datos_personales_form.sexo }}
+              {% if datos_personales_form.sexo.errors %}
+                  <div class="alert alert-danger">
+                      {% for error in datos_personales_form.sexo.errors %}
+                          <p>{{ error }}</p>
+                      {% endfor %}
+                  </div>
+              {% endif %}
+          </div>
+      </div>
+
+      <!-- Formación Académica -->
+      <div class="col-md-6 mb-3">
+        <label for="id_formacion_academica">Formación Académica</label>
+        {{ datos_personales_form.formacion_academica }}
+        {% if datos_personales_form.formacion_academica.errors %}
+          <div class="alert alert-danger">
+            {% for error in datos_personales_form.formacion_academica.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- CURP -->
+      <div class="col-md-6 mb-3">
+        <label for="id_curp">CURP</label>
+        {{ datos_personales_form.curp }}
+        {% if datos_personales_form.curp.errors %}
+          <div class="alert alert-danger">
+            {% for error in datos_personales_form.curp.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Foto -->
+      <div class="col-md-6 mb-3">
+        <label for="id_fotografia">Foto del Usuario</label>
+        {{ datos_personales_form.fotografia }}
+        {% if datos_personales_form.fotografia.errors %}
+          <div class="alert alert-danger">
+            {% for error in datos_personales_form.fotografia.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Nombre de Usuario -->
+      <div class="col-md-6 mb-3">
+        <label for="id_usuario">Nombre de Usuario</label>
+        {{ usuario_form.usuario }}
+        {% if usuario_form.usuario.errors %}
+          <div class="alert alert-danger">
+            {% for error in usuario_form.usuario.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Contraseña -->
+      <div class="col-md-6 mb-3">
+        <label for="id_contrasenia">Contraseña</label>
+        {{ usuario_form.contrasenia }}
+        {% if usuario_form.contrasenia.errors %}
+          <div class="alert alert-danger">
+            {% for error in usuario_form.contrasenia.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      
+      <div class="col-md-6 mb-3">
+        <label for="rol">Rol del Empleado</label>
+        <select id="rol" name="rol" class="form-control" required>
+          <option value="">Selecciona el Rol</option>
+          <option value="DOT">Director de Operaciones y Tecnología</option>
+          <option value="DECB">Dirección de Educación Comunitaria e Inclusión Social</option>
+          <option value="DPE">Dirección de Planeación y Evaluación</option>
+          <option value="CT">Coordinador Territorial</option>
+          <option value="DEP">Dirección de Operación Territorial</option>
+        </select>
+      </div>
+
+            <!-- Documentos Personales -->
+      <div class="col-md-6 mb-3">
+        <label for="id_identificacion_oficial">Identificación Oficial</label>
+        {{ documentos_personales_form.identificacion_oficial }}
+        {% if documentos_personales_form.identificacion_oficial.errors %}
+          <div class="alert alert-danger">
+            {% for error in documentos_personales_form.identificacion_oficial.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label for="id_comprobante_domicilio">Comprobante de Domicilio</label>
+        {{ documentos_personales_form.comprobante_domicilio }}
+        {% if documentos_personales_form.comprobante_domicilio.errors %}
+          <div class="alert alert-danger">
+            {% for error in documentos_personales_form.comprobante_domicilio.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label for="id_certificado_estudio">Certificado de Estudio</label>
+        {{ documentos_personales_form.certificado_estudio }}
+        {% if documentos_personales_form.certificado_estudio.errors %}
+          <div class="alert alert-danger">
+            {% for error in documentos_personales_form.certificado_estudio.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Botón de envío -->
+      <div class="col-md-12 text-center">
+        <button type="submit" class="btn btn-success btn-block" style="background-color: #620b0b">
+          Registrar Usuario <i class="fas fa-check-circle"></i>
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+
+
+
+

@@ -1,0 +1,51 @@
+from modulo_dot.models import Usuario, DatosPersonales, DocumentosPersonales, UsuarioRol
+from django.contrib.auth.hashers import make_password
+
+# Crear el usuario DOT
+usuario_dot = Usuario.objects.create(
+    usuario="dot",  
+    contrasenia="dot",  
+    rol="DOT",  # Rol Dirección de Operación Territorial
+)
+
+# Encriptar la contraseña del usuario rol y guardarla
+# Primero buscamos el usuario rol coordinador_dot
+usuario_rol_dot = UsuarioRol.objects.get(username="coordinador_dot")
+
+# Encriptamos la contraseña y la asignamos al usuario rol
+usuario_rol_dot.password = make_password('coordinador')
+usuario_rol_dot.save()
+
+# Asignamos el rol al usuario DOT
+usuario_dot.usuario_rol = usuario_rol_dot
+usuario_dot.save()
+
+# Crear datos personales asociados al usuario DOT
+# Crear un objeto Aspirante, ya que es necesario para la relación de datos personales
+aspirante_dot = Aspirante.objects.create(rol="Aspirante")
+
+# Ahora creamos los datos personales para el usuario DOT
+datos_personales_dot = DatosPersonales.objects.create(
+    usuario=usuario_dot,  # Relacionamos con el usuario recién creado
+    aspirante=aspirante_dot,  # Relacionamos con el aspirante recién creado
+    nombre="Carlos",
+    apellidopa="Pérez",
+    apellidoma="González",
+    edad=40,
+    sexo="Masculino",
+    correo="carlos.perez@example.com",
+    telefono="5552345678",
+    formacion_academica="Licenciatura en Administración",
+    curp="PEMC800512HDFRNL09",
+)
+
+# Crear documentos personales con valores None (puedes modificar estos valores si tienes archivos)
+documentos_personales_dot = DocumentosPersonales.objects.create(
+    datos_personales=datos_personales_dot,  # Asociamos los documentos con los datos personales
+    identificacion_oficial=None,  # Ningún archivo cargado
+    comprobante_domicilio=None,   # Ningún archivo cargado
+    certificado_estudio=None      # Ningún archivo cargado
+)
+
+print("Usuario DOT creado exitosamente.")
+

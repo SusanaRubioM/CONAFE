@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Detalles del Lista de Figuras Educativas{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Botón para volver al menú -->
+    <div class="d-flex justify-content-start mb-3">
+        <a href="{% url 'dot_home:home_dot' %}" class="btn btn-warning" style="background-color: #620b0b; color:white;">Menú</a>
+    </div>
+
+    <!-- Título -->
+    <h2 class="text-center mb-4">Detalles del Empleado</h2>
+
+    <div class="row">
+        <!-- Columna para la foto -->
+        <div class="col-md-4 text-center">
+            {% if empleado.fotografia %}
+                <img src="{{ empleado.fotografia.url }}" alt="Foto de {{ empleado.nombre }}" class="img-fluid rounded-circle mb-3" style="max-width: 200px; height: auto;">
+            {% else %}
+                <p class="text-muted">No hay foto disponible</p>
+            {% endif %}
+        </div>
+
+        <!-- Columna para los detalles -->
+        <div class="col-md-8">
+            <ul class="list-group">
+                <li class="list-group-item"><strong>Nombre:</strong> {{ empleado.nombre }}</li>
+                <li class="list-group-item"><strong>Apellido Paterno:</strong> {{ empleado.apellidopa }}</li>
+                <li class="list-group-item"><strong>Apellido Materno:</strong> {{ empleado.apellidoma }}</li>
+                <li class="list-group-item"><strong>Email:</strong> {{ empleado.correo }}</li>
+                <li class="list-group-item"><strong>Edad:</strong> {{ empleado.edad }}</li>
+                <li class="list-group-item"><strong>Género:</strong> {{ empleado.sexo }}</li>
+                <li class="list-group-item"><strong>Teléfono:</strong> {{ empleado.telefono }}</li>
+                <li class="list-group-item"><strong>Formación Académica:</strong> {{ empleado.formacion_academica }}</li>
+                <li class="list-group-item"><strong>CURP:</strong> {{ empleado.curp }}</li>
+                <li class="list-group-item"><strong>Rol:</strong> {{ empleado.usuario.rol }}</li>
+                <li class="list-group-item"><strong>Usuario:</strong> {{ empleado.usuario.usuario }}</li>
+                <li class="list-group-item"><strong>Contraseña:</strong> {{ empleado.usuario.contrasenia }}</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

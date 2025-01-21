@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Agregar Evento{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <a href="{% url 'modulo_DECB:home' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Regresar
+    </a>
+    <h1 class="text-center mb-4">Agregar Evento</h1>
+    <div class="card shadow">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-success w-48">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+                    <a href="{% url 'modulo_DECB:visualizar_calendario' %}" class="btn btn-secondary w-48">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

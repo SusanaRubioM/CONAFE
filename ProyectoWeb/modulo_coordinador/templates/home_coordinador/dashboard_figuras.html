@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Lista de Figuras Educativas{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Botón de regreso al menú -->
+    <div class="d-flex justify-content-start mb-3">
+        <a href="{% url 'coordinador_home:home_coordinador' %}" class="btn btn-warning" style="background-color: #620b0b; color:white;">Menú</a>
+    </div>
+
+    <h2 class="text-center mb-4">Lista de Figuras Educativas</h2>
+
+    <!-- Filtros -->
+    <div class="mb-4">
+        <form method="get" class="form-inline">
+            <input type="text" name="search" class="form-control mr-2" placeholder="Buscar por nombre o correo" value="{{ request.GET.search }}">
+            <select name="region" class="form-control mr-2">
+                <option value="">Todas las regiones</option>
+                {% for region in regiones %}
+                <option value="{{ region }}" {% if request.GET.region == region %}selected{% endif %}>{{ region }}</option>
+                {% endfor %}
+            </select>
+            <select name="microregion" class="form-control mr-2">
+                <option value="">Todas las microrregiones</option>
+                {% for microregion in microregiones %}
+                <option value="{{ microregion }}" {% if request.GET.microregion == microregion %}selected{% endif %}>{{ microregion }}</option>
+                {% endfor %}
+            </select>
+            <select name="estado" class="form-control mr-2">
+                <option value="">Todos los estados</option>
+                {% for estado in estados %}
+                <option value="{{ estado }}" {% if request.GET.estado == estado %}selected{% endif %}>{{ estado }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-primary">Buscar</button>
+        </form>
+    </div>
+
+    {% if empleados %}
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nombre completo</th>
+                    <th>Edad</th>
+                    <th>Rol</th>
+                    <th>Ubicación asignada</th>
+                    <th>Situación</th>
+                    <th>Tipo de servicio</th>
+                    <th>Nivel</th>
+                    <th>Contexto</th>
+                    <th>Estatus</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for empleado in empleados %}
+                <tr id="empleado_{{ empleado.id }}">
+                    <td>{{ empleado.datos_personales.nombre }}
+                        {{ empleado.datos_personales.apellidopa }}
+                        {{ empleado.datos_personales.apellidoma }}</td>
+                    <td>{{ empleado.datos_personales.edad }}</td>
+                    <td>{{ empleado.usuario.rol }}</td>
+                    <td>
+                        {% if empleado.participacion.ubicacion %}
+                        {{ empleado.participacion.ubicacion.microregion }},
+                        {{ empleado.participacion.ubicacion.region }},
+                        {{ empleado.participacion.ubicacion.comunidad }},
+                        {{ empleado.participacion.ubicacion.cct }}
+                        {% else %}
+                        Aún no asignado
+                        {% endif %}
+                    </td>
+                    <td>{{ empleado.participacion.situacion|default:"No asignada" }}</td>
+                    <td>{{ empleado.participacion.tipo_servicio }}</td>
+                    <td>{{ empleado.escuela.nivel }}</td>
+                    <td>{{ empleado.participacion.contexto }}</td>
+                    <td>{{ empleado.usuario.statuses.status }}</td>
+                    <td>
+                        <a href="{% url 'coordinador_home:detalles_educador' empleado.id %}" class="btn btn-info btn-sm">Detalles</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Paginación -->
+    <div class="d-flex justify-content-center mt-4">
+        <div>
+            <span class="mr-2">Página {{ empleados.number }} de {{ empleados.paginator.num_pages }}</span>
+            <span>
+                {% if empleados.has_previous %}
+                    <a href="?page=1" class="btn btn-secondary btn-sm">Primera</a>
+                    <a href="?page={{ empleados.previous_page_number }}" class="btn btn-secondary btn-sm">Anterior</a>
+                {% endif %}
+                {% if empleados.has_next %}
+                    <a href="?page={{ empleados.next_page_number }}" class="btn btn-secondary btn-sm">Siguiente</a>
+                    <a href="?page={{ empleados.paginator.num_pages }}" class="btn btn-secondary btn-sm">Última</a>
+                {% endif %}
+            </span>
+        </div>
+    </div>
+
+    {% else %}
+    <p class="text-center">No hay figuras educativas registradas o coincidentes con los filtros aplicados.</p>
+    {% endif %}
+</div>
+{% endblock %}

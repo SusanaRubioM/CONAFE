@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Pagos</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Historial de Pagos</h1>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Educador</th>
+                    <th>Fecha</th>
+                    <th>Monto</th>
+                    <th>Categoría</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pago in pagos %}
+                    <tr>
+                        <td>{{ pago.educador.nombre }}</td>
+                        <td>{{ pago.fecha }}</td>
+                        <td>${{ pago.monto }}</td>
+                        <td>{{ pago.get_categoria_display }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center">No hay pagos registrados</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="text-center mt-4">
+            <a href="{% url 'modulo_DECB:home' %}" class="btn btn-secondary">Regresar a Inicio</a>
+        </div>
+    </div>
+</body>
+</html>

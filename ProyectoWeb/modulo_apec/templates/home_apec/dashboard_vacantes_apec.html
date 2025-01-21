@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Listado de servicios educativos vacantes con detalles completos sobre las regiones, roles y contexto.">
+    <meta name="author" content="Tu Nombre">
+    <title>Servicios Educativos Vacantes Observaciones</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        :root {
+            --primary-color: #620b0b;
+            --primary-color-hover: hsla(0, 61%, 24%, 0.89);
+            --secondary-color: #f8faeb;
+            --text-color: #333;
+            --header-bg-color: #f8faeb;
+            --header-text-color: #f8faeb;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--secondary-color);
+        }
+        h1 {
+            color: var(--text-color);
+            font-size: 1.5rem;
+        }
+        .btn-custom {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            padding: 5px 10px;
+        }
+        .btn-custom:hover {
+            background-color: var(--primary-color-hover);
+            color: white;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        .table {
+            table-layout: fixed;
+            width: 100%;
+            font-size: 0.75rem;
+        }
+        th, td {
+            text-align: center;
+            padding: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        td {
+            background-color: var(--secondary-color);
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-3">
+        <div class="header-container">
+            <h1>Servicios Educativos Vacantes</h1>
+            <a href="{% url 'modulo_apec:home_apec' %}" class="btn btn-custom" aria-label="Ir al menú principal">Menú Promoción</a>
+        </div>
+        <div class="table-container">
+            <table class="table table-striped table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th>CvEstado</th>
+                        <th>Estado</th>
+                        <th>Cv Región</th>
+                        <th>Región</th>
+                        <th>CvMicrorregión</th>
+                        <th>Microrregión</th>
+                        <th>CvComunidad</th>
+                        <th>Comunidad</th>
+                        <th>Rol Vacante</th>
+                        <th>Tipo Servicio</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for servicio in servicios %}
+                    <tr>
+                        <td>{{ servicio.clave_estado }}</td>
+                        <td>{{ servicio.nombre_estado }}</td>
+                        <td>{{ servicio.clave_region }}</td>
+                        <td>{{ servicio.nombre_region }}</td>
+                        <td>{{ servicio.clave_microregion }}</td>
+                        <td>{{ servicio.nombre_microregion }}</td>
+                        <td>{{ servicio.clave_comunidad }}</td>
+                        <td>{{ servicio.nombre_comunidad }}</td>
+                        <td>{{ servicio.rol_vacante }}</td>
+                        <td>{{ servicio.rol_vacante  }}</td>
+                        <td>
+                            <form method="POST" action="{% url 'modulo_apec:observaciones' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="servicio_id" value="{{ servicio.id }}">
+                                <button type="submit" class="btn btn-custom">Asignar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

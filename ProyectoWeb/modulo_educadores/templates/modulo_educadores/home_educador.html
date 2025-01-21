@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Educador</title>
+</head>
+<body>
+    <h1>Bienvenido, {{ request.user.username }}</h1>
+    <p>Esta es tu página de inicio.</p>
+    <div>
+        <a href="{% url 'modulo_educadores:calendario_educador' %}" class="btn btn-primary">Ver Calendario</a>
+    </div>
+</body>
+</html>
