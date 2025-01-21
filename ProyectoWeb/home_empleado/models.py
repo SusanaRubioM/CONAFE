@@ -168,6 +168,7 @@ class ModuloCoordinadorStatusHistory(models.Model):
 class ActCAP(models.Model):
     id_usuario = models.ForeignKey('modulo_dot.Usuario', on_delete=models.CASCADE, db_column='id_usuario', null=True, blank=True)
     num_capacitacion = models.IntegerField(db_column='num_capacitacion', null=True, blank=True)
+    nombre_region = models.CharField(max_length=200, default='Tabasco')
     tema = models.CharField(max_length=200, db_column='tema', null=True, blank=True)
     id_region = models.ForeignKey('modulo_apec.Region', on_delete=models.CASCADE, db_column='id_region', null=True, blank=True)
     id_microregion = models.ForeignKey('modulo_apec.Microrregion', on_delete=models.CASCADE, db_column='id_microregion', null=True, blank=True)

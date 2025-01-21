@@ -26,8 +26,9 @@ class CapacitacionInicialForm(forms.ModelForm):
         self.fields['usuario_responsable'].label = 'Educador Comunitario de Acompañamiento Regional'
         self.fields['usuario_eca'].label = 'Educador Comunitario Acompañante'
         self.fields['usuario_ec'].label = 'Educador Comunitario'
+        self.fields['fecha'].label = 'Fecha de inicio'
         self.fields['ciclo_asignado'].label = 'Ciclo Escolar Asignado'
-        self.fields['horas_cubiertas'].label = 'Horas de Capacitación Cubiertas'
+        self.fields['horas_cubiertas'].label = 'Horas por Cubrir'
 
     def clean_fecha(self):
         fecha = self.cleaned_data.get('fecha')

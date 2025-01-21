@@ -2,11 +2,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Usuario, DatosPersonales
-from .serializers import UsuarioSerializer, DatosPersonalesSerializer, ReporteFiguraEducativaSerializer, CalificacionSerializer, ActCAPSerializer, PaymentScheduleSerializer, ComunidadSerializer
+from .serializers import UsuarioSerializer, DatosPersonalesSerializer, ReporteFiguraEducativaSerializer, CalificacionSerializer, ActCAPSerializer, PaymentScheduleSerializer, ComunidadSerializer, AlumnosSerialize
 from modulo_apec.models import Comunidad
 from modulo_DECB.models import PaymentSchedule
 from modulo_dpe.models import Calificacion
 from home_empleado.models import ReporteFiguraEducativa, ActCAP
+from modulo_dpe.models import ReportesAcomp, Alumno
+from .serializers import ReporteAcompSerializer
 class UsuarioAPI(APIView):
     def get(self, request, pk=None):
         if pk:
@@ -265,3 +267,82 @@ class ComunidadAPI(APIView):
         comunidad.delete()
         return Response({'message': 'Comunidad eliminada correctamente'}, status=status.HTTP_200_OK)
 
+class ReporteAcompAPI(APIView):
+    def get(self, request, pk=None):
+        if pk:
+            reporte_acomp = ReportesAcomp.objects.filter(pk=pk).first()
+            if not reporte_acomp:
+                return Response({'error': 'Reporte no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+            serializer = ReporteAcompSerializer(reporte_acomp)
+        else:
+            reportes_acomp = ReportesAcomp.objects.all()
+            serializer = ReporteAcompSerializer(reportes_acomp, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        serializer = ReporteAcompSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, pk):
+        reporte_acomp = ReportesAcomp.objects.filter(pk=pk).first()
+        if not reporte_acomp:
+            return Response({'error': 'Reporte no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = ReporteAcompSerializer(reporte_acomp, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        reporte_acomp = ReportesAcomp.objects.filter(pk=pk).first()
+        if not reporte_acomp:
+            return Response({'error': 'Reporte no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+        reporte_acomp.delete()
+        return Response({'message': 'Reporte eliminado correctamente'}, status=status.HTTP_200_OK)
+    
+
+
+class AlumnoAPI(APIView):
+    
+    # GET: Obtiene todos los alumnos o uno específico por pk
+    def get(self, request, pk=None):
+        if pk:
+            alumno = Alumno.objects.filter(pk=pk).first()
+            if not alumno:
+                return Response({'error': 'Alumno no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+            serializer = AlumnosSerialize(alumno)
+        else:
+            alumnos = Alumno.objects.all()
+            serializer = AlumnosSerialize(alumnos, many=True)
+        
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    # POST: Crea un nuevo alumno
+    def post(self, request):
+        serializer = AlumnosSerialize(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # PUT: Actualiza los datos de un alumno existente
+    def put(self, request, pk):
+        alumno = Alumno.objects.filter(pk=pk).first()
+        if not alumno:
+            return Response({'error': 'Alumno no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = AlumnosSerialize(alumno, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # DELETE: Elimina un alumno por su pk
+    def delete(self, request, pk):
+        alumno = Alumno.objects.filter(pk=pk).first()
+        if not alumno:
+            return Response({'error': 'Alumno no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+        alumno.delete()
+        return Response({'message': 'Alumno eliminado correctamente'}, status=status.HTTP_200_OK)

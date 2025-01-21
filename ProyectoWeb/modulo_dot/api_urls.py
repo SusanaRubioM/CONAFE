@@ -1,5 +1,5 @@
 from django.urls import path
-from .api_views import UsuarioAPI, DatosPersonalesAPI, ReporteFiguraEducativaAPI, CalificacionAPI, ActCAPAPI, PaymentScheduleAPI, ComunidadAPI
+from .api_views import UsuarioAPI, DatosPersonalesAPI, ReporteFiguraEducativaAPI, CalificacionAPI, ActCAPAPI, PaymentScheduleAPI, ComunidadAPI, ReporteAcompAPI, AlumnoAPI
 
 urlpatterns = [
     path('usuario/', UsuarioAPI.as_view(), name='usuario_list'),
@@ -16,4 +16,9 @@ urlpatterns = [
     path('payments/<int:pk>/', PaymentScheduleAPI.as_view(), name='payments_detail'),
     path('comunidades/', ComunidadAPI.as_view(), name='comunidad_list'),
     path('comunidades/<int:pk>/', ComunidadAPI.as_view(), name='comunidad_detail'),
+    path('reportes-acomp/', ReporteAcompAPI.as_view(), name='reportes_acomp_list'),
+    path('reportes-acomp/<int:pk>/', ReporteAcompAPI.as_view(), name='reportes_acomp_detail'),
+       path('alumnos/', AlumnoAPI.as_view(), name='alumno-list'),  # Para obtener todos los alumnos o crear uno
+    path('alumnos/<int:pk>/', AlumnoAPI.as_view(), name='alumno-detail')  # Para obtener, actualizar o eliminar un alumno específico
 ]
+

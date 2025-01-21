@@ -4,35 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confirmación</title>
-    
     <!-- Agregar Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container mt-5">
-        {% if messages %}
-            <div class="alert alert-dismissible" role="alert">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
+        <h1 class="text-center">¡Registro Exitoso!</h1>
+
+        {% if aspirante %}
+            <p class="text-center">
+                El aspirante ha sido registrado correctamente. <br>
+                Su folio es: <strong>{{ aspirante.folio }}</strong>.
+            </p>
+        {% else %}
+            <p class="text-center">
+                Ha ocurrido un error al generar el folio. Por favor, inténtelo nuevamente.
+            </p>
         {% endif %}
 
-        <h1 class="text-center">¡Aspirante Registrado Exitosamente!</h1>
-        <p class="text-center">Los datos del aspirante han sido registrados correctamente en el sistema.</p>
-
-        <!-- Opcional: Botón de redirección para volver al formulario o a alguna otra sección -->
+        <!-- Botón para volver al formulario -->
         <div class="text-center">
             <a href="{% url 'formulario_aspirante' %}" class="btn btn-primary" style="background-color: #620b0b">Volver al Formulario</a>
         </div>
     </div>
 
-    <!-- Agregar Bootstrap JS (al final del body) -->
+    <!-- Agregar Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

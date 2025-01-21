@@ -37,8 +37,6 @@
                             <th>Monto</th>
                             <th>Estado</th>
                             <th>Asignado a</th>
-                            <th>Asignado por</th>
-                            <th>Sin acciones por el momento</th> <!-- Nueva columna -->
                         </tr>
                     </thead>
                     <tbody>
@@ -63,8 +61,6 @@
                                 {% endif %}
                             </td>
                             <td>{{ pago.assigned_to.get_full_name|default:pago.assigned_to.username }}</td>
-                            <td>{{ pago.assigned_by.get_full_name|default:pago.assigned_by.username }}</td>
-                            <td class="text-center">Sin acciones por el momento</td> <!-- Nueva columna con texto estático -->
                         </tr>
 
                         {% empty %}

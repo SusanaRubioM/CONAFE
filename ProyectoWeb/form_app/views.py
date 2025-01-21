@@ -1,9 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .forms import RegistroAspiranteForm
 from .models import Residencia, Participacion, Gestion, Banco, Aspirante, Usuario
 from modulo_dot.models import DatosPersonales, DocumentosPersonales
 from django.db import transaction
 from login_app.models import UsuarioRol
+from .models import Aspirante
 def form_view(request):
     if request.method == "POST":
         form = RegistroAspiranteForm(request.POST, request.FILES)
@@ -99,11 +100,14 @@ def form_view(request):
                     )
 
                 # Redirigir a una página de éxito o confirmación
-                return render(request, "app_form/confirmacion.html")
+                return redirect('confirmacion', aspirante_id=aspirante.id)
     else:
         form = RegistroAspiranteForm()
 
     return render(request, 'app_form/template_form.html', {'form': form})
 
-def confirmacion(request):
-    return render(request, 'app_form/confirmacion.html')
+def confirmacion(request, aspirante_id):
+    # Recuperar el aspirante por su ID
+    aspirante = get_object_or_404(Aspirante, id=aspirante_id)
+    
+    return render(request, 'app_form/confirmacion.html', {'aspirante': aspirante})

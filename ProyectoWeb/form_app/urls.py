@@ -6,5 +6,5 @@ from . import views
 urlpatterns = [
     path('', views.form_view, name='formulario_aspirante'),  # Ruta principal del formulario
     path('registrar/', views.form_view, name='registrar_aspirante'),  # Registro del aspirante
-    path('confirmacion/', views.confirmacion, name='confirmacion'),  # Página de confirmación
+    path('confirmacion/<int:aspirante_id>/', views.confirmacion, name='confirmacion'),
 ]
